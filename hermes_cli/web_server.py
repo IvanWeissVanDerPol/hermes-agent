@@ -15036,18 +15036,7 @@ def _ws_host_origin_is_allowed(ws: "WebSocket") -> bool:
     repeated here before accepting the upgrade.  Browsers also send an Origin
     header on WebSocket handshakes; when present, require it to target the
     same bound dashboard host.
-
-    When the dashboard is bound to loopback, the Host header check is skipped:
-    cloudflared (or any reverse proxy) connects from 127.0.0.1 so the peer-IP
-    check in :func:`_ws_client_is_allowed` is the real access boundary, and
-    the Host header may be the public hostname rather than 127.0.0.1.
     """
-    bound_host = getattr(app.state, "bound_host", None) or ""
-    if bound_host in _LOOPBACK_HOST_VALUES:
-        # Loopback-bound dashboard: peer-IP is the real access gate.  Skip
-        # the Host-header check so cloudflared/proxy WS upgrades are not
-        # rejected due to a public hostname in the Host header.
-        return True
     return _ws_host_origin_reason(ws) is None
 
 
@@ -16083,9 +16072,9 @@ async def pty_ws(ws: WebSocket) -> None:
 
     # Loopback-bound dashboards are commonly fronted by cloudflared. The
     # proxy's public Host/Origin pair is expected there; the peer-IP gate and
-    # credential check remain the access boundaries. For direct loopback
-    # clients, the legacy Host/Origin guard is still enforced by the HTTP
-    # middleware and by the JSON-RPC WebSocket path.
+    # credential check remain the access boundaries. Keep this exception local
+    # to the PTY route; the JSON-RPC and event WebSockets retain the strict
+    # DNS-rebinding guard used by the existing test suite.
     if (getattr(app.state, "bound_host", "") or "").strip().lower() not in _LOOPBACK_HOSTS:
         host_origin_reason = _ws_host_origin_reason(ws)
         if host_origin_reason is not None:
