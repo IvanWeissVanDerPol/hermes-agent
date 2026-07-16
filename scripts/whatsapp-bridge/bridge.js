@@ -1067,6 +1067,23 @@ app.get('/chat/:id', async (req, res) => {
   });
 });
 
+// List groups (discovery)
+app.get('/groups', async (req, res) => {
+  if (!sock || connectionState !== 'connected') return res.status(503).json({ error: 'Not connected' });
+  try {
+    const groups = await sock.groupFetchAllParticipating();
+    const out = {};
+    for (const [jid, meta] of Object.entries(groups)) {
+      out[jid] = {
+        subject: meta.subject,
+        size: meta.participants.length,
+        participants: meta.participants.map(p => ({ id: p.id, admin: p.admin || null })),
+      };
+    }
+    res.json(out);
+  } catch (err) { res.status(500).json({ error: String(err) }); }
+});
+
 // Health check
 app.get('/health', (req, res) => {
   res.json({
