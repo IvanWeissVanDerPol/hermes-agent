@@ -1074,10 +1074,17 @@ app.get('/groups', async (req, res) => {
     const groups = await sock.groupFetchAllParticipating();
     const out = {};
     for (const [jid, meta] of Object.entries(groups)) {
+      // Discovery payload: expose group-level metadata + admin-count.
+      // Do NOT return raw participant `id`s — this endpoint is unauthenticated
+      // by design (chat dict-lookup), so leaking every member's phone
+      // number/handle is unsafe. Callers that need full membership can
+      // scope their own access (e.g. credentialed client + ops review).
+      let adminCount = 0;
+      for (const p of meta.participants) if (p?.admin) adminCount += 1;
       out[jid] = {
         subject: meta.subject,
         size: meta.participants.length,
-        participants: meta.participants.map(p => ({ id: p.id, admin: p.admin || null })),
+        admins: adminCount,
       };
     }
     res.json(out);

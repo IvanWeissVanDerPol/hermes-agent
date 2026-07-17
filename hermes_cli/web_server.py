@@ -16070,12 +16070,16 @@ async def pty_ws(ws: WebSocket) -> None:
         await ws.close(code=4401, reason=_ws_close_reason(f"auth: {auth_reason}"))
         return
 
-    # Loopback-bound dashboards are commonly fronted by cloudflared. The
-    # proxy's public Host/Origin pair is expected there; the peer-IP gate and
-    # credential check remain the access boundaries. Keep this exception local
-    # to the PTY route; the JSON-RPC and event WebSockets retain the strict
-    # DNS-rebinding guard used by the existing test suite.
-    if (getattr(app.state, "bound_host", "") or "").strip().lower() not in _LOOPBACK_HOSTS:
+    # When the dashboard is bound to loopback (e.g. behind a cloudflared
+    # tunnel), the proxy's public Host/Origin pair is expected. The peer-IP
+    # gate and credential check above remain the access boundaries. Bind
+    # this exception locally to the PTY route; the JSON-RPC and event
+    # WebSockets keep the strict DNS-rebinding guard used by the existing
+    # test suite.
+    if (getattr(app.state, "bound_host", "") or "").strip().lower() in _LOOPBACK_HOSTS:
+        # Loopback: skip the host/origin check below.
+        pass
+    else:
         host_origin_reason = _ws_host_origin_reason(ws)
         if host_origin_reason is not None:
             _log.warning("pty refused: %s peer=%s", host_origin_reason, peer)
