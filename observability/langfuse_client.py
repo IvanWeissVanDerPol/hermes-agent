@@ -44,7 +44,7 @@ class LangfuseTrace:
 
         try:
             self.conn = psycopg2.connect(
-                host=os.environ.get("LANGFUSE_DB_HOST", "localhost"),
+                host=os.environ.get("LANGFUSE_DB_HOST", "172.19.0.2"),
                 port=int(os.environ.get("LANGFUSE_DB_PORT", "5432")),
                 dbname=os.environ.get("LANGFUSE_DB_NAME", "langfuse"),
                 user=os.environ.get("LANGFUSE_DB_USER", "langfuse"),
@@ -68,7 +68,7 @@ class LangfuseTrace:
         if not self.local_mode:
             cur = self.conn.cursor()
             cur.execute(
-                """INSERT INTO "Trace" (id, "projectId", name, "userId", metadata, "createdAt")
+                """INSERT INTO traces (id, project_id, name, user_id, metadata, created_at)
                    VALUES (%s, %s, %s, %s, %s::jsonb, %s)""",
                 (self.trace_id, self.project_id, self.name, self.user,
                  json.dumps(self.metadata), datetime.now(timezone.utc))
@@ -111,8 +111,8 @@ class LangfuseTrace:
             try:
                 cur = self.conn.cursor()
                 cur.execute(
-                    """INSERT INTO "Observation" (id, "traceId", "projectId", type, name, metadata, "createdAt")
-                       VALUES (%s, %s, %s, %s, %s, %s::jsonb, %s)""",
+                    """INSERT INTO observations (id, trace_id, project_id, type, name, metadata, created_at)
+                       VALUES (%s, %s, %s, %s::"ObservationType", %s, %s::jsonb, %s)""",
                     (obs["id"], self.trace_id, self.project_id, "SPAN", name,
                      json.dumps(kwargs), datetime.now(timezone.utc))
                 )
