@@ -2,3 +2,5 @@
 {"ts": "2026-08-05T19:23:05.497084+00:00", "category": "skill-loop", "name": "cycle", "status": "ok", "duration_ms": null, "payload": {"phases": ["validate", "dedup", "improve", "publish"]}}
 {"ts": "2026-08-06T07:33:49.363285+00:00", "category": "test", "name": "fn", "status": "ok", "duration_ms": 0, "payload": {"args": "()", "kwargs": "{}"}}
 {"ts": "2026-08-06T07:33:49.364268+00:00", "category": "test", "name": "fn", "status": "ok", "duration_ms": 0, "payload": {"args": "()", "kwargs": "{}"}}
+{"ts": "2026-08-06T08:00:23.461436+00:00", "category": "cost_forecast", "name": "main", "status": "ok", "duration_ms": 316, "payload": {"args": "()", "kwargs": "{}"}}
+{"ts": "2026-08-06T08:00:32.406835+00:00", "category": "telegram-bot", "name": "main", "status": "ok", "duration_ms": 1753, "payload": {"args": "()", "kwargs": "{}"}}
