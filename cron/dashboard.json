@@ -1,0 +1,42 @@
+{
+  "ts": "2026-08-06T07:58:33.959184+00:00",
+  "total": 84,
+  "healthy_count": 72,
+  "failing_count": 6,
+  "disabled_count": 2,
+  "never_run_count": 4,
+  "failing": [
+    {
+      "name": "kanban-doctor-weekly",
+      "last_run": "2026-08-03T09:00:26.143456-03:00",
+      "last_error": "[R46] Fixed at 555e30 - awaiting next cron tick"
+    },
+    {
+      "name": "skill-quality-audit",
+      "last_run": "2026-08-03T07:00:13.312651-03:00",
+      "last_error": "[R46] Fixed at 15f8b6 - awaiting next cron tick"
+    },
+    {
+      "name": "weekly-skill-loop-back",
+      "last_run": "2026-08-03T07:00:10.756620-03:00",
+      "last_error": "[R46] Fixed at b92fc4 - awaiting next cron tick"
+    },
+    {
+      "name": "weekly-auto-remediate",
+      "last_run": "2026-08-03T08:00:22.072112-03:00",
+      "last_error": "[R46] Fixed at 978698 - awaiting next cron tick"
+    },
+    {
+      "name": "weekly-cron-orchestrator",
+      "last_run": "2026-08-02T21:04:34.719150-03:00",
+      "last_error": "[R46] Fixed at 03d2d3 - awaiting next cron tick"
+    },
+    {
+      "name": "cost-alert-daily",
+      "last_run": "2026-08-05T09:05:34.912457-03:00",
+      "last_error": "[R46] Fixed at 783f65 - awaiting next cron tick"
+    }
+  ],
+  "healthy_pct": 85.7,
+  "ok": false
+}

@@ -1,0 +1,26 @@
+{
+  "__main__/demo-tool": {
+    "avg_ms": 10,
+    "calls": 2,
+    "errors": 0,
+    "max_ms": 11,
+    "min_ms": 10,
+    "total_ms": 21
+  },
+  "__main__/test-function": {
+    "avg_ms": 100,
+    "calls": 2,
+    "errors": 0,
+    "max_ms": 100,
+    "min_ms": 100,
+    "total_ms": 200
+  },
+  "demo/test-block": {
+    "avg_ms": 50,
+    "calls": 1,
+    "errors": 0,
+    "max_ms": 50,
+    "min_ms": 50,
+    "total_ms": 50
+  }
+}

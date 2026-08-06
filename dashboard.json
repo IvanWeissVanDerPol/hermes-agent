@@ -1,0 +1,109 @@
+{
+  "ts": "2026-08-06T07:38:11.674537+00:00",
+  "cron": {
+    "ts": "2026-08-05T19:23:05.556331+00:00",
+    "total": 83,
+    "healthy_count": 72,
+    "failing_count": 6,
+    "disabled_count": 2,
+    "never_run_count": 3,
+    "failing": [
+      {
+        "name": "kanban-doctor-weekly",
+        "last_run": "2026-08-03T09:00:26.143456-03:00",
+        "last_error": "Script exited with code 1\nstderr:\n\u26a0 nexa-tasks: 5 active tasks without assignee\n  \u26a0 prompt-quality: 28 active tasks without assignee\nstdout:\n==========================================================="
+      },
+      {
+        "name": "skill-quality-audit",
+        "last_run": "2026-08-03T07:00:13.312651-03:00",
+        "last_error": "Script exited with code 2\nstdout:\n# Skill Quality Audit \u2014 New Findings\n\n**Timestamp:** 2026-08-03T10:00:13.261702+00:00\n**Scope:** /root/.hermes/skills (768 skills scored)\n**Threshold:** < 70/100\n**Bo"
+      },
+      {
+        "name": "weekly-skill-loop-back",
+        "last_run": "2026-08-03T07:00:10.756620-03:00",
+        "last_error": "Script not found: /root/.hermes/scripts/run_cycle.py --all --phases validate"
+      },
+      {
+        "name": "weekly-auto-remediate",
+        "last_run": "2026-08-03T08:00:22.072112-03:00",
+        "last_error": "Script not found: /root/.hermes/scripts/auto_remediate.py --all --safe-only"
+      },
+      {
+        "name": "weekly-cron-orchestrator",
+        "last_run": "2026-08-02T21:04:34.719150-03:00",
+        "last_error": "Script exited with code 1\nstdout:\n=== Cron Orchestrator ===\n  Duration: 241.6s\n  Steps: 5 (1 failed)\n    \u2713 repo_tick: ok (197.7s)\n    \u2717 auto_remediate_safe: failed (0.1s)\n    \u2713 skill_usage_tracker: ok"
+      },
+      {
+        "name": "cost-alert-daily",
+        "last_run": "2026-08-05T09:05:34.912457-03:00",
+        "last_error": "Script exited with code 3\nstderr:\nerror sending telegram: HTTP Error 400: Bad Request\nstdout:\n=== Cost Alert ===\n  Level: CRITICAL\n  Sending to Telegram chat_id=5664287858...\n  \u2717 Telegram send failed"
+      }
+    ],
+    "healthy_pct": 86.7,
+    "ok": false
+  },
+  "observability": {
+    "ts": "2026-08-05T19:21:49.240408+00:00",
+    "uptime_seconds": 0,
+    "llm": {
+      "test-model": {
+        "calls": 1,
+        "tokens": 0,
+        "errors": 1,
+        "total_latency_ms": 949
+      },
+      "m": {
+        "calls": 1,
+        "tokens": 0,
+        "errors": 1,
+        "total_latency_ms": 631
+      },
+      "stub": {
+        "calls": 1,
+        "tokens": 0,
+        "errors": 0,
+        "total_latency_ms": 0
+      }
+    },
+    "perf": {
+      "__main__/demo-tool": {
+        "avg_ms": 10,
+        "calls": 2,
+        "errors": 0,
+        "max_ms": 11,
+        "min_ms": 10,
+        "total_ms": 21
+      },
+      "__main__/test-function": {
+        "avg_ms": 100,
+        "calls": 2,
+        "errors": 0,
+        "max_ms": 100,
+        "min_ms": 100,
+        "total_ms": 200
+      },
+      "demo/test-block": {
+        "avg_ms": 50,
+        "calls": 1,
+        "errors": 0,
+        "max_ms": 50,
+        "min_ms": 50,
+        "total_ms": 50
+      }
+    },
+    "events": 0,
+    "traces": 3
+  },
+  "langfuse": {
+    "url": "http://127.0.0.1:3200",
+    "ok": true,
+    "version": "2.95.11"
+  },
+  "hostinger": {
+    "configured": true
+  },
+  "paragu_ai": {
+    "total": 19,
+    "up": 19
+  }
+}

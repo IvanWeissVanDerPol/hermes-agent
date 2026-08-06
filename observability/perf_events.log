@@ -1,0 +1,5 @@
+{"ts": "2026-08-05T19:21:39.389682+00:00", "name": "test-block", "category": "demo", "duration_ms": 50, "status": "ok", "error": null}
+{"ts": "2026-08-05T19:21:39.490571+00:00", "name": "test-function", "category": "__main__", "duration_ms": 100, "status": "ok", "error": null}
+{"ts": "2026-08-05T19:21:39.592045+00:00", "name": "test-function", "category": "__main__", "duration_ms": 100, "status": "ok", "error": null}
+{"ts": "2026-08-05T19:21:49.225354+00:00", "name": "demo-tool", "category": "__main__", "duration_ms": 10, "status": "ok", "error": null}
+{"ts": "2026-08-05T19:21:49.238782+00:00", "name": "demo-tool", "category": "__main__", "duration_ms": 11, "status": "ok", "error": null}

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Hermes Agent Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, system-ui, sans-serif;
+      background: #0a0a0f;
+      color: #e0e0e0;
+      padding: 24px;
+    }
+    h1 { margin: 0 0 24px 0; font-weight: 300; font-size: 28px; color: #fff; }
+    h2 { margin: 24px 0 12px 0; font-weight: 500; font-size: 18px; color: #ccc; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
+    .card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+      padding: 20px;
+    }
+    .stat { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .stat:last-child { border-bottom: none; }
+    .label { color: #888; font-size: 13px; }
+    .value { color: #fff; font-weight: 500; }
+    .ok { color: #10b981; }
+    .fail { color: #ef4444; }
+    .warn { color: #f59e0b; }
+    .big { font-size: 36px; font-weight: 200; }
+    .sub { color: #888; font-size: 13px; }
+    a { color: #60a5fa; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .footer { margin-top: 40px; color: #555; font-size: 12px; }
+    .tag {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      background: rgba(255,255,255,0.08);
+      margin-right: 4px;
+    }
+    .tag.ok { background: rgba(16,185,129,0.15); color: #10b981; }
+    .tag.fail { background: rgba(239,68,68,0.15); color: #ef4444; }
+  </style>
+</head>
+<body>
+  <h1>H<span style="opacity:0.6">ermes</span> <span style="opacity:0.5">Agent Dashboard</span></h1>
+  <div class="sub">Last updated: 2026-08-06T07:38:11.674537+00:00</div>
+  
+  <div class="grid">
+    <div class="card">
+      <h2>Cron Health</h2>
+      <div class="big">72/83</div>
+      <div class="sub">86.7% healthy</div>
+      <div style="margin-top: 16px">
+        <div class="stat"><span class="label">Failing</span><span class="value fail">6</span></div>
+        <div class="stat"><span class="label">Disabled</span><span class="value">2</span></div>
+        <div class="stat"><span class="label">Never run</span><span class="value warn">3</span></div>
+      </div>
+    </div>
+    
+    <div class="card">
+      <h2>ParaguAI Lead Sites</h2>
+      <div class="big">19/19</div>
+      <div class="sub">sites live</div>
+      <div style="margin-top: 16px">
+        <a href="https://paragu-ai.com/precios" class="tag ok">precios</a>
+        <a href="https://paragu-ai.com/onboarding" class="tag ok">onboarding</a>
+        <a href="https://paragu-ai.com/dashboard" class="tag ok">dashboard</a>
+        <a href="https://leads.paragu-ai.com/api/status" class="tag ok">api status</a>
+      </div>
+    </div>
+    
+    <div class="card">
+      <h2>Observability</h2>
+      <div style="margin-top:8px">
+        <div class="stat"><span class="label">LLM models tracked</span><span class="value">3</span></div>
+        <div class="stat"><span class="label">Perf stats keys</span><span class="value">3</span></div>
+        <div class="stat"><span class="label">Traces logged</span><span class="value">3</span></div>
+        <div class="stat"><span class="label">Custom events</span><span class="value">0</span></div>
+      </div>
+    </div>
+    
+    <div class="card">
+      <h2>Langfuse</h2>
+      <div class="big ok">ONLINE</div>
+      <div class="sub">v2.95.11</div>
+      <div style="margin-top: 16px">
+        <a href="http://127.0.0.1:3200" class="tag ok">UI: 3200</a>
+        <a href="http://127.0.0.1:3200/api/public/health" class="tag">health</a>
+      </div>
+    </div>
+    
+    <div class="card">
+      <h2>Hostinger MCP</h2>
+      <div class="big ok">ACTIVE</div>
+      <div class="sub">VPS + DNS + billing access</div>
+      <div style="margin-top: 16px; font-size: 13px">
+        Tools available:<br>
+        <span class="tag">domains_get_list</span>
+        <span class="tag">vps_list</span>
+        <span class="tag">billing_get_subscriptions</span>
+      </div>
+    </div>
+    
+    <div class="card">
+      <h2>Failing Crons</h2>
+      <div style="font-size: 12px; max-height: 240px; overflow-y: auto">
+        <div class="stat"><span class="label">kanban-doctor-weekly</span><span class="value fail">Script exited with code 1 stderr: ⚠ nexa-tasks: 5 active tasks without assignee   ⚠ prompt-quality: </span></div>
+        <div class="stat"><span class="label">skill-quality-audit</span><span class="value fail">Script exited with code 2 stdout: # Skill Quality Audit — New Findings  **Timestamp:** 2026-08-03T10</span></div>
+        <div class="stat"><span class="label">weekly-skill-loop-back</span><span class="value fail">Script not found: /root/.hermes/scripts/run_cycle.py --all --phases validate</span></div>
+        <div class="stat"><span class="label">weekly-auto-remediate</span><span class="value fail">Script not found: /root/.hermes/scripts/auto_remediate.py --all --safe-only</span></div>
+        <div class="stat"><span class="label">weekly-cron-orchestrator</span><span class="value fail">Script exited with code 1 stdout: === Cron Orchestrator ===   Duration: 241.6s   Steps: 5 (1 failed)</span></div>
+        <div class="stat"><span class="label">cost-alert-daily</span><span class="value fail">Script exited with code 3 stderr: error sending telegram: HTTP Error 400: Bad Request stdout: === Co</span></div>
+      </div>
+    </div>
+    
+    <div class="card">
+      <h2>Recent Activity</h2>
+      <div style="font-size: 13px">
+        <div class="stat"><span class="label">Stripe</span><span class="value ok">3 products</span></div>
+        <div class="stat"><span class="label">GA4</span><span class="value ok">19/19 sites</span></div>
+        <div class="stat"><span class="label">Leads API</span><span class="value ok">30+ endpoints</span></div>
+        <div class="stat"><span class="label">Multi-tenant</span><span class="value ok">live</span></div>
+        <div class="stat"><span class="label">A/B testing</span><span class="value ok">live</span></div>
+      </div>
+    </div>
+    
+    <div class="card">
+      <h2>Subscriptions (Hostinger)</h2>
+      <div style="font-size: 13px; max-height: 240px; overflow-y: auto">
+        <div class="stat"><span class="label">.COM Domain</span><span class="value">3 yr $60</span></div>
+        <div class="stat"><span class="label">Business Email</span><span class="value">1 yr $19</span></div>
+        <div class="stat"><span class="label">KVM 8 VPS</span><span class="value">72.61.44.159</span></div>
+        <div class="stat"><span class="label">Sunstein Cloud</span><span class="value">free</span></div>
+        <div class="stat"><span class="label">Ometz Dental</span><span class="value">active</span></div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="footer">
+    <div class="sub">Phase 4.1: Hermes dashboard (R46)</div>
+    <div class="sub">Datasets: <a href="/root/.hermes/dashboard.json">dashboard.json</a> · <a href="/root/.hermes/cron/dashboard.json">cron</a> · <a href="/root/.hermes/observability/dashboard.json">observability</a></div>
+  </div>
+</body>
+</html>

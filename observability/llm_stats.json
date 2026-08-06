@@ -1,0 +1,14 @@
+{
+  "deepseek-chat": {
+    "calls": 3,
+    "tokens": 5300,
+    "errors": 0,
+    "total_latency_ms": 4500
+  },
+  "gpt-oss-120b": {
+    "calls": 2,
+    "tokens": 7300,
+    "errors": 0,
+    "total_latency_ms": 8000
+  }
+}

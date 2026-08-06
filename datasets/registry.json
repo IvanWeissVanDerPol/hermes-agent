@@ -1,0 +1,11 @@
+{
+  "datasets": {
+    "paragu-ai-onboarding": {
+      "description": "Sample Q&A",
+      "created_at": "2026-08-06T07:37:03.869466+00:00",
+      "size": 3,
+      "file": "/root/.hermes/datasets/paragu-ai-onboarding.jsonl",
+      "updated_at": "2026-08-06T07:37:03.869834+00:00"
+    }
+  }
+}

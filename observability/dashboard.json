@@ -1,0 +1,52 @@
+{
+  "ts": "2026-08-05T19:21:49.240408+00:00",
+  "uptime_seconds": 0,
+  "llm": {
+    "test-model": {
+      "calls": 1,
+      "tokens": 0,
+      "errors": 1,
+      "total_latency_ms": 949
+    },
+    "m": {
+      "calls": 1,
+      "tokens": 0,
+      "errors": 1,
+      "total_latency_ms": 631
+    },
+    "stub": {
+      "calls": 1,
+      "tokens": 0,
+      "errors": 0,
+      "total_latency_ms": 0
+    }
+  },
+  "perf": {
+    "__main__/demo-tool": {
+      "avg_ms": 10,
+      "calls": 2,
+      "errors": 0,
+      "max_ms": 11,
+      "min_ms": 10,
+      "total_ms": 21
+    },
+    "__main__/test-function": {
+      "avg_ms": 100,
+      "calls": 2,
+      "errors": 0,
+      "max_ms": 100,
+      "min_ms": 100,
+      "total_ms": 200
+    },
+    "demo/test-block": {
+      "avg_ms": 50,
+      "calls": 1,
+      "errors": 0,
+      "max_ms": 50,
+      "min_ms": 50,
+      "total_ms": 50
+    }
+  },
+  "events": 0,
+  "traces": 3
+}
