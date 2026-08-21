@@ -6,7 +6,7 @@ before handing downloaded bytes to the cache primitives in
 ``cache_audio_from_bytes``, ``cache_document_from_bytes``).  Those maps
 *disagree* with each other on purpose — e.g. BlueBubbles coerces
 ``image/heic`` to ``.jpg`` because downstream vision tools can't read HEIC,
-while WhatsApp Cloud pins ``audio/ogg`` to ``.ogg`` (not the RFC-correct
+while Messaging Cloud pins ``audio/ogg`` to ``.ogg`` (not the RFC-correct
 ``.oga`` Python's ``mimetypes`` returns) because the STT pipeline whitelists
 extensions.
 
@@ -50,19 +50,19 @@ from typing import Mapping, Optional
 # RFC-correct one (``audio/ogg`` → ``.ogg``, not ``.oga``) because the
 # downstream STT/vision pipelines whitelist real-world extensions.
 DEFAULT_MIME_TO_EXT: dict[str, str] = {
-    # --- images (bluebubbles + whatsapp_cloud agree; matches mimetypes) ---
+    # --- images (bluebubbles + messaging_cloud agree; matches mimetypes) ---
     "image/jpeg": ".jpg",
     "image/png": ".png",
     "image/gif": ".gif",
     "image/webp": ".webp",
     # --- audio ---
-    "audio/ogg": ".ogg",          # bluebubbles + whatsapp_cloud agree
-    "audio/x-opus+ogg": ".ogg",   # whatsapp voice notes (opus-in-ogg)
-    "audio/opus": ".ogg",         # whatsapp voice notes (opus-in-ogg)
+    "audio/ogg": ".ogg",          # bluebubbles + messaging_cloud agree
+    "audio/x-opus+ogg": ".ogg",   # messaging voice notes (opus-in-ogg)
+    "audio/opus": ".ogg",         # messaging voice notes (opus-in-ogg)
     "audio/mpeg": ".mp3",
     "audio/mp3": ".mp3",          # non-standard but seen in the wild
     "audio/wav": ".wav",
-    "audio/mp4": ".m4a",          # bluebubbles + whatsapp_cloud agree
+    "audio/mp4": ".m4a",          # bluebubbles + messaging_cloud agree
     "audio/x-m4a": ".m4a",
     "audio/aac": ".aac",
     # --- video / documents (from signal's inverse table) ---

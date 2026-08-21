@@ -1,12 +1,12 @@
 ---
 sidebar_position: 1
 title: "Messaging Gateway"
-description: "Chat with Hermes from Telegram, Discord, Slack, WhatsApp, Signal, SMS, Email, Home Assistant, Mattermost, Matrix, DingTalk, Yuanbao, Microsoft Teams, LINE, Raft, Webhooks, or any OpenAI-compatible frontend via the API server — architecture and setup overview"
+description: "Chat with Hermes from Telegram, Discord, Slack, Messaging, Signal, SMS, Email, Home Assistant, Mattermost, Matrix, DingTalk, Yuanbao, Microsoft Teams, LINE, Raft, Webhooks, or any OpenAI-compatible frontend via the API server — architecture and setup overview"
 ---
 
 # Messaging Gateway
 
-Chat with Hermes from Telegram, Discord, Slack, WhatsApp, Signal, SMS, Email, Home Assistant, Mattermost, Matrix, DingTalk, Feishu/Lark, WeCom, Weixin, BlueBubbles (iMessage), QQ, Yuanbao, Microsoft Teams, LINE, ntfy, or your browser. The gateway is a single background process that connects to all your configured platforms, handles sessions, runs cron jobs, and delivers voice messages.
+Chat with Hermes from Telegram, Discord, Slack, Messaging, Signal, SMS, Email, Home Assistant, Mattermost, Matrix, DingTalk, Feishu/Lark, WeCom, Weixin, BlueBubbles (iMessage), QQ, Yuanbao, Microsoft Teams, LINE, ntfy, or your browser. The gateway is a single background process that connects to all your configured platforms, handles sessions, runs cron jobs, and delivers voice messages.
 
 For the full voice feature set — including CLI microphone mode, spoken replies in messaging, and Discord voice-channel conversations — see [Voice Mode](/user-guide/features/voice-mode) and [Use Voice Mode with Hermes](/guides/use-voice-mode-with-hermes).
 
@@ -22,8 +22,8 @@ Bots need both a model provider and tool providers (TTS, web). A [Nous Portal](/
 | Discord | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | Slack | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | Google Chat | — | ✅ | ✅ | ✅ | — | ✅ | — |
-| WhatsApp | — | ✅ | ✅ | — | — | ✅ | ✅ |
-| WhatsApp Cloud API | ✅ | ✅ | ✅ | — | — | ✅ | — |
+| Messaging | — | ✅ | ✅ | — | — | ✅ | ✅ |
+| Messaging Cloud API | ✅ | ✅ | ✅ | — | — | ✅ | — |
 | Signal | — | ✅ | ✅ | — | — | ✅ | — |
 | SMS | — | — | — | — | — | — | — |
 | Email | — | ✅ | ✅ | ✅ | — | — | — |
@@ -50,7 +50,7 @@ Bots need both a model provider and tool providers (TTS, web). A [Nous Portal](/
 **Voice** = TTS audio replies and/or voice message transcription. **Images** = send/receive images. **Files** = send/receive file attachments. **Threads** = threaded conversations. **Reactions** = emoji reactions on messages. **Typing** = typing indicator while processing. **Streaming** = progressive message updates via editing.
 
 :::note Hermes Relay
-[Hermes Relay](/user-guide/messaging/relay) (experimental) is not a chat platform itself — it is a connector system that fronts platforms like Discord, Telegram, Slack, and WhatsApp through an external connector that owns the platform credentials. Capabilities (media, native approval/clarify prompts, reactions, threads, typing, streaming) are negotiated per connector at handshake rather than fixed in the table above.
+[Hermes Relay](/user-guide/messaging/relay) (experimental) is not a chat platform itself — it is a connector system that fronts platforms like Discord, Telegram, Slack, and Messaging through an external connector that owns the platform credentials. Capabilities (media, native approval/clarify prompts, reactions, threads, typing, streaming) are negotiated per connector at handshake rather than fixed in the table above.
 :::
 
 ## Architecture
@@ -61,7 +61,7 @@ flowchart TB
         subgraph Adapters["Platform adapters"]
             tg[Telegram]
             dc[Discord]
-            wa[WhatsApp]
+            wa[Messaging]
             sl[Slack]
             gc[Google Chat]
             sig[Signal]
@@ -457,7 +457,7 @@ Long-running gateway status lines ("still working…"-style heartbeats) draw fro
 ```yaml
 display:
   status_phrases:
-    path: status_phrases/whatsapp.yaml  # relative to HERMES_HOME
+    path: status_phrases/messaging.yaml  # relative to HERMES_HOME
     mode: append                        # append (default) or replace
 ```
 
@@ -609,7 +609,7 @@ tail -f ~/.hermes/logs/gateway.log   # View logs
 
 The generated plist lives at `~/Library/LaunchAgents/ai.hermes.gateway.plist`. It includes three environment variables:
 
-- **PATH** — your full shell PATH at install time, with the venv `bin/` and `node_modules/.bin` prepended. This ensures user-installed tools (Node.js, ffmpeg, etc.) are available to gateway subprocesses like the WhatsApp bridge.
+- **PATH** — your full shell PATH at install time, with the venv `bin/` and `node_modules/.bin` prepended. This ensures user-installed tools (Node.js, ffmpeg, etc.) are available to gateway subprocesses like the Messaging bridge.
 - **VIRTUAL_ENV** — points to the Python virtualenv so tools can resolve packages correctly.
 - **HERMES_HOME** — scopes the gateway to your Hermes installation.
 
@@ -630,8 +630,8 @@ Each platform has its own toolset:
 | CLI | `hermes-cli` | Full access |
 | Telegram | `hermes-telegram` | Full tools including terminal |
 | Discord | `hermes-discord` | Full tools including terminal |
-| WhatsApp | `hermes-whatsapp` | Full tools including terminal |
-| WhatsApp Cloud API | `hermes-whatsapp` | Full tools including terminal (shares toolset with the Baileys bridge) |
+| Messaging | `hermes-messaging` | Full tools including terminal |
+| Messaging Cloud API | `hermes-messaging` | Full tools including terminal (shares toolset with the Baileys bridge) |
 | Slack | `hermes-slack` | Full tools including terminal |
 | Google Chat | `hermes-google_chat` | Full tools including terminal |
 | Signal | `hermes-signal` | Full tools including terminal |
@@ -776,8 +776,8 @@ Defaults to `false`. Only platforms whose adapter implements `delete_message` ho
 - [Discord Setup](discord.md)
 - [Slack Setup](slack.md)
 - [Google Chat Setup](google_chat.md)
-- [WhatsApp Setup](whatsapp.md)
-- [WhatsApp Business Cloud API Setup](whatsapp-cloud.md)
+- [Messaging Setup](messaging.md)
+- [Messaging Business Cloud API Setup](messaging-cloud.md)
 - [Signal Setup](signal.md)
 - [SMS Setup (Twilio)](sms.md)
 - [Email Setup](email.md)

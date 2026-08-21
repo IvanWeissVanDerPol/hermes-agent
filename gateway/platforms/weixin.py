@@ -81,7 +81,7 @@ def _wx_secret(name: str, default: Optional[str] = None) -> Optional[str]:
     multiplexing, where a bare ``get_secret`` would raise
     ``UnscopedSecretError`` and crash its Weixin path; there ``os.environ`` is
     that profile's own value, so fall back to it. Same pattern as the Slack
-    ``SLACK_APP_TOKEN`` read (#59739) and WhatsApp's ``_get_wsecret``.
+    ``SLACK_APP_TOKEN`` read (#59739) and Messaging's ``_get_wsecret``.
     """
     try:
         return get_secret(name, default)

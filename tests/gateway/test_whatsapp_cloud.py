@@ -1,4 +1,4 @@
-"""Tests for the WhatsApp Cloud API adapter (Phase 2).
+"""Tests for the Messaging Cloud API adapter (Phase 2).
 
 Covers the outbound Graph API send path and the inbound verify-token
 handshake. The webhook POST path is currently a stub (Phase 3 will add
@@ -22,17 +22,17 @@ from gateway.config import Platform
 
 
 @pytest.fixture(autouse=True)
-def _whatsapp_open_optin(monkeypatch):
-    """Opt into WhatsApp allow-all for the file's dispatch-mechanics tests.
+def _messaging_open_optin(monkeypatch):
+    """Opt into Messaging allow-all for the file's dispatch-mechanics tests.
 
     The adapter now fails closed on ``dm_policy: open`` unless
-    ``WHATSAPP_ALLOW_ALL_USERS`` / ``GATEWAY_ALLOW_ALL_USERS`` is set
+    ``MESSAGING_ALLOW_ALL_USERS`` / ``GATEWAY_ALLOW_ALL_USERS`` is set
     (SECURITY.md 2.6). These tests set ``_dm_policy = "open"`` as a stand-in
     for "process this DM" while exercising unrelated dispatch mechanics, so
     grant the opt-in here. Tests that specifically assert the gate override
     this within their own body.
     """
-    monkeypatch.setenv("WHATSAPP_ALLOW_ALL_USERS", "true")
+    monkeypatch.setenv("MESSAGING_ALLOW_ALL_USERS", "true")
 
 
 # ---------------------------------------------------------------------------
@@ -40,14 +40,14 @@ def _whatsapp_open_optin(monkeypatch):
 # ---------------------------------------------------------------------------
 
 def _make_adapter(**overrides):
-    """Build a WhatsAppCloudAdapter with test attributes (bypass __init__).
+    """Build a MessagingCloudAdapter with test attributes (bypass __init__).
 
-    Mirrors the pattern in tests/gateway/test_whatsapp_*.py.
+    Mirrors the pattern in tests/gateway/test_messaging_*.py.
     """
-    from gateway.platforms.whatsapp_cloud import WhatsAppCloudAdapter
+    from gateway.platforms.messaging_cloud import MessagingCloudAdapter
 
-    adapter = WhatsAppCloudAdapter.__new__(WhatsAppCloudAdapter)
-    adapter.platform = Platform.WHATSAPP_CLOUD
+    adapter = MessagingCloudAdapter.__new__(MessagingCloudAdapter)
+    adapter.platform = Platform.MESSAGING_CLOUD
     adapter.config = MagicMock()
     adapter.config.extra = {}
 
@@ -60,7 +60,7 @@ def _make_adapter(**overrides):
     adapter._verify_token = overrides.pop("verify_token", "")
     adapter._webhook_host = "127.0.0.1"
     adapter._webhook_port = 8090
-    adapter._webhook_path = "/whatsapp/webhook"
+    adapter._webhook_path = "/messaging/webhook"
     adapter._health_path = "/health"
     adapter._api_version = overrides.pop("api_version", "v20.0")
     adapter._runner = None
@@ -113,7 +113,7 @@ def _make_adapter(**overrides):
 @pytest.fixture
 def authorized_interactive_env(monkeypatch):
     """``dm_policy: open`` requires an explicit allow-all opt-in on main."""
-    monkeypatch.setenv("WHATSAPP_ALLOW_ALL_USERS", "true")
+    monkeypatch.setenv("MESSAGING_ALLOW_ALL_USERS", "true")
 
 
 def _mock_httpx_response(status_code: int, json_body: dict):
@@ -162,7 +162,7 @@ class TestSendText:
         await adapter.send("15551234567", "hello world")
 
         payload = adapter._http_client.post.call_args.kwargs["json"]
-        assert payload["messaging_product"] == "whatsapp"
+        assert payload["messaging_product"] == "messaging"
         assert payload["recipient_type"] == "individual"
         assert payload["to"] == "15551234567"
         assert payload["type"] == "text"
@@ -307,7 +307,7 @@ def _post_request(body: bytes, headers: dict | None = None):
 # A realistic Meta inbound text-message payload, modelled on the
 # get-started docs sample.
 _SAMPLE_INBOUND_TEXT_PAYLOAD = {
-    "object": "whatsapp_business_account",
+    "object": "messaging_business_account",
     "entry": [
         {
             "id": "215589313241560883",
@@ -315,7 +315,7 @@ _SAMPLE_INBOUND_TEXT_PAYLOAD = {
                 {
                     "field": "messages",
                     "value": {
-                        "messaging_product": "whatsapp",
+                        "messaging_product": "messaging",
                         "metadata": {
                             "display_phone_number": "15551797781",
                             "phone_number_id": "7794189252778687",
@@ -352,7 +352,7 @@ class TestWebhookSignature:
         # Patch the dispatcher to a no-op so we don't depend on
         # MessageEvent construction here (covered separately).
         adapter._dispatch_payload = AsyncMock()
-        body = b'{"object":"whatsapp_business_account","entry":[]}'
+        body = b'{"object":"messaging_business_account","entry":[]}'
         request = _post_request(body, {"X-Hub-Signature-256": _sign("signing-key-123", body)})
 
         response = await adapter._handle_webhook(request)
@@ -364,7 +364,7 @@ class TestWebhookSignature:
     async def test_tampered_body_rejected(self):
         adapter = _make_adapter(app_secret="signing-key-123")
         adapter._dispatch_payload = AsyncMock()
-        original = b'{"object":"whatsapp_business_account"}'
+        original = b'{"object":"messaging_business_account"}'
         tampered = b'{"object":"evil_payload"}'
         sig_for_original = _sign("signing-key-123", original)
         request = _post_request(tampered, {"X-Hub-Signature-256": sig_for_original})
@@ -381,7 +381,7 @@ class TestWebhookSignature:
         """Don't quietly accept webhooks when we can't authenticate them."""
         adapter = _make_adapter(app_secret="")
         adapter._dispatch_payload = AsyncMock()
-        body = b'{"object":"whatsapp_business_account"}'
+        body = b'{"object":"messaging_business_account"}'
         request = _post_request(body, {"X-Hub-Signature-256": "sha256=deadbeef"})
 
         response = await adapter._handle_webhook(request)
@@ -395,7 +395,7 @@ class TestWebhookReplay:
 
 
     def test_dedup_cache_evicts_oldest(self):
-        from gateway.platforms.whatsapp_cloud import WAMID_DEDUP_CACHE_SIZE
+        from gateway.platforms.messaging_cloud import WAMID_DEDUP_CACHE_SIZE
         adapter = _make_adapter()
         # Fill the cache plus 5 extra
         for i in range(WAMID_DEDUP_CACHE_SIZE + 5):
@@ -433,7 +433,7 @@ class TestWebhookDispatch:
         assert event.message_id == (
             "wamid.HBgLMTM1NTc4MjU2OTgVAGHAYWYET688aASGNTI1QzZFQjhEMDk2QQA="
         )
-        assert event.source.platform == Platform.WHATSAPP_CLOUD
+        assert event.source.platform == Platform.MESSAGING_CLOUD
         assert event.source.chat_id == "13557825698"
         assert event.source.user_name == "Jessica Laverdetman"
         assert event.source.chat_type == "dm"
@@ -466,7 +466,7 @@ class TestWebhookDispatch:
 
         adapter.handle_message = _capture
         payload = {
-            "object": "whatsapp_business_account",
+            "object": "messaging_business_account",
             "entry": [
                 {
                     "id": "x",
@@ -474,7 +474,7 @@ class TestWebhookDispatch:
                         {
                             "field": "messages",
                             "value": {
-                                "messaging_product": "whatsapp",
+                                "messaging_product": "messaging",
                                 "metadata": {"phone_number_id": "1"},
                                 "contacts": [
                                     {"profile": {"name": "U"}, "wa_id": "1555"}
@@ -534,7 +534,7 @@ class TestHealth:
 
 class TestMixinInherited:
     """Sanity-check: the Cloud adapter inherits the same gating behavior
-    as the Baileys adapter via WhatsAppBehaviorMixin.
+    as the Baileys adapter via MessagingBehaviorMixin.
     """
 
 
@@ -763,7 +763,7 @@ class TestDownloadMedia:
 
     @pytest.mark.asyncio
     async def test_two_step_download_writes_cache_file(self, tmp_path):
-        from gateway.platforms import whatsapp_cloud as wac
+        from gateway.platforms import messaging_cloud as wac
 
         adapter = _make_adapter()
         adapter._http_client = MagicMock()
@@ -771,12 +771,12 @@ class TestDownloadMedia:
         # Step 1 — metadata returns temp URL + mime
         meta_resp = MagicMock(status_code=200)
         meta_resp.json = MagicMock(return_value={
-            "url": "https://lookaside.fbsbx.com/whatsapp/m/...",
+            "url": "https://lookaside.fbsbx.com/messaging/m/...",
             "mime_type": "image/jpeg",
             "sha256": "abc",
             "file_size": 12345,
             "id": "media_xyz",
-            "messaging_product": "whatsapp",
+            "messaging_product": "messaging",
         })
         # Step 2 — bytes
         blob_resp = MagicMock(status_code=200, content=b"\xff\xd8\xff\xe0jpegdata")
@@ -813,7 +813,7 @@ class TestInboundMediaDispatch:
     @pytest.mark.asyncio
     async def test_inbound_text_document_injected_into_body(self, tmp_path):
         """A .txt document should have its content prepended to the body."""
-        from gateway.platforms import whatsapp_cloud as wac
+        from gateway.platforms import messaging_cloud as wac
 
         adapter = _make_adapter(app_secret="key")
         captured: list = []
@@ -826,7 +826,7 @@ class TestInboundMediaDispatch:
         text_content = b"hello\nthis is the file\n"
         meta_resp = MagicMock(status_code=200)
         meta_resp.json = MagicMock(return_value={
-            "url": "https://lookaside.fbsbx.com/whatsapp/m/doc",
+            "url": "https://lookaside.fbsbx.com/messaging/m/doc",
             "mime_type": "text/plain",
         })
         blob_resp = MagicMock(status_code=200, content=text_content)
@@ -834,13 +834,13 @@ class TestInboundMediaDispatch:
         adapter._http_client.get = AsyncMock(side_effect=[meta_resp, blob_resp])
 
         payload = {
-            "object": "whatsapp_business_account",
+            "object": "messaging_business_account",
             "entry": [{
                 "id": "x",
                 "changes": [{
                     "field": "messages",
                     "value": {
-                        "messaging_product": "whatsapp",
+                        "messaging_product": "messaging",
                         "metadata": {"phone_number_id": "1"},
                         "contacts": [{"profile": {"name": "U"}, "wa_id": "1555"}],
                         "messages": [{
@@ -1286,7 +1286,7 @@ class TestSendTyping:
         adapter._http_client.post.assert_called_once()
         payload = adapter._http_client.post.call_args.kwargs["json"]
         # Meta's combined endpoint shape
-        assert payload["messaging_product"] == "whatsapp"
+        assert payload["messaging_product"] == "messaging"
         assert payload["status"] == "read"
         assert payload["message_id"] == "wamid.LATEST"
         assert payload["typing_indicator"] == {"type": "text"}
@@ -1321,10 +1321,10 @@ class TestSendTyping:
 
 class TestAllowlistNormalization:
     def test_normalize_allow_ids_strips_jid_suffix_and_punctuation(self):
-        from gateway.platforms.whatsapp_cloud import WhatsAppCloudAdapter
+        from gateway.platforms.messaging_cloud import MessagingCloudAdapter
 
-        ids = {"15551234567@s.whatsapp.net", "+1 (555) 765-4321", "15550000000"}
-        normalized = WhatsAppCloudAdapter._normalize_allow_ids(ids)
+        ids = {"15551234567@s.messaging.net", "+1 (555) 765-4321", "15550000000"}
+        normalized = MessagingCloudAdapter._normalize_allow_ids(ids)
         assert normalized == {"15551234567", "15557654321", "15550000000"}
 
 
@@ -1332,14 +1332,14 @@ class TestBoundedInteractiveState:
     def test_bounded_put_evicts_oldest(self):
         from collections import OrderedDict
 
-        from gateway.platforms.whatsapp_cloud import (
+        from gateway.platforms.messaging_cloud import (
             INTERACTIVE_STATE_CACHE_SIZE,
-            WhatsAppCloudAdapter,
+            MessagingCloudAdapter,
         )
 
         cache: OrderedDict = OrderedDict()
         for i in range(INTERACTIVE_STATE_CACHE_SIZE + 10):
-            WhatsAppCloudAdapter._bounded_put(cache, f"id-{i}", "sess")
+            MessagingCloudAdapter._bounded_put(cache, f"id-{i}", "sess")
         assert len(cache) == INTERACTIVE_STATE_CACHE_SIZE
         assert "id-0" not in cache
         assert f"id-{INTERACTIVE_STATE_CACHE_SIZE + 9}" in cache

@@ -37,7 +37,7 @@ Hermes 的差异化特性：
 
 - **通过 skill 自我提升** — Hermes 通过将可复用流程保存为 skill 来从经验中学习。当它解决复杂问题、发现工作流或被纠正时，可以将该知识持久化为 skill 文档，加载到未来的会话中。skill 随时间积累，使 agent 在你的特定任务和环境中表现越来越好。
 - **跨会话持久记忆** — 记住你是谁、你的偏好、环境细节和经验教训。可插拔的记忆后端（内置、Honcho、Mem0 等）让你选择记忆的工作方式。
-- **多平台 gateway** — 同一个 agent 在 Telegram、Discord、Slack、WhatsApp、Signal、Matrix、Email 及 10+ 其他平台上运行，具备完整工具访问权限，而不仅仅是聊天。
+- **多平台 gateway** — 同一个 agent 在 Telegram、Discord、Slack、Messaging、Signal、Matrix、Email 及 10+ 其他平台上运行，具备完整工具访问权限，而不仅仅是聊天。
 - **提供商无关** — 在工作流中途切换模型和提供商，无需更改其他任何内容。凭证池自动轮换多个 API key。
 - **Profiles（配置文件）** — 运行多个独立的 Hermes 实例，各自拥有隔离的配置、会话、skill 和记忆。
 - **可扩展** — 插件、MCP 服务器、自定义工具、webhook 触发器、cron 调度以及完整的 Python 生态系统。
@@ -168,7 +168,7 @@ hermes gateway status       Check status
 hermes gateway setup        Configure platforms
 ```
 
-支持的平台：Telegram、Discord、Slack、WhatsApp、Signal、Email、SMS、Matrix、Mattermost、Home Assistant、DingTalk、Feishu、WeCom、BlueBubbles（iMessage）、Weixin（WeChat）、API Server、Webhooks。Open WebUI 通过 API Server 适配器连接。
+支持的平台：Telegram、Discord、Slack、Messaging、Signal、Email、SMS、Matrix、Mattermost、Home Assistant、DingTalk、Feishu、WeCom、BlueBubbles（iMessage）、Weixin（WeChat）、API Server、Webhooks。Open WebUI 通过 API Server 适配器连接。
 
 平台文档：https://hermes-agent.nousresearch.com/docs/user-guide/messaging/
 

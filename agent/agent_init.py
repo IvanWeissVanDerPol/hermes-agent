@@ -569,7 +569,7 @@ def init_agent(
             NOTE: Anthropic Sonnet 4.6+ and Opus 4.6+ reject a conversation that ends on an
             assistant-role message (400 error).  For those models use structured outputs or
             output_config.format instead of a trailing-assistant prefill.
-        platform (str): The interface platform the user is on (e.g. "cli", "telegram", "discord", "whatsapp").
+        platform (str): The interface platform the user is on (e.g. "cli", "telegram", "discord", "messaging").
             Used to inject platform-specific formatting hints into the system prompt.
         skip_context_files (bool): If True, skip auto-injection of project context files
             (SOUL.md, .hermes.md, AGENTS.md, CLAUDE.md, .cursorrules) from the cwd / HERMES_HOME
@@ -591,7 +591,7 @@ def init_agent(
     agent.quiet_mode = quiet_mode
     agent.tool_progress_mode = tool_progress_mode
     agent.ephemeral_system_prompt = ephemeral_system_prompt
-    agent.platform = platform  # "cli", "telegram", "discord", "whatsapp", etc.
+    agent.platform = platform  # "cli", "telegram", "discord", "messaging", etc.
     agent._user_id = user_id  # Platform user identifier (gateway sessions)
     agent._user_id_alt = user_id_alt  # Optional stable alternate platform identifier
     agent._user_name = user_name
@@ -1815,10 +1815,10 @@ def init_agent(
 
     # Per-platform prompt-hint overrides (config.yaml → platform_hints).
     # Lets an enterprise admin append to or replace Hermes' built-in
-    # platform hint for a single messaging platform (e.g. WhatsApp) without
+    # platform hint for a single messaging platform (e.g. Messaging) without
     # affecting other platforms. Shape:
     #   platform_hints:
-    #     whatsapp:
+    #     messaging:
     #       append: "When tabular output would help, invoke the ... skill."
     #     slack:
     #       replace: "Custom Slack hint that fully replaces the default."

@@ -82,7 +82,7 @@ def _get_scoped_secret(name, default=None):
     ``UnscopedSecretError`` and crash this path; there ``os.environ`` is that
     profile's own value, so fall back to it. Same pattern as the Slack
     ``SLACK_APP_TOKEN`` read (#59739) and
-    ``gateway/platforms/whatsapp_common.py::_get_wsecret``.
+    ``gateway/platforms/messaging_common.py::_get_wsecret``.
     """
     try:
         val = _scoped_get_secret(name, default)
@@ -1607,7 +1607,7 @@ class PhotonAdapter(BasePlatformAdapter):
         env["PHOTON_SIDECAR_WATCH_STDIN"] = "1"
 
         # Windows: hide the child console (0 elsewhere). Same helper the
-        # discord/whatsapp adapters use for their sidecar spawns.
+        # discord/messaging adapters use for their sidecar spawns.
         from hermes_cli._subprocess_compat import windows_hide_flags
 
         try:

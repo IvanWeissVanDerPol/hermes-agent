@@ -1502,7 +1502,7 @@ install_deps() {
 
         log_success "Main package installed"
         log_info "Termux note: matrix e2ee and local faster-whisper extras are excluded from .[termux-all] due to upstream Android wheel/toolchain blockers."
-        log_info "Termux note: browser/WhatsApp tooling is not installed by default; see the Termux guide for optional follow-up steps."
+        log_info "Termux note: browser/Messaging tooling is not installed by default; see the Termux guide for optional follow-up steps."
 
         log_success "All dependencies installed"
         return 0
@@ -2442,7 +2442,7 @@ maybe_start_gateway() {
     fi
 
     HAS_MESSAGING=false
-    for VAR in TELEGRAM_BOT_TOKEN DISCORD_BOT_TOKEN SLACK_BOT_TOKEN SLACK_APP_TOKEN WHATSAPP_ENABLED; do
+    for VAR in TELEGRAM_BOT_TOKEN DISCORD_BOT_TOKEN SLACK_BOT_TOKEN SLACK_APP_TOKEN MESSAGING_ENABLED; do
         VAL=$(grep "^${VAR}=" "$ENV_FILE" 2>/dev/null | cut -d'=' -f2-)
         if [ -n "$VAL" ] && [ "$VAL" != "your-token-here" ]; then
             HAS_MESSAGING=true
@@ -2458,21 +2458,21 @@ maybe_start_gateway() {
     log_info "Messaging platform token detected!"
     log_info "The gateway needs to be running for Hermes to send/receive messages."
 
-    # If WhatsApp is enabled and no session exists yet, run foreground first for QR scan
-    WHATSAPP_VAL=$(grep "^WHATSAPP_ENABLED=" "$ENV_FILE" 2>/dev/null | cut -d'=' -f2-)
-    WHATSAPP_SESSION="$HERMES_HOME/whatsapp/session/creds.json"
-    if [ "$WHATSAPP_VAL" = "true" ] && [ ! -f "$WHATSAPP_SESSION" ]; then
+    # If Messaging is enabled and no session exists yet, run foreground first for QR scan
+    MESSAGING_VAL=$(grep "^MESSAGING_ENABLED=" "$ENV_FILE" 2>/dev/null | cut -d'=' -f2-)
+    MESSAGING_SESSION="$HERMES_HOME/messaging/session/creds.json"
+    if [ "$MESSAGING_VAL" = "true" ] && [ ! -f "$MESSAGING_SESSION" ]; then
         if [ "$IS_INTERACTIVE" = true ]; then
             echo ""
-            log_info "WhatsApp is enabled but not yet paired."
-            log_info "Running 'hermes whatsapp' to pair via QR code..."
+            log_info "Messaging is enabled but not yet paired."
+            log_info "Running 'hermes messaging' to pair via QR code..."
             echo ""
-            if prompt_yes_no "Pair WhatsApp now?" "yes"; then
+            if prompt_yes_no "Pair Messaging now?" "yes"; then
                 HERMES_CMD="$(get_hermes_command_path)"
-                $HERMES_CMD whatsapp || true
+                $HERMES_CMD messaging || true
             fi
         else
-            log_info "WhatsApp pairing skipped (non-interactive). Run 'hermes whatsapp' to pair."
+            log_info "Messaging pairing skipped (non-interactive). Run 'hermes messaging' to pair."
         fi
     fi
 

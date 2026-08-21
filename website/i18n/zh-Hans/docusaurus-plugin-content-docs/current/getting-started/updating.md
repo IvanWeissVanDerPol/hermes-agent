@@ -127,7 +127,7 @@ hermes version
 
 ### 从消息平台更新
 
-你也可以直接从 Telegram、Discord、Slack、WhatsApp 或 Teams 发送以下命令进行更新：
+你也可以直接从 Telegram、Discord、Slack、Messaging 或 Teams 发送以下命令进行更新：
 
 ```
 /update

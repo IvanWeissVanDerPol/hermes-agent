@@ -1,6 +1,6 @@
-"""Text-debounce batching for the WhatsApp adapter (issue #35301).
+"""Text-debounce batching for the Messaging adapter (issue #35301).
 
-WhatsApp delivers rapid multi-message bursts (forwarded batches, paste-splits)
+Messaging delivers rapid multi-message bursts (forwarded batches, paste-splits)
 individually.  Without debounce each fragment triggers a separate agent
 invocation, wasting tokens and flooding the user with reply fragments.  This
 mirrors the Telegram/WeCom/Feishu pattern.
@@ -12,19 +12,19 @@ import asyncio
 
 from gateway.config import Platform, PlatformConfig
 from gateway.platforms.base import MessageEvent, MessageType
-from plugins.platforms.whatsapp.adapter import WhatsAppAdapter
+from plugins.platforms.messaging.adapter import MessagingAdapter
 from gateway.session import SessionSource
 
 
 def _make_adapter(**extra):
     base = {"session_name": "test"}
     base.update(extra)
-    return WhatsAppAdapter(PlatformConfig(enabled=True, extra=base))
+    return MessagingAdapter(PlatformConfig(enabled=True, extra=base))
 
 
 def _event(text):
     src = SessionSource(
-        platform=Platform.WHATSAPP,
+        platform=Platform.MESSAGING,
         chat_id="chat123",
         chat_type="dm",
         user_id="user1",

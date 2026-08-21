@@ -807,7 +807,7 @@ The resulting graph dispatches normally — workers run in parallel, the verifie
 
 ## `/kanban` slash command {#kanban-slash-command}
 
-Every `hermes kanban <action>` verb is also reachable as `/kanban <action>` — from inside an interactive `hermes chat` session **and** from any gateway platform (Telegram, Discord, Slack, WhatsApp, Signal, Matrix, Mattermost, email, SMS). Both surfaces call the exact same `hermes_cli.kanban.run_slash()` entry point that reuses the `hermes kanban` argparse tree, so the argument surface, flags, and output format are identical across CLI, `/kanban`, and `hermes kanban`. You don't have to leave the chat to drive the board.
+Every `hermes kanban <action>` verb is also reachable as `/kanban <action>` — from inside an interactive `hermes chat` session **and** from any gateway platform (Telegram, Discord, Slack, Messaging, Signal, Matrix, Mattermost, email, SMS). Both surfaces call the exact same `hermes_cli.kanban.run_slash()` entry point that reuses the `hermes kanban` argparse tree, so the argument surface, flags, and output format are identical across CLI, `/kanban`, and `hermes kanban`. You don't have to leave the chat to drive the board.
 
 ```
 /kanban list

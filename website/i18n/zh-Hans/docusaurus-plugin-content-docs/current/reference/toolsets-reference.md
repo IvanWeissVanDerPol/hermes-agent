@@ -97,7 +97,7 @@ hermes tools                            # curses UI to enable/disable per platfo
 | `hermes-telegram` | 与 `hermes-cli` 相同。 |
 | `hermes-discord` | 在 `hermes-cli` 基础上添加了 `discord` 和 `discord_admin`。 |
 | `hermes-slack` | 与 `hermes-cli` 相同。 |
-| `hermes-whatsapp` | 与 `hermes-cli` 相同。 |
+| `hermes-messaging` | 与 `hermes-cli` 相同。 |
 | `hermes-signal` | 与 `hermes-cli` 相同。 |
 | `hermes-matrix` | 与 `hermes-cli` 相同。 |
 | `hermes-mattermost` | 与 `hermes-cli` 相同。 |

@@ -161,7 +161,7 @@ def _resolve_qq_secret(name: str, default: str = "") -> str:
     bare ``get_secret`` would raise ``UnscopedSecretError`` on the active
     profile's ``__init__`` and break its startup. Same pattern as the Slack
     ``SLACK_APP_TOKEN`` read (#59739) and
-    ``gateway.platforms.whatsapp_common._get_wsecret``.
+    ``gateway.platforms.messaging_common._get_wsecret``.
     """
     from agent.secret_scope import UnscopedSecretError, get_secret
 

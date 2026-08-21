@@ -117,7 +117,7 @@ hermes-agent/
 │   ├── mirror.py             # 跨会话消息镜像
 │   ├── status.py             # Token 锁、profile 范围的进程追踪
 │   ├── builtin_hooks/        # 始终注册的 hook 扩展点（当前无内置）
-│   └── platforms/            # 20 个适配器：telegram、discord、slack、whatsapp、
+│   └── platforms/            # 20 个适配器：telegram、discord、slack、messaging、
 │                             #   signal、matrix、mattermost、email、sms、
 │                             #   dingtalk、feishu、wecom、wecom_callback、weixin、
 │                             #   bluebubbles、qqbot、homeassistant、webhook、api_server、

@@ -1,4 +1,4 @@
-"""``hermes whatsapp`` subcommand parser.
+"""``hermes messaging`` subcommand parser.
 
 Extracted verbatim from ``hermes_cli/main.py:main()`` (god-file Phase 2).
 Handler injected to avoid importing ``main``.
@@ -9,14 +9,14 @@ from __future__ import annotations
 from typing import Callable
 
 
-def build_whatsapp_parser(subparsers, *, cmd_whatsapp: Callable) -> None:
-    """Attach the ``whatsapp`` subcommand to ``subparsers``."""
+def build_messaging_parser(subparsers, *, cmd_messaging: Callable) -> None:
+    """Attach the ``messaging`` subcommand to ``subparsers``."""
     # =========================================================================
-    # whatsapp command
+    # messaging command
     # =========================================================================
-    whatsapp_parser = subparsers.add_parser(
-        "whatsapp",
-        help="Set up WhatsApp integration",
-        description="Configure WhatsApp and pair via QR code",
+    messaging_parser = subparsers.add_parser(
+        "messaging",
+        help="Set up Messaging integration",
+        description="Configure Messaging and pair via QR code",
     )
-    whatsapp_parser.set_defaults(func=cmd_whatsapp)
+    messaging_parser.set_defaults(func=cmd_messaging)

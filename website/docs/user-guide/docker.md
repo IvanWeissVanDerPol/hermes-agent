@@ -45,7 +45,7 @@ Inside the container, run `hermes setup --portal` once — the refresh token per
 
 ## Running in gateway mode
 
-Once configured, run the container in the background as a persistent gateway (Telegram, Discord, Slack, WhatsApp, etc.):
+Once configured, run the container in the background as a persistent gateway (Telegram, Discord, Slack, Messaging, etc.):
 
 ```sh
 docker run -d \
@@ -472,12 +472,12 @@ docker run -d \
 The official image is based on `debian:13.4` and includes:
 
 - Python 3.13 with dependencies synced from the lockfile via `uv sync --frozen --no-install-project` for the baked extras (`all`, `messaging`, Anthropic/Bedrock/Azure identity, Hindsight, Matrix), followed by a no-dependency editable install of Hermes itself.
-- Node.js 26 + npm (for browser automation, WhatsApp bridge, TUI/Desktop bundles, and workspace build tooling)
+- Node.js 26 + npm (for browser automation, Messaging bridge, TUI/Desktop bundles, and workspace build tooling)
 - Playwright with Chromium (`npx playwright install --with-deps chromium --only-shell`)
 - ripgrep, ffmpeg, git, and `xz-utils` as system utilities
 - **`docker-cli`** — so agents running inside the container can drive the host's Docker daemon (bind-mount `/var/run/docker.sock` to opt in) for `docker build`, `docker run`, container inspection, etc.
 - **`openssh-client`** — enables the [SSH terminal backend](/user-guide/configuration#ssh-backend) from inside the container. The SSH backend shells out to the system `ssh` binary; without this, it failed silently in containerized installs.
-- The WhatsApp bridge (`scripts/whatsapp-bridge/`)
+- The Messaging bridge (`scripts/messaging-bridge/`)
 - **[`s6-overlay`](https://github.com/just-containers/s6-overlay) v3** as PID 1 (replaces the older `tini`) — supervises the dashboard and per-profile gateways with auto-restart on crash, reaps zombie subprocesses, and forwards signals.
 
 The image treats `/opt/hermes` as an immutable install tree at runtime. Optional Python extras, Node workspaces, and TUI assets that must be available inside Docker need to be baked during the image build; runtime lazy installs are disabled so supervised gateways and `docker exec hermes …` commands do not try to write dependency artifacts back into the read-only source tree.

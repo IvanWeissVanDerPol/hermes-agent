@@ -1,4 +1,4 @@
-"""Tests for the WhatsApp plugin's interactive_setup wizard home-channel flow.
+"""Tests for the Messaging plugin's interactive_setup wizard home-channel flow.
 
 The interactive_setup wizard lazy-imports its CLI helpers from
 ``hermes_cli.config`` (get_env_value / save_env_value / remove_env_value) and
@@ -8,7 +8,7 @@ PR #58421 and extended in the follow-up.
 """
 import hermes_cli.config as config_mod
 import hermes_cli.cli_output as cli_output_mod
-from plugins.platforms.whatsapp.adapter import interactive_setup
+from plugins.platforms.messaging.adapter import interactive_setup
 
 
 def _patch_setup_io(monkeypatch, prompts, yes_no_responses, saved, removed, existing):
@@ -30,16 +30,16 @@ def _patch_setup_io(monkeypatch, prompts, yes_no_responses, saved, removed, exis
         monkeypatch.setattr(cli_output_mod, name, lambda *_a, **_kw: None)
 
 
-# WhatsApp prompts (after the Enable? prompt_yes_no): allowed_users, home_channel.
+# Messaging prompts (after the Enable? prompt_yes_no): allowed_users, home_channel.
 # Enable? = True so we don't return early.
 _PROMPTS_NONEMPTY = ["", "12025550100@c.us"]
 _PROMPTS_BLANK = ["", ""]
 _PROMPTS_WHITESPACE = ["", "   "]
-_YES_NO = [True]  # Enable WhatsApp? -> True
+_YES_NO = [True]  # Enable Messaging? -> True
 
 
-class TestWhatsAppHomeChannelClear:
-    """Blank home-channel answer must clear WHATSAPP_HOME_CHANNEL (#12423)."""
+class TestMessagingHomeChannelClear:
+    """Blank home-channel answer must clear MESSAGING_HOME_CHANNEL (#12423)."""
 
     def test_blank_removes_existing_home_channel(self, monkeypatch, tmp_path):
         monkeypatch.setenv("HERMES_HOME", str(tmp_path))
@@ -50,10 +50,10 @@ class TestWhatsAppHomeChannelClear:
             _YES_NO,
             saved,
             removed,
-            existing={"WHATSAPP_HOME_CHANNEL": "12025550100@c.us"},
+            existing={"MESSAGING_HOME_CHANNEL": "12025550100@c.us"},
         )
         interactive_setup()
-        assert "WHATSAPP_HOME_CHANNEL" in removed
-        assert "WHATSAPP_HOME_CHANNEL" not in saved
+        assert "MESSAGING_HOME_CHANNEL" in removed
+        assert "MESSAGING_HOME_CHANNEL" not in saved
 
 

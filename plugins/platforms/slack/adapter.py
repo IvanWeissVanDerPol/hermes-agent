@@ -8413,7 +8413,7 @@ class SlackAdapter(BasePlatformAdapter):
         """Compile optional regex wake-word patterns for channel triggers.
 
         Parity with the other adapters (Telegram, DingTalk, Mattermost,
-        WhatsApp, BlueBubbles, Photon): when ``require_mention`` is on, a
+        Messaging, BlueBubbles, Photon): when ``require_mention`` is on, a
         channel message matching one of these patterns triggers the bot even
         without a literal ``<@BOTUID>`` mention. Reads ``slack.mention_patterns``
         (a list or single string) or ``SLACK_MENTION_PATTERNS`` (a JSON list, or

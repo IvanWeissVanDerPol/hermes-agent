@@ -119,7 +119,7 @@ renderable inside a terminal.
 ## Customizing platform hints
 
 The platform hint (Layer 10 above) is the per-surface guidance Hermes
-injects for Telegram, WhatsApp, Slack, CLI, and other platforms — for
+injects for Telegram, Messaging, Slack, CLI, and other platforms — for
 example "you are on a terminal, avoid Markdown." The built-in defaults
 live in `PLATFORM_HINTS` (`agent/system_prompt.py`); plugin-provided
 platforms supply theirs through the platform registry.
@@ -130,7 +130,7 @@ any other platform:
 
 ```yaml
 platform_hints:
-  whatsapp:
+  messaging:
     append: >
       When tabular output would be useful, invoke the table_formatting
       skill instead of emitting a Markdown table.

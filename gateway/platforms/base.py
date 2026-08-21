@@ -1,7 +1,7 @@
 """
 Base platform adapter interface.
 
-All platform adapters (Telegram, Discord, WhatsApp, Weixin, and more) inherit from this
+All platform adapters (Telegram, Discord, Messaging, Weixin, and more) inherit from this
 and implement the required methods.
 """
 
@@ -2092,7 +2092,7 @@ class MessageEvent:
     # Structured interactive-prompt reply (relay Phase 3). Present when this
     # event is the user answering a native interactive prompt rendered by the
     # relay connector (Discord component / Telegram inline keyboard / Slack
-    # Block Kit / WhatsApp button-list). Shape mirrors the wire contract:
+    # Block Kit / Messaging button-list). Shape mirrors the wire contract:
     # {prompt_id, option_id, label?, prompt_message_id?}. The RelayAdapter
     # consumes it in _on_inbound (routing to the approval/slash-confirm/
     # clarify resolvers) BEFORE normal dispatch; native adapters never set it
@@ -2118,7 +2118,7 @@ class MessageEvent:
     internal: bool = False
 
     # Free-form per-event metadata.  Adapters may set platform-specific
-    # signals here (e.g. WhatsApp sets ``whatsapp_from_owner=True`` when
+    # signals here (e.g. Messaging sets ``messaging_from_owner=True`` when
     # the bridge is configured to forward owner-typed messages).  Plugins
     # consume via ``event.metadata.get(...)`` and must not rely on any
     # particular key existing.
@@ -2884,7 +2884,7 @@ class BasePlatformAdapter(ABC):
     def enforces_own_access_policy(self) -> bool:
         """Whether this adapter gates inbound access before dispatch.
 
-        Some adapters (WeCom, Weixin, Yuanbao, QQBot, WhatsApp) implement a
+        Some adapters (WeCom, Weixin, Yuanbao, QQBot, Messaging) implement a
         documented config-driven access surface — ``dm_policy`` / ``group_policy`` /
         ``allow_from`` / ``group_allow_from`` in ``PlatformConfig.extra`` — and
         enforce it at intake: a message is dropped inside the adapter and never

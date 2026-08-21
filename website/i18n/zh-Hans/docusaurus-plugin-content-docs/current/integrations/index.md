@@ -63,7 +63,7 @@ Hermes 内置完整的浏览器自动化功能，提供多种后端选项，用�
 | **MiniMax** | 良好 | 付费 | `MINIMAX_API_KEY` |
 | **NeuTTS** | 良好 | 免费 | 无需 |
 
-语音转文字支持六个提供商：本地 faster-whisper（免费，设备端运行）、本地命令封装器、Groq、OpenAI Whisper API、Mistral 和 xAI。语音消息转录支持 Telegram、Discord、WhatsApp 及其他消息平台。详见[语音与 TTS](/user-guide/features/tts) 和[语音模式](/user-guide/features/voice-mode)。
+语音转文字支持六个提供商：本地 faster-whisper（免费，设备端运行）、本地命令封装器、Groq、OpenAI Whisper API、Mistral 和 xAI。语音消息转录支持 Telegram、Discord、Messaging 及其他消息平台。详见[语音与 TTS](/user-guide/features/tts) 和[语音模式](/user-guide/features/voice-mode)。
 
 ## IDE 与编辑器集成
 
@@ -82,7 +82,7 @@ Hermes 内置完整的浏览器自动化功能，提供多种后端选项，用�
 
 Hermes 可作为 gateway（网关）机器人运行于 19+ 个消息平台，均通过同一 `gateway` 子系统配置：
 
-- **[Telegram](/user-guide/messaging/telegram)**、**[Discord](/user-guide/messaging/discord)**、**[Slack](/user-guide/messaging/slack)**、**[WhatsApp](/user-guide/messaging/whatsapp)**、**[Signal](/user-guide/messaging/signal)**、**[Matrix](/user-guide/messaging/matrix)**、**[Mattermost](/user-guide/messaging/mattermost)**、**[Email](/user-guide/messaging/email)**、**[SMS](/user-guide/messaging/sms)**、**[DingTalk](/user-guide/messaging/dingtalk)**、**[Feishu/Lark](/user-guide/messaging/feishu)**、**[WeCom](/user-guide/messaging/wecom)**、**[WeCom Callback](/user-guide/messaging/wecom-callback)**、**[Weixin](/user-guide/messaging/weixin)**、**[BlueBubbles](/user-guide/messaging/bluebubbles)**、**[QQ Bot](/user-guide/messaging/qqbot)**、**[Yuanbao](/user-guide/messaging/yuanbao)**、**[Home Assistant](/user-guide/messaging/homeassistant)**、**[Microsoft Teams](/user-guide/messaging/teams)**、**[Webhooks](/user-guide/messaging/webhooks)**
+- **[Telegram](/user-guide/messaging/telegram)**、**[Discord](/user-guide/messaging/discord)**、**[Slack](/user-guide/messaging/slack)**、**[Messaging](/user-guide/messaging/messaging)**、**[Signal](/user-guide/messaging/signal)**、**[Matrix](/user-guide/messaging/matrix)**、**[Mattermost](/user-guide/messaging/mattermost)**、**[Email](/user-guide/messaging/email)**、**[SMS](/user-guide/messaging/sms)**、**[DingTalk](/user-guide/messaging/dingtalk)**、**[Feishu/Lark](/user-guide/messaging/feishu)**、**[WeCom](/user-guide/messaging/wecom)**、**[WeCom Callback](/user-guide/messaging/wecom-callback)**、**[Weixin](/user-guide/messaging/weixin)**、**[BlueBubbles](/user-guide/messaging/bluebubbles)**、**[QQ Bot](/user-guide/messaging/qqbot)**、**[Yuanbao](/user-guide/messaging/yuanbao)**、**[Home Assistant](/user-guide/messaging/homeassistant)**、**[Microsoft Teams](/user-guide/messaging/teams)**、**[Webhooks](/user-guide/messaging/webhooks)**
 
 平台对比表和配置指南详见[消息 Gateway 概览](/user-guide/messaging)。
 

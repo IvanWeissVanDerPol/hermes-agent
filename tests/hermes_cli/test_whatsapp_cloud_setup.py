@@ -1,4 +1,4 @@
-"""Tests for the WhatsApp Cloud API setup wizard.
+"""Tests for the Messaging Cloud API setup wizard.
 
 Covers:
 - Field-shape validators (catch the #1 setup mistake — phone number in
@@ -21,13 +21,13 @@ from pathlib import Path
 
 import pytest
 
-from hermes_cli.setup_whatsapp_cloud import (
+from hermes_cli.setup_messaging_cloud import (
     _validate_phone_number_id,
     _validate_waba_id,
     _validate_app_id,
     _validate_app_secret,
     _validate_access_token,
-    run_whatsapp_cloud_setup,
+    run_messaging_cloud_setup,
 )
 
 
@@ -99,7 +99,7 @@ def isolated_home(tmp_path, monkeypatch):
     monkeypatch.setattr(Path, "home", lambda: home)
     monkeypatch.setenv("HERMES_HOME", str(hermes))
     for key in list(os.environ):
-        if key.startswith("WHATSAPP_CLOUD_"):
+        if key.startswith("MESSAGING_CLOUD_"):
             monkeypatch.delenv(key, raising=False)
     return hermes
 
@@ -132,20 +132,20 @@ class TestWizardFlow:
         monkeypatch.setattr("builtins.input", lambda *a, **kw: next(inputs))
         buf = io.StringIO()
         with redirect_stdout(buf):
-            rc = run_whatsapp_cloud_setup()
+            rc = run_messaging_cloud_setup()
         assert rc == 0
         out = buf.getvalue()
         assert "SETUP COMPLETE" in out
         # Required fields written
-        assert _env_value(isolated_home, "WHATSAPP_CLOUD_PHONE_NUMBER_ID") == "7794189252778687"
-        assert _env_value(isolated_home, "WHATSAPP_CLOUD_ACCESS_TOKEN").startswith("EAA")
-        assert len(_env_value(isolated_home, "WHATSAPP_CLOUD_APP_SECRET")) == 32
-        assert _env_value(isolated_home, "WHATSAPP_CLOUD_ALLOWED_USERS") == "15551234567"
+        assert _env_value(isolated_home, "MESSAGING_CLOUD_PHONE_NUMBER_ID") == "7794189252778687"
+        assert _env_value(isolated_home, "MESSAGING_CLOUD_ACCESS_TOKEN").startswith("EAA")
+        assert len(_env_value(isolated_home, "MESSAGING_CLOUD_APP_SECRET")) == 32
+        assert _env_value(isolated_home, "MESSAGING_CLOUD_ALLOWED_USERS") == "15551234567"
         # Verify token auto-generated
-        assert _env_value(isolated_home, "WHATSAPP_CLOUD_VERIFY_TOKEN")
+        assert _env_value(isolated_home, "MESSAGING_CLOUD_VERIFY_TOKEN")
         # Optional fields stayed unset
-        assert _env_value(isolated_home, "WHATSAPP_CLOUD_APP_ID") is None
-        assert _env_value(isolated_home, "WHATSAPP_CLOUD_WABA_ID") is None
+        assert _env_value(isolated_home, "MESSAGING_CLOUD_APP_ID") is None
+        assert _env_value(isolated_home, "MESSAGING_CLOUD_WABA_ID") is None
 
 
     def test_verify_token_is_auto_generated(self, isolated_home, monkeypatch):
@@ -163,8 +163,8 @@ class TestWizardFlow:
         monkeypatch.setattr("builtins.input", lambda *a, **kw: next(inputs))
         buf = io.StringIO()
         with redirect_stdout(buf):
-            run_whatsapp_cloud_setup()
-        verify_token = _env_value(isolated_home, "WHATSAPP_CLOUD_VERIFY_TOKEN")
+            run_messaging_cloud_setup()
+        verify_token = _env_value(isolated_home, "MESSAGING_CLOUD_VERIFY_TOKEN")
         assert verify_token is not None
         # secrets.token_urlsafe(32) produces ~43 chars (base64-of-32-bytes)
         assert len(verify_token) >= 32
@@ -175,12 +175,12 @@ class TestWizardFlow:
 
 
 # =========================================================================
-# Profile polish block (SETUP COMPLETE → optional WhatsApp profile setup)
+# Profile polish block (SETUP COMPLETE → optional Messaging profile setup)
 # =========================================================================
 
 
 class TestProfilePolishGuidance:
-    """The wizard can't set the bot's WhatsApp display name or profile
+    """The wizard can't set the bot's Messaging display name or profile
     picture via the API — those go through Meta's Business Manager UI.
     Verify that the SETUP COMPLETE block points the user at the right
     place rather than leaving them to figure it out on their own."""
@@ -204,9 +204,9 @@ class TestProfilePolishGuidance:
         monkeypatch.setattr("builtins.input", lambda *a, **kw: next(inputs))
         buf = io.StringIO()
         with redirect_stdout(buf):
-            run_whatsapp_cloud_setup()
+            run_messaging_cloud_setup()
         out = buf.getvalue()
         # Deep-linked URL with the user's WABA pre-selected
         assert f"waba_id={waba}" in out
         # Without WABA, we tell the user they'll need to pick their account
-        assert "select your WhatsApp Business Account" not in out
+        assert "select your Messaging Business Account" not in out

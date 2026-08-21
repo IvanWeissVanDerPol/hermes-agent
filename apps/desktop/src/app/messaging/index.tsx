@@ -107,8 +107,8 @@ const FIELD_COPY: Record<string, { advanced?: boolean }> = {
   QQ_ALLOW_ALL_USERS: { advanced: true },
   QQBOT_HOME_CHANNEL: { advanced: true },
   QQBOT_HOME_CHANNEL_NAME: { advanced: true },
-  WHATSAPP_ENABLED: { advanced: true },
-  WHATSAPP_MODE: { advanced: true }
+  MESSAGING_ENABLED: { advanced: true },
+  MESSAGING_MODE: { advanced: true }
 }
 
 function fieldCopy(field: MessagingEnvVarInfo, m: Translations['messaging']) {
@@ -792,8 +792,8 @@ const PLATFORM_INTRO: Record<string, string> = {
   matrix: 'Sign in to your homeserver with the bot account, then copy the access token, user ID, and homeserver URL.',
   signal:
     'Run a signal-cli REST bridge somewhere reachable, then point Hermes at the URL and the registered phone number.',
-  whatsapp:
-    'Start the WhatsApp bridge that ships with Hermes, scan the QR code on first run, then enable the platform.',
+  messaging:
+    'Start the Messaging bridge that ships with Hermes, scan the QR code on first run, then enable the platform.',
   bluebubbles:
     'Run BlueBubbles Server on a Mac with iMessage, expose its API, then point Hermes at the URL with the server password.',
   homeassistant:

@@ -118,7 +118,7 @@ def _get_scoped_secret(name, default=None):
     ``UnscopedSecretError`` and crash this path; there ``os.environ`` is that
     profile's own value, so fall back to it. Same pattern as the Slack
     ``SLACK_APP_TOKEN`` read (#59739) and
-    ``gateway/platforms/whatsapp_common.py::_get_wsecret``.
+    ``gateway/platforms/messaging_common.py::_get_wsecret``.
     """
     try:
         val = _scoped_get_secret(name, default)
@@ -241,7 +241,7 @@ class DingTalkAdapter(BasePlatformAdapter):
             "DINGTALK_CLIENT_SECRET", ""
         )
 
-        # Group-chat gating (mirrors Slack/Telegram/Discord/WhatsApp conventions).
+        # Group-chat gating (mirrors Slack/Telegram/Discord/Messaging conventions).
         # Mention state is the structured ``is_in_at_list`` attribute from the
         # dingtalk-stream SDK (set from the callback's ``isInAtList`` flag),
         # not text parsing.

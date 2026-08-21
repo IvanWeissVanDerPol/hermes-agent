@@ -54,7 +54,7 @@ curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash
 - 使用 `python -m venv` 创建虚拟环境
 - 优先尝试较大的 `.[termux-all]` 扩展，失败后回退到较小的 `.[termux]` 扩展（再次失败则进行基础安装）——curl 安装程序自动按此顺序执行
 - 将 `hermes` 链接到 `$PREFIX/bin`，使其保留在 Termux PATH 中
-- 跳过未经验证的浏览器 / WhatsApp 引导
+- 跳过未经验证的浏览器 / Messaging 引导
 
 如果你需要显式命令或需要调试失败的安装，请使用下方的手动安装路径。
 
@@ -157,7 +157,7 @@ npm install
 
 浏览器工具会自动将 Termux 目录（`/data/data/com.termux/files/usr/bin`）纳入 PATH 搜索，因此无需额外配置 PATH 即可发现 `agent-browser` 和 `npx`。
 
-在另有文档说明之前，请将 Android 上的浏览器 / WhatsApp 工具视为实验性功能。
+在另有文档说明之前，请将 Android 上的浏览器 / Messaging 工具视为实验性功能。
 
 ---
 

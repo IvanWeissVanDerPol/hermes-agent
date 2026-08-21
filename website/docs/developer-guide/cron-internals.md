@@ -241,7 +241,7 @@ Most platforms also accept an optional thread/topic as a third segment: `platfor
 | Slack | `slack`, `slack:#channel`, `slack:<channel_id>`, `slack:<channel_id>:<thread_ts>` | `slack:#engineering` |
 | Matrix | `matrix`, `matrix:<!room_id:server>`, `matrix:<@user:server>` | `matrix:!abc123:example.org` |
 | Feishu | `feishu`, `feishu:<chat_id>`, `feishu:<chat_id>:<thread_id>` | `feishu:oc_abc123def` |
-| WhatsApp | `whatsapp`, `whatsapp:<jid>`, `whatsapp:+<E.164>` | `whatsapp:123456@g.us` |
+| Messaging | `messaging`, `messaging:<jid>`, `messaging:+<E.164>` | `messaging:123456@g.us` |
 | Signal | `signal`, `signal:group:<id>`, `signal:+<E.164>` | `signal:group:aBcD==` |
 | SMS | `sms`, `sms:+<E.164>` | `sms:+<E.164 number>` |
 | Email | `email`, `email:<address>` | `email:alerts@example.com` |

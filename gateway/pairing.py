@@ -29,9 +29,9 @@ import time
 from pathlib import Path
 from typing import Optional
 
-from gateway.whatsapp_identity import (
-    expand_whatsapp_aliases,
-    normalize_whatsapp_identifier,
+from gateway.messaging_identity import (
+    expand_messaging_aliases,
+    normalize_messaging_identifier,
 )
 from hermes_constants import (
     get_default_hermes_root,
@@ -69,8 +69,8 @@ PAIRING_DIR = get_hermes_dir("platforms/pairing", "pairing")
 _PLATFORM_ALLOWLIST_ENV = {
     "telegram": "TELEGRAM_ALLOWED_USERS",
     "discord": "DISCORD_ALLOWED_USERS",
-    "whatsapp": "WHATSAPP_ALLOWED_USERS",
-    "whatsapp_cloud": "WHATSAPP_CLOUD_ALLOWED_USERS",
+    "messaging": "MESSAGING_ALLOWED_USERS",
+    "messaging_cloud": "MESSAGING_CLOUD_ALLOWED_USERS",
     "slack": "SLACK_ALLOWED_USERS",
     "signal": "SIGNAL_ALLOWED_USERS",
     "email": "EMAIL_ALLOWED_USERS",
@@ -113,16 +113,16 @@ def _split_allowlist(raw: str) -> list:
     return [uid.strip() for uid in raw.split(",") if uid.strip()]
 
 
-def _platform_uses_whatsapp_identity(platform: str) -> bool:
-    """True for Baileys WhatsApp and Meta Cloud — same phone/JID identity rules."""
-    return (platform or "").strip().lower() in {"whatsapp", "whatsapp_cloud"}
+def _platform_uses_messaging_identity(platform: str) -> bool:
+    """True for Baileys Messaging and Meta Cloud — same phone/JID identity rules."""
+    return (platform or "").strip().lower() in {"messaging", "messaging_cloud"}
 
 
 def _normalize_user_id(platform: str, user_id: str) -> str:
     """Normalize platform-specific user IDs before persisting / comparing them."""
     raw_user_id = str(user_id or "").strip()
-    if _platform_uses_whatsapp_identity(platform):
-        return normalize_whatsapp_identifier(raw_user_id) or raw_user_id
+    if _platform_uses_messaging_identity(platform):
+        return normalize_messaging_identifier(raw_user_id) or raw_user_id
     return raw_user_id
 
 
@@ -133,8 +133,8 @@ def _user_id_aliases(platform: str, user_id: str) -> set[str]:
         return set()
 
     aliases = {raw_user_id, _normalize_user_id(platform, raw_user_id)}
-    if _platform_uses_whatsapp_identity(platform):
-        aliases.update(expand_whatsapp_aliases(raw_user_id))
+    if _platform_uses_messaging_identity(platform):
+        aliases.update(expand_messaging_aliases(raw_user_id))
     aliases.discard("")
     return aliases
 
@@ -261,8 +261,8 @@ def _purge_allowlist_entries(entries, platform: str, user_id: str):
 def _sync_live_adapter_allowlist_remove(platform: str, user_id: str) -> None:
     """Clear revoked principals from in-process adapter allowlist snapshots.
 
-    ``WhatsAppAdapter`` (and Cloud) snapshot ``_allow_from`` at construction.
-    Pairing revoke updates ``WHATSAPP_ALLOWED_USERS`` / cloud env, but when the
+    ``MessagingAdapter`` (and Cloud) snapshot ``_allow_from`` at construction.
+    Pairing revoke updates ``MESSAGING_ALLOWED_USERS`` / cloud env, but when the
     revoked principal was the sole entry the env key is removed entirely.
     Intake must not keep authorizing from the stale snapshot until restart.
     """
@@ -290,10 +290,10 @@ def _sync_live_adapter_allowlist_remove(platform: str, user_id: str) -> None:
 
 
 def _sync_allowlist_remove(platform: str, user_id: str) -> None:
-    """Remove ``user_id`` (and WhatsApp alias equivalents) from the allowlist.
+    """Remove ``user_id`` (and Messaging alias equivalents) from the allowlist.
 
-    Matching must mirror PairingStore / authz WhatsApp alias rules: approve
-    mirrors a normalized phone into ``WHATSAPP_ALLOWED_USERS``, while revoke
+    Matching must mirror PairingStore / authz Messaging alias rules: approve
+    mirrors a normalized phone into ``MESSAGING_ALLOWED_USERS``, while revoke
     is often invoked with a JID or device-suffix form. Exact-string delete
     would leave the allowlist entry and keep the sender authorized.
 

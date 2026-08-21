@@ -205,7 +205,7 @@ Debug logs go to `./logs/image_tools_debug_<session_id>.json` with per-call deta
 | **Telegram** | Photo message with the prompt as caption |
 | **Discord** | Embedded in a message |
 | **Slack** | URL unfurled by Slack |
-| **WhatsApp** | Media message |
+| **Messaging** | Media message |
 | **Others** | URL in plain text |
 
 ## Limitations

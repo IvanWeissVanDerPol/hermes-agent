@@ -368,7 +368,7 @@ Bare-string entries (`- MY_PLATFORM_TOKEN`) still work — they get a generic de
 Some platforms have constraints that change how a slow LLM response should be presented:
 
 - **LINE** issues a single-use *reply token* that expires roughly 60 seconds after the inbound event. Replying with that token is free; falling back to the metered Push API is not. If the LLM hasn't finished by the deadline, the choice is "burn paid Push quota" or "do something cleverer with the reply token before it expires."
-- **WhatsApp** marks a session inactive after 24h, after which only template messages are accepted.
+- **Messaging** marks a session inactive after 24h, after which only template messages are accepted.
 - **SMS** has no concept of typing indicators or progressive updates — long responses just look like the bot is offline.
 
 These are real constraints the base `BasePlatformAdapter` can't anticipate. The plugin surface intentionally leaves the room for an adapter to layer platform-specific UX on top of the base typing loop without expanding the kwarg list.

@@ -46,8 +46,8 @@ hermes [global-options] <command> [subcommand/options]
 | `hermes egress` | Outbound credential-injection firewall for remote terminal sandboxes (iron-proxy). Disabled by default. See [Egress proxy](../user-guide/egress/iron-proxy.md). |
 | `hermes lsp` | Manage Language Server Protocol integration (semantic diagnostics for write_file/patch). |
 | `hermes setup` | Interactive setup wizard for all or part of the configuration. |
-| `hermes whatsapp` | Configure and pair the WhatsApp bridge. |
-| `hermes whatsapp-cloud` | Configure the official Meta WhatsApp Business Cloud API adapter (Business account + public webhook required). Distinct from `hermes whatsapp` (Baileys personal-account bridge). |
+| `hermes messaging` | Configure and pair the Messaging bridge. |
+| `hermes messaging-cloud` | Configure the official Meta Messaging Business Cloud API adapter (Business account + public webhook required). Distinct from `hermes messaging` (Baileys personal-account bridge). |
 | `hermes slack` | Slack helpers (currently: generate the app manifest with every command as a native slash). |
 | `hermes auth` | Manage credentials — add, list, remove, reset, status, logout. Handles OAuth flows for Codex/Nous/Anthropic. |
 | `hermes login` / `logout` | **Deprecated** — use `hermes auth` instead. |
@@ -347,13 +347,13 @@ Inspect Nous Portal auth, Tool Gateway routing, and reach the subscription page.
 
 For configuration of the gateway itself, see [Tool Gateway](../user-guide/features/tool-gateway.md). For the one-shot setup path, see `hermes setup --portal` above.
 
-## `hermes whatsapp`
+## `hermes messaging`
 
 ```bash
-hermes whatsapp
+hermes messaging
 ```
 
-Runs the WhatsApp pairing/setup flow, including mode selection and QR-code pairing.
+Runs the Messaging pairing/setup flow, including mode selection and QR-code pairing.
 
 ## `hermes slack`
 
@@ -396,7 +396,7 @@ hermes send --list [platform]
 
 Send a one-shot message to a configured messaging platform without spinning up an agent or gateway loop. Reuses the gateway's already-configured credentials (`~/.hermes/.env` + `~/.hermes/config.yaml`) so ops scripts, cron jobs, CI hooks, and monitoring daemons can post status updates without reimplementing each platform's REST client.
 
-For bot-token platforms (Telegram, Discord, Slack, Signal, SMS, WhatsApp-CloudAPI) no running gateway is required — `hermes send` talks directly to the platform's REST endpoint. Plugin platforms that need a persistent adapter still require a live gateway.
+For bot-token platforms (Telegram, Discord, Slack, Signal, SMS, Messaging-CloudAPI) no running gateway is required — `hermes send` talks directly to the platform's REST endpoint. Plugin platforms that need a persistent adapter still require a live gateway.
 
 | Option | Description |
 |--------|-------------|
@@ -1498,7 +1498,7 @@ Migrate your OpenClaw setup to Hermes. Reads from `~/.openclaw` (or a custom pat
 
 The migration covers 30+ categories across persona, memory, skills, model providers, messaging platforms, agent behavior, session policies, MCP servers, TTS, and more. Items are either **directly imported** into Hermes equivalents or **archived** for manual review.
 
-**Directly imported:** SOUL.md, MEMORY.md, USER.md, AGENTS.md, skills (4 source directories), default model, custom providers, MCP servers, messaging platform tokens and allowlists (Telegram, Discord, Slack, WhatsApp, Signal, Matrix, Mattermost), agent defaults (reasoning effort, compression, human delay, timezone, sandbox), session reset policies, approval rules, TTS config, browser settings, tool settings, exec timeout, command allowlist, gateway config, and API keys from 3 sources.
+**Directly imported:** SOUL.md, MEMORY.md, USER.md, AGENTS.md, skills (4 source directories), default model, custom providers, MCP servers, messaging platform tokens and allowlists (Telegram, Discord, Slack, Messaging, Signal, Matrix, Mattermost), agent defaults (reasoning effort, compression, human delay, timezone, sandbox), session reset policies, approval rules, TTS config, browser settings, tool settings, exec timeout, command allowlist, gateway config, and API keys from 3 sources.
 
 **Archived for manual review:** Cron jobs, plugins, hooks/webhooks, memory backend (QMD), skills registry config, UI/identity, logging, multi-agent setup, channel bindings, IDENTITY.md, TOOLS.md, HEARTBEAT.md, BOOTSTRAP.md.
 

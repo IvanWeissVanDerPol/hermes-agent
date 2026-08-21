@@ -8,7 +8,7 @@ happens in place. Hosted/managed images instead keep the whole install tree
 under an immutable ``/opt/hermes`` (read-only for the hermes user), which
 broke every install/self-heal path with EROFS (NS-606).
 
-Resolution order (mirrors ``resolve_whatsapp_bridge_dir`` for the Baileys
+Resolution order (mirrors ``resolve_messaging_bridge_dir`` for the Baileys
 bridge, which hit the same wall):
 
 1. ``PHOTON_SIDECAR_DIR`` env override — operator escape hatch, used as-is.
@@ -60,7 +60,7 @@ def dir_writable(path: Path) -> bool:
     """True when we can create files in ``path`` (probe-based, not stat).
 
     A stat-mode check lies on containers (root-squash, read-only bind
-    mounts), so probe with a real create+unlink like the WhatsApp bridge
+    mounts), so probe with a real create+unlink like the Messaging bridge
     resolver does.
     """
     probe = path / ".hermes-write-probe"

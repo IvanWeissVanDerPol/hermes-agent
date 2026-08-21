@@ -23,7 +23,7 @@ Custom command providers:
 
 Output formats:
 - Opus (.ogg) for Telegram voice bubbles (requires ffmpeg for Edge TTS)
-- MP3 (.mp3) for everything else (CLI, Discord, WhatsApp)
+- MP3 (.mp3) for everything else (CLI, Discord, Messaging)
 
 Configuration is loaded from ~/.hermes/config.yaml under the 'tts:' key.
 The user chooses the provider and voice; the model just sends text.
@@ -630,14 +630,14 @@ COMMAND_TTS_OUTPUT_FORMATS = frozenset(
 DEFAULT_COMMAND_TTS_MAX_TEXT_LENGTH = 5000
 
 # Platforms whose native voice-bubble delivery requires Ogg/Opus audio.
-# Previously only Telegram was recognized, so Matrix/Feishu/WhatsApp/Signal
+# Previously only Telegram was recognized, so Matrix/Feishu/Messaging/Signal
 # voice replies were synthesized as MP3 and rendered as broken attachments
 # (#14841, #45557 and siblings).
 OPUS_VOICE_PLATFORMS = frozenset({
     "telegram",
     "matrix",
     "feishu",
-    "whatsapp",
+    "messaging",
     "signal",
 })
 
@@ -1307,7 +1307,7 @@ def _ffmpeg_transcode_to_opus(input_path: str, ogg_path: str) -> Optional[str]:
 # file". Several TTS backends silently ignore the requested opus format
 # (Edge only emits MP3, Piper writes WAV, xAI writes MP3, some
 # OpenAI-compatible servers reject/ignore response_format="opus"), which
-# breaks native voice bubbles on Telegram/Matrix/Feishu/WhatsApp. Rather
+# breaks native voice bubbles on Telegram/Matrix/Feishu/Messaging. Rather
 # than special-casing every provider, sniff the magic bytes once after
 # synthesis and repair the container when it doesn't match the extension.
 # ---------------------------------------------------------------------------
@@ -2860,7 +2860,7 @@ def text_to_speech_tool(
 
     # Detect platform from gateway env var to choose the best output format.
     # Several platforms deliver native voice bubbles only for Ogg/Opus
-    # (Telegram, Matrix, Feishu/Lark, WhatsApp, Signal); OpenAI and
+    # (Telegram, Matrix, Feishu/Lark, Messaging, Signal); OpenAI and
     # ElevenLabs can produce Opus natively (no ffmpeg needed). Edge TTS
     # always outputs MP3 and needs ffmpeg for conversion.
     from gateway.session_context import get_session_env

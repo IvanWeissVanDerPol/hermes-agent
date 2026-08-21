@@ -49,7 +49,7 @@ What you'll see:
 | `/goal wait <pid> [reason]` | Park the loop on a background process — it stops re-poking the agent every turn while the process runs, and auto-resumes when it exits. |
 | `/goal unwait` | Drop the wait barrier and resume the loop immediately. |
 
-Works identically on the CLI and every gateway platform (Telegram, Discord, Slack, Matrix, Signal, WhatsApp, SMS, iMessage, Webhook, API server, and the web dashboard).
+Works identically on the CLI and every gateway platform (Telegram, Discord, Slack, Matrix, Signal, Messaging, SMS, iMessage, Webhook, API server, and the web dashboard).
 
 ## Completion contracts
 

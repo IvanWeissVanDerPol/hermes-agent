@@ -9795,7 +9795,7 @@ class HermesCLI(CLIAgentSetupMixin, CLICommandsMixin, CLIBillingMixin):
                 Platform.TELEGRAM: ("Telegram", "TELEGRAM_BOT_TOKEN"),
                 Platform.DISCORD: ("Discord", "DISCORD_BOT_TOKEN"),
                 Platform.SLACK: ("Slack", "SLACK_BOT_TOKEN"),
-                Platform.WHATSAPP: ("WhatsApp", "WHATSAPP_ENABLED"),
+                Platform.MESSAGING: ("Messaging", "MESSAGING_ENABLED"),
             }
             
             for platform, (name, env_var) in platform_status.items():

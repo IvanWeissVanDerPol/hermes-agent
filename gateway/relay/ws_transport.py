@@ -259,7 +259,7 @@ def _event_from_wire(raw: Dict[str, Any]) -> MessageEvent:
         reply_to_message_id=raw.get("reply_to_message_id"),
         # Richer quoted-reply context (Phase 4): what the user replied TO,
         # when the connector had it in hand (Discord referenced_message,
-        # Telegram reply_to_message, WhatsApp context + text cache). Maps to
+        # Telegram reply_to_message, Messaging context + text cache). Maps to
         # the SAME MessageEvent fields native adapters populate, so run.py's
         # reply-context injection works identically over the relay.
         reply_to_text=(raw.get("reply_to") or {}).get("text"),

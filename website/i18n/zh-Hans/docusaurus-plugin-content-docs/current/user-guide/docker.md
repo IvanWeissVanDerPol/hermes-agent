@@ -28,7 +28,7 @@ docker run -it --rm \
 
 ## 以 gateway 模式运行
 
-配置完成后，将容器作为持久化 gateway（Telegram、Discord、Slack、WhatsApp 等）在后台运行：
+配置完成后，将容器作为持久化 gateway（Telegram、Discord、Slack、Messaging 等）在后台运行：
 
 ```sh
 docker run -d \
@@ -263,12 +263,12 @@ docker run -d \
 官方镜像基于 `debian:13.4`，包含：
 
 - Python 3 及所有 Hermes 依赖（`uv pip install -e ".[all]"`）
-- Node.js + npm（用于浏览器自动化和 WhatsApp 桥接）
+- Node.js + npm（用于浏览器自动化和 Messaging 桥接）
 - Playwright 与 Chromium（`npx playwright install --with-deps chromium --only-shell`）
 - ripgrep、ffmpeg、git 和 `xz-utils` 作为系统工具
 - **`docker-cli`** — 使容器内运行的 agent 可以驱动宿主机的 Docker 守护进程（绑定挂载 `/var/run/docker.sock` 以启用），用于 `docker build`、`docker run`、容器检查等操作
 - **`openssh-client`** — 从容器内启用 [SSH 终端后端](/user-guide/configuration#ssh-backend)。SSH 后端调用系统 `ssh` 二进制文件；若缺少此组件，在容器化安装中会静默失败
-- WhatsApp 桥接（`scripts/whatsapp-bridge/`）
+- Messaging 桥接（`scripts/messaging-bridge/`）
 - **[`s6-overlay`](https://github.com/just-containers/s6-overlay) v3** 作为 PID 1（替代旧版 `tini`）——监管 dashboard 和各 profile gateway，崩溃后自动重启，回收僵尸子进程，并转发信号
 
 容器的 `ENTRYPOINT` 是 s6-overlay 的 `/init`。启动时：

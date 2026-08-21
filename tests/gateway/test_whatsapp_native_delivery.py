@@ -3,11 +3,11 @@ from unittest.mock import AsyncMock, MagicMock
 import pytest
 
 from gateway.config import PlatformConfig
-from plugins.platforms.whatsapp.adapter import WhatsAppAdapter
-from tests.gateway.test_whatsapp_formatting import _AsyncCM, _make_adapter
+from plugins.platforms.messaging.adapter import MessagingAdapter
+from tests.gateway.test_messaging_formatting import _AsyncCM, _make_adapter
 
 
-class TestWhatsAppNativeFormatting:
+class TestMessagingNativeFormatting:
 
     def test_invisible_unicode_prefixes_are_sanitized(self):
         adapter = _make_adapter()
@@ -35,7 +35,7 @@ async def test_send_location_posts_to_bridge_location_endpoint():
     call = adapter._http_session.post.call_args
     assert call.args[0] == "http://127.0.0.1:3000/send-location"
     assert call.kwargs["json"] == {
-        "chatId": "15551234567@s.whatsapp.net",
+        "chatId": "15551234567@s.messaging.net",
         "latitude": 41.015,
         "longitude": 28.979,
         "name": "HQ",

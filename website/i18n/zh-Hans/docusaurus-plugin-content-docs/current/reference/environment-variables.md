@@ -292,11 +292,11 @@ description: "Hermes Agent 使用的所有环境变量完整参考"
 | `GOOGLE_CHAT_MAX_BYTES` | Pub/Sub FlowControl 最大在途字节数（默认：`16777216`，16 MiB） |
 | `GOOGLE_CHAT_BOOTSTRAP_SPACES` | 启动时探测以解析 bot 自身 `users/{id}` 的逗号分隔额外空间 ID |
 | `GOOGLE_CHAT_DEBUG_RAW` | 设置任意值可在 DEBUG 级别记录脱敏的 Pub/Sub 信封（仅用于调试） |
-| `WHATSAPP_ENABLED` | 启用 WhatsApp 桥接（`true`/`false`） |
-| `WHATSAPP_MODE` | `bot`（独立号码）或 `self-chat`（给自己发消息） |
-| `WHATSAPP_ALLOWED_USERS` | 逗号分隔的手机号码（含国家代码，不含 `+`），或 `*` 允许所有发送者 |
-| `WHATSAPP_ALLOW_ALL_USERS` | 无需白名单允许所有 WhatsApp 发送者（`true`/`false`） |
-| `WHATSAPP_DEBUG` | 在桥接中记录原始消息事件以供排查（`true`/`false`） |
+| `MESSAGING_ENABLED` | 启用 Messaging 桥接（`true`/`false`） |
+| `MESSAGING_MODE` | `bot`（独立号码）或 `self-chat`（给自己发消息） |
+| `MESSAGING_ALLOWED_USERS` | 逗号分隔的手机号码（含国家代码，不含 `+`），或 `*` 允许所有发送者 |
+| `MESSAGING_ALLOW_ALL_USERS` | 无需白名单允许所有 Messaging 发送者（`true`/`false`） |
+| `MESSAGING_DEBUG` | 在桥接中记录原始消息事件以供排查（`true`/`false`） |
 | `SIGNAL_HTTP_URL` | signal-cli 守护进程 HTTP 端点（例如 `http://127.0.0.1:8080`） |
 | `SIGNAL_ACCOUNT` | E.164 格式的 bot 手机号码 |
 | `SIGNAL_ALLOWED_USERS` | 逗号分隔的 E.164 手机号码或 UUID |

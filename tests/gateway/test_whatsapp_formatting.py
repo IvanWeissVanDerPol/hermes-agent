@@ -1,7 +1,7 @@
-"""Tests for WhatsApp message formatting and chunking.
+"""Tests for Messaging message formatting and chunking.
 
 Covers:
-- format_message(): markdown → WhatsApp syntax conversion
+- format_message(): markdown → Messaging syntax conversion
 - send(): message chunking for long responses
 - MAX_MESSAGE_LENGTH: practical UX limit
 """
@@ -15,14 +15,14 @@ from gateway.config import Platform
 
 
 @pytest.fixture(autouse=True)
-def _whatsapp_open_optin(monkeypatch):
-    """Opt into WhatsApp allow-all so ``dm_policy: open`` dispatch tests run.
+def _messaging_open_optin(monkeypatch):
+    """Opt into Messaging allow-all so ``dm_policy: open`` dispatch tests run.
 
     The adapter fails closed on ``open`` without an allow-all opt-in
     (SECURITY.md 2.6); these formatting/dispatch-mechanics tests set
     ``_dm_policy = "open"`` as a stand-in for "process this DM".
     """
-    monkeypatch.setenv("WHATSAPP_ALLOW_ALL_USERS", "true")
+    monkeypatch.setenv("MESSAGING_ALLOW_ALL_USERS", "true")
 
 
 # ---------------------------------------------------------------------------
@@ -30,11 +30,11 @@ def _whatsapp_open_optin(monkeypatch):
 # ---------------------------------------------------------------------------
 
 def _make_adapter():
-    """Create a WhatsAppAdapter with test attributes (bypass __init__)."""
-    from plugins.platforms.whatsapp.adapter import WhatsAppAdapter
+    """Create a MessagingAdapter with test attributes (bypass __init__)."""
+    from plugins.platforms.messaging.adapter import MessagingAdapter
 
-    adapter = WhatsAppAdapter.__new__(WhatsAppAdapter)
-    adapter.platform = Platform.WHATSAPP
+    adapter = MessagingAdapter.__new__(MessagingAdapter)
+    adapter.platform = Platform.MESSAGING
     adapter.config = MagicMock()
     adapter.config.extra = {}
     adapter._bridge_port = 3000
@@ -82,7 +82,7 @@ class _AsyncCM:
 # ---------------------------------------------------------------------------
 
 class TestFormatMessage:
-    """WhatsApp markdown conversion."""
+    """Messaging markdown conversion."""
 
 
     def test_strikethrough(self):
@@ -96,18 +96,18 @@ class TestFormatMessage:
         assert adapter.format_message("### Deep") == "*Deep*"
 
     def test_bold_header_does_not_double_wrap(self):
-        """"# **Title**" must become *Title*, not **Title** (WhatsApp would
+        """"# **Title**" must become *Title*, not **Title** (Messaging would
         render the doubled asterisks literally)."""
         adapter = _make_adapter()
         assert adapter.format_message("# **Title**") == "*Title*"
         assert adapter.format_message("## __Strong__") == "*Strong*"
 
 
-    def test_already_whatsapp_italic(self):
-        """Markdown *italic* converts to WhatsApp _italic_ (PR #58704)."""
+    def test_already_messaging_italic(self):
+        """Markdown *italic* converts to Messaging _italic_ (PR #58704)."""
         adapter = _make_adapter()
         assert adapter.format_message("*italic*") == "_italic_"
-        # Already-WhatsApp _italic_ passes through unchanged
+        # Already-Messaging _italic_ passes through unchanged
         assert adapter.format_message("_italic_") == "_italic_"
 
 
@@ -116,13 +116,13 @@ class TestFormatMessage:
 # ---------------------------------------------------------------------------
 
 class TestMessageLimits:
-    """WhatsApp message length limits."""
+    """Messaging message length limits."""
 
 
     def test_chunk_limit_reserves_default_self_chat_prefix(self, monkeypatch):
         adapter = _make_adapter()
-        monkeypatch.delenv("WHATSAPP_REPLY_PREFIX", raising=False)
-        monkeypatch.setenv("WHATSAPP_MODE", "self-chat")
+        monkeypatch.delenv("MESSAGING_REPLY_PREFIX", raising=False)
+        monkeypatch.setenv("MESSAGING_MODE", "self-chat")
 
         assert adapter._outgoing_chunk_limit() == (
             adapter.MAX_MESSAGE_LENGTH - len(adapter.DEFAULT_REPLY_PREFIX)
@@ -134,7 +134,7 @@ class TestMessageLimits:
 # ---------------------------------------------------------------------------
 
 class TestSendChunking:
-    """WhatsApp send() splits long messages into chunks."""
+    """Messaging send() splits long messages into chunks."""
 
     @pytest.mark.asyncio
     async def test_short_message_single_send(self):
@@ -166,8 +166,8 @@ class TestSendChunking:
     @pytest.mark.asyncio
     async def test_chunks_leave_room_for_bridge_prefix(self, monkeypatch):
         adapter = _make_adapter()
-        monkeypatch.delenv("WHATSAPP_REPLY_PREFIX", raising=False)
-        monkeypatch.setenv("WHATSAPP_MODE", "self-chat")
+        monkeypatch.delenv("MESSAGING_REPLY_PREFIX", raising=False)
+        monkeypatch.setenv("MESSAGING_MODE", "self-chat")
         resp = MagicMock(status=200)
         resp.json = AsyncMock(return_value={"messageId": "msg1"})
         adapter._http_session.post = MagicMock(return_value=_AsyncCM(resp))
@@ -187,15 +187,15 @@ class TestSendChunking:
 # ---------------------------------------------------------------------------
 
 class TestBridgeEventMetadata:
-    """WhatsApp bridge metadata is preserved for downstream consumers."""
+    """Messaging bridge metadata is preserved for downstream consumers."""
 
     @pytest.mark.asyncio
     async def test_quoted_reply_metadata_is_preserved_in_raw_message(self):
         adapter = _make_adapter()
         data = {
             "messageId": "incoming-msg",
-            "chatId": "15551234567@s.whatsapp.net",
-            "senderId": "15551234567@s.whatsapp.net",
+            "chatId": "15551234567@s.messaging.net",
+            "senderId": "15551234567@s.messaging.net",
             "senderName": "Tester",
             "chatName": "Tester",
             "isGroup": False,
@@ -203,8 +203,8 @@ class TestBridgeEventMetadata:
             "hasMedia": False,
             "mediaUrls": [],
             "quotedMessageId": "outbound-msg",
-            "quotedParticipant": "99999999999@s.whatsapp.net",
-            "quotedRemoteJid": "15551234567@s.whatsapp.net",
+            "quotedParticipant": "99999999999@s.messaging.net",
+            "quotedRemoteJid": "15551234567@s.messaging.net",
             "hasQuotedMessage": True,
         }
 
@@ -212,8 +212,8 @@ class TestBridgeEventMetadata:
 
         assert event is not None
         assert event.raw_message["quotedMessageId"] == "outbound-msg"
-        assert event.raw_message["quotedParticipant"] == "99999999999@s.whatsapp.net"
-        assert event.raw_message["quotedRemoteJid"] == "15551234567@s.whatsapp.net"
+        assert event.raw_message["quotedParticipant"] == "99999999999@s.messaging.net"
+        assert event.raw_message["quotedRemoteJid"] == "15551234567@s.messaging.net"
         assert event.raw_message["hasQuotedMessage"] is True
 
 
@@ -221,11 +221,11 @@ class TestBridgeEventMetadata:
 # display_config tier classification
 # ---------------------------------------------------------------------------
 
-class TestWhatsAppTier:
-    """WhatsApp should be classified as TIER_MEDIUM."""
+class TestMessagingTier:
+    """Messaging should be classified as TIER_MEDIUM."""
 
-    def test_whatsapp_streaming_follows_global(self):
+    def test_messaging_streaming_follows_global(self):
         from gateway.display_config import resolve_display_setting
         # TIER_MEDIUM has streaming: None (follow global), not False
-        assert resolve_display_setting({}, "whatsapp", "streaming") is None
+        assert resolve_display_setting({}, "messaging", "streaming") is None
 

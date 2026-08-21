@@ -189,7 +189,7 @@ See the [cron feature reference](/user-guide/features/cron) for the full syntax.
 --deliver local                          # just save to ~/.hermes/cron/output/
 ```
 
-No running gateway is required at script-run time for bot-token platforms (Telegram, Discord, Slack, Signal, SMS, WhatsApp) — the tool calls each platform's REST endpoint directly using the credentials already in `~/.hermes/.env` / `~/.hermes/config.yaml`.
+No running gateway is required at script-run time for bot-token platforms (Telegram, Discord, Slack, Signal, SMS, Messaging) — the tool calls each platform's REST endpoint directly using the credentials already in `~/.hermes/.env` / `~/.hermes/config.yaml`.
 
 ## Editing and Lifecycle
 

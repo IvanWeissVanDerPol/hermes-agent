@@ -18,7 +18,7 @@ Hermes 有三套 hook 系统，可在关键生命周期节点运行自定义代�
 
 ## Gateway Event Hooks
 
-Gateway hooks 在 gateway 运行期间（Telegram、Discord、Slack、WhatsApp、Teams）自动触发，不会阻塞主 agent 管道。
+Gateway hooks 在 gateway 运行期间（Telegram、Discord、Slack、Messaging、Teams）自动触发，不会阻塞主 agent 管道。
 
 ### 创建 Hook
 
@@ -346,7 +346,7 @@ Hermes 早期版本将此作为内置 hook 发布，每次 gateway 启动时都�
 5. 任何处理器中的错误都会被捕获并记录——损坏的 hook 永远不会导致 agent 崩溃
 
 :::info
-Gateway hooks 仅在 **gateway**（Telegram、Discord、Slack、WhatsApp、Teams）中触发。CLI 不加载 gateway hooks。如需在所有环境中生效的 hook，请使用 [plugin hooks](#plugin-hooks)。
+Gateway hooks 仅在 **gateway**（Telegram、Discord、Slack、Messaging、Teams）中触发。CLI 不加载 gateway hooks。如需在所有环境中生效的 hook，请使用 [plugin hooks](#plugin-hooks)。
 :::
 
 ## Plugin Hooks
@@ -917,7 +917,7 @@ def register(ctx):
 
 ### `pre_approval_request`
 
-在审批请求向用户展示**之前立即**触发——覆盖所有界面：交互式 CLI、Ink TUI、gateway 平台（Telegram、Discord、Slack、WhatsApp、Matrix 等）以及 ACP 客户端（VS Code、Zed、JetBrains）。
+在审批请求向用户展示**之前立即**触发——覆盖所有界面：交互式 CLI、Ink TUI、gateway 平台（Telegram、Discord、Slack、Messaging、Matrix 等）以及 ACP 客户端（VS Code、Zed、JetBrains）。
 
 这是接入自定义通知器的正确位置——例如弹出允许/拒绝通知的 macOS 菜单栏应用，或记录每个带上下文审批请求的审计日志。
 

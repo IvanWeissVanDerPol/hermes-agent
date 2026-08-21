@@ -467,7 +467,7 @@ def execution_surface(kwargs: dict[str, Any]) -> str:
             return "gateway"
     except Exception:
         pass
-    if value in {"discord", "email", "slack", "telegram", "teams", "whatsapp"}:
+    if value in {"discord", "email", "slack", "telegram", "teams", "messaging"}:
         return "gateway"
     return "unknown" if value == "unknown" else "other"
 

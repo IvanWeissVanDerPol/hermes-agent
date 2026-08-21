@@ -57,7 +57,7 @@ curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash
 - 使用 `python -m venv` 创建虚拟环境
 - 自动导出 `ANDROID_API_LEVEL` 以用于 Android wheel 构建
 - 优先使用较宽泛的 `.[termux-all]` extra，若首次编译失败则回退到较小的 `.[termux]` extra（最终回退到基础安装）
-- 默认跳过未经测试的浏览器 / WhatsApp 引导
+- 默认跳过未经测试的浏览器 / Messaging 引导
 
 如需完整的显式步骤，请参阅专门的 [Termux 指南](./termux.md)。
 
@@ -127,7 +127,7 @@ hermes setup --portal
 
 - **uv**（快速 Python 包管理器）
 - **Python 3.11**（通过 uv，无需 sudo）
-- **Node.js v22**（用于浏览器自动化和 WhatsApp 桥接）
+- **Node.js v22**（用于浏览器自动化和 Messaging 桥接）
 - **ripgrep**（快速文件搜索）
 - **ffmpeg**（TTS 的音频格式转换）
 

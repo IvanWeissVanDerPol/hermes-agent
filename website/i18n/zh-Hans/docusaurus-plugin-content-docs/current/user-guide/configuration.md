@@ -1307,7 +1307,7 @@ display:
       tool_progress: 'off'    # 在共享 Slack 工作区中保持安静
 ```
 
-没有覆盖的平台回退到全局 `tool_progress` 值。有效平台键：`telegram`、`discord`、`slack`、`signal`、`whatsapp`、`matrix`、`mattermost`、`email`、`sms`、`homeassistant`、`dingtalk`、`feishu`、`wecom`、`weixin`、`bluebubbles`、`qqbot`。旧版 `display.tool_progress_overrides` 键仍可加载以向后兼容，但已弃用，并在首次加载时迁移到 `display.platforms`。
+没有覆盖的平台回退到全局 `tool_progress` 值。有效平台键：`telegram`、`discord`、`slack`、`signal`、`messaging`、`matrix`、`mattermost`、`email`、`sms`、`homeassistant`、`dingtalk`、`feishu`、`wecom`、`weixin`、`bluebubbles`、`qqbot`。旧版 `display.tool_progress_overrides` 键仍可加载以向后兼容，但已弃用，并在首次加载时迁移到 `display.platforms`。
 
 `interim_assistant_messages` 仅限 gateway。启用后，Hermes 将已完成的轮次中 assistant 更新作为单独的聊天消息发送。这与 `tool_progress` 无关，不需要 gateway 流式传输。
 
@@ -1322,13 +1322,13 @@ privacy:
 
 | 字段 | 处理方式 |
 |-------|-----------|
-| 电话号码（WhatsApp/Signal 上的用户 ID） | 哈希为 `user_<12-char-sha256>` |
+| 电话号码（Messaging/Signal 上的用户 ID） | 哈希为 `user_<12-char-sha256>` |
 | 用户 ID | 哈希为 `user_<12-char-sha256>` |
 | 聊天 ID | 数字部分哈希，保留平台前缀（`telegram:<hash>`） |
 | 主频道 ID | 数字部分哈希 |
 | 用户名/昵称 | **不受影响**（用户选择的，公开可见） |
 
-**平台支持：** 删除适用于 WhatsApp、Signal 和 Telegram。Discord 和 Slack 被排除，因为它们的提及系统（`<@user_id>`）需要 LLM 上下文中的真实 ID。
+**平台支持：** 删除适用于 Messaging、Signal 和 Telegram。Discord 和 Slack 被排除，因为它们的提及系统（`<@user_id>`）需要 LLM 上下文中的真实 ID。
 
 哈希是确定性的 —— 同一用户始终映射到同一哈希，因此模型仍然可以在群聊中区分用户。路由和传递在内部使用原始值。
 
@@ -1435,7 +1435,7 @@ group_sessions_per_user: true  # true = 群组/频道中每用户隔离，false 
 ```yaml
 unauthorized_dm_behavior: pair
 
-whatsapp:
+messaging:
   unauthorized_dm_behavior: ignore
 ```
 
@@ -1472,7 +1472,7 @@ quick_commands:
 - **优先级** —— 快速命令在技能命令之前检查，因此您可以覆盖技能名称
 - **自动补全** —— 快速命令在调度时解析，不显示在内置斜杠命令自动补全表中
 - **类型** —— 支持的类型为 `exec` 和 `alias`；其他类型显示错误
-- **到处可用** —— CLI、Telegram、Discord、Slack、WhatsApp、Signal、Email、Home Assistant
+- **到处可用** —— CLI、Telegram、Discord、Slack、Messaging、Signal、Email、Home Assistant
 
 仅字符串的 prompt 快捷方式不是有效的快速命令。对于可重用的 prompt 工作流，请创建技能或别名到现有斜杠命令。
 

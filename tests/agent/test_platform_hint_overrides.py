@@ -18,7 +18,7 @@ def _agent(overrides):
     return a
 
 
-DEFAULT = "You are on WhatsApp. Do not use markdown."
+DEFAULT = "You are on Messaging. Do not use markdown."
 EXTRA = "When tabular output would help, invoke the table_formatting skill."
 
 
@@ -26,26 +26,26 @@ class TestResolvePlatformHint:
 
     def test_missing_attr_returns_default(self):
         a = types.SimpleNamespace()  # no _platform_hint_overrides at all
-        assert _resolve_platform_hint(a, "whatsapp", DEFAULT) == DEFAULT
+        assert _resolve_platform_hint(a, "messaging", DEFAULT) == DEFAULT
 
 
     def test_append_dict(self):
-        a = _agent({"whatsapp": {"append": EXTRA}})
-        out = _resolve_platform_hint(a, "whatsapp", DEFAULT)
+        a = _agent({"messaging": {"append": EXTRA}})
+        out = _resolve_platform_hint(a, "messaging", DEFAULT)
         assert out == f"{DEFAULT}\n\n{EXTRA}"
         assert DEFAULT in out and EXTRA in out
 
     def test_replace_dict(self):
-        a = _agent({"whatsapp": {"replace": EXTRA}})
-        out = _resolve_platform_hint(a, "whatsapp", DEFAULT)
+        a = _agent({"messaging": {"replace": EXTRA}})
+        out = _resolve_platform_hint(a, "messaging", DEFAULT)
         assert out == EXTRA
         assert DEFAULT not in out
 
 
 
     def test_other_platform_unaffected(self):
-        """An override for whatsapp must not change telegram's hint."""
-        a = _agent({"whatsapp": {"append": EXTRA}})
+        """An override for messaging must not change telegram's hint."""
+        a = _agent({"messaging": {"append": EXTRA}})
         tg_default = "You are on Telegram. Markdown works."
         assert _resolve_platform_hint(a, "telegram", tg_default) == tg_default
 

@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 /**
- * Hermes Agent WhatsApp Bridge
+ * Hermes Agent Messaging Bridge
  *
- * Standalone Node.js process that connects to WhatsApp via Baileys
+ * Standalone Node.js process that connects to Messaging via Baileys
  * and exposes HTTP endpoints for the Python gateway adapter.
  *
- * Endpoints (matches gateway/platforms/whatsapp.py expectations):
+ * Endpoints (matches gateway/platforms/messaging.py expectations):
  *   GET  /messages       - Long-poll for new incoming messages
  *   POST /send           - Send a message { chatId, message, replyTo? }
  *   POST /edit           - Edit a sent message { chatId, messageId, message }
@@ -16,7 +16,7 @@
  *   GET  /health         - Health check
  *
  * Usage:
- *   node bridge.js --port 3000 --session ~/.hermes/whatsapp/session
+ *   node bridge.js --port 3000 --session ~/.hermes/messaging/session
  */
 
 import { makeWASocket, useMultiFileAuthState, DisconnectReason, fetchLatestBaileysVersion, downloadMediaMessage, getAggregateVotesInPollMessage, decryptPollVote, getKeyAuthor, jidNormalizedUser } from '@whiskeysockets/baileys';
@@ -55,13 +55,13 @@ function getArg(name, defaultVal) {
   return idx !== -1 && args[idx + 1] ? args[idx + 1] : defaultVal;
 }
 
-const WHATSAPP_DEBUG =
+const MESSAGING_DEBUG =
   typeof process !== 'undefined' &&
   process.env &&
-  typeof process.env.WHATSAPP_DEBUG === 'string' &&
-  ['1', 'true', 'yes', 'on'].includes(process.env.WHATSAPP_DEBUG.toLowerCase());
+  typeof process.env.MESSAGING_DEBUG === 'string' &&
+  ['1', 'true', 'yes', 'on'].includes(process.env.MESSAGING_DEBUG.toLowerCase());
 
-// Opt-in: when true (and WHATSAPP_MODE === 'bot'), fromMe inbound messages
+// Opt-in: when true (and MESSAGING_MODE === 'bot'), fromMe inbound messages
 // that are NOT echoes of our own /send or /send-media calls are forwarded
 // to the Python adapter with `fromOwner: true`. This lets plugins detect
 // "owner just typed in this customer chat" — needed for handover / sliding
@@ -75,17 +75,17 @@ const WHATSAPP_DEBUG =
 const FORWARD_OWNER_MESSAGES =
   typeof process !== 'undefined' &&
   process.env &&
-  typeof process.env.WHATSAPP_FORWARD_OWNER_MESSAGES === 'string' &&
-  ['1', 'true', 'yes', 'on'].includes(process.env.WHATSAPP_FORWARD_OWNER_MESSAGES.toLowerCase());
+  typeof process.env.MESSAGING_FORWARD_OWNER_MESSAGES === 'string' &&
+  ['1', 'true', 'yes', 'on'].includes(process.env.MESSAGING_FORWARD_OWNER_MESSAGES.toLowerCase());
 
 const SEND_READ_RECEIPTS =
   typeof process !== 'undefined' &&
   process.env &&
-  typeof process.env.WHATSAPP_SEND_READ_RECEIPTS === 'string' &&
-  ['1', 'true', 'yes', 'on'].includes(process.env.WHATSAPP_SEND_READ_RECEIPTS.toLowerCase());
+  typeof process.env.MESSAGING_SEND_READ_RECEIPTS === 'string' &&
+  ['1', 'true', 'yes', 'on'].includes(process.env.MESSAGING_SEND_READ_RECEIPTS.toLowerCase());
 
 const PORT = parseInt(getArg('port', '3000'), 10);
-const SESSION_DIR = getArg('session', path.join(process.env.HOME || '~', '.hermes', 'whatsapp', 'session'));
+const SESSION_DIR = getArg('session', path.join(process.env.HOME || '~', '.hermes', 'messaging', 'session'));
 // Cache directories: the Python gateway passes the profile-aware paths via
 // env (HERMES_HOME-aware, new cache/ layout).  Fall back to the legacy
 // hardcoded locations for bridges launched outside the gateway.
@@ -110,25 +110,25 @@ try {
 } catch {}
 const PAIR_ONLY = args.includes('--pair-only');
 const PAIR_JSON = args.includes('--pair-json');
-const WHATSAPP_MODE = getArg('mode', process.env.WHATSAPP_MODE || 'self-chat'); // "bot" or "self-chat"
-const WHATSAPP_DM_POLICY = String(process.env.WHATSAPP_DM_POLICY || 'open').trim().toLowerCase();
-const ALLOWED_USERS = parseAllowedUsers(process.env.WHATSAPP_ALLOWED_USERS || '');
+const MESSAGING_MODE = getArg('mode', process.env.MESSAGING_MODE || 'self-chat'); // "bot" or "self-chat"
+const MESSAGING_DM_POLICY = String(process.env.MESSAGING_DM_POLICY || 'open').trim().toLowerCase();
+const ALLOWED_USERS = parseAllowedUsers(process.env.MESSAGING_ALLOWED_USERS || '');
 const DEFAULT_REPLY_PREFIX = '⚕ *Hermes Agent*\n────────────\n';
-const REPLY_PREFIX = process.env.WHATSAPP_REPLY_PREFIX === undefined
+const REPLY_PREFIX = process.env.MESSAGING_REPLY_PREFIX === undefined
   ? DEFAULT_REPLY_PREFIX
-  : process.env.WHATSAPP_REPLY_PREFIX.replace(/\\n/g, '\n');
-const MAX_MESSAGE_LENGTH = parseInt(process.env.WHATSAPP_MAX_MESSAGE_LENGTH || '4096', 10);
-const CHUNK_DELAY_MS = parseInt(process.env.WHATSAPP_CHUNK_DELAY_MS || '300', 10);
+  : process.env.MESSAGING_REPLY_PREFIX.replace(/\\n/g, '\n');
+const MAX_MESSAGE_LENGTH = parseInt(process.env.MESSAGING_MAX_MESSAGE_LENGTH || '4096', 10);
+const CHUNK_DELAY_MS = parseInt(process.env.MESSAGING_CHUNK_DELAY_MS || '300', 10);
 // Per-call timeout for sock.sendMessage(). Baileys occasionally hangs forever
-// when uploading media to WhatsApp servers (and, less often, on text sends),
+// when uploading media to Messaging servers (and, less often, on text sends),
 // which pins the bridge's HTTP handler until the upstream aiohttp timeout
 // fires. Fail fast instead so the gateway can surface a real error and retry.
-const SEND_TIMEOUT_MS = parseInt(process.env.WHATSAPP_SEND_TIMEOUT_MS || '60000', 10);
+const SEND_TIMEOUT_MS = parseInt(process.env.MESSAGING_SEND_TIMEOUT_MS || '60000', 10);
 
 // --- Send queue: serialise all sock.sendMessage() calls across concurrent
 //     HTTP handlers so a single Baileys socket never has overlapping sends.
 //     Overlapping sends are the root cause of cross-chat contamination
-//     (#33360) — the WhatsApp protocol-level routing can misdeliver when
+//     (#33360) — the Messaging protocol-level routing can misdeliver when
 //     two sendMessage() Promises race on the same socket. ---
 let _sendQueue = Promise.resolve();
 
@@ -160,7 +160,7 @@ function formatOutgoingMessage(message) {
   // In bot mode, messages come from a different number so the prefix is
   // redundant — the sender identity is already clear.  Only prepend in
   // self-chat mode where bot and user share the same number.
-  if (WHATSAPP_MODE !== 'self-chat') return message;
+  if (MESSAGING_MODE !== 'self-chat') return message;
   return REPLY_PREFIX ? `${REPLY_PREFIX}${message}` : message;
 }
 
@@ -203,12 +203,12 @@ function trackSentMessageId(sent) {
   rememberSentId(sent?.key?.id);
 }
 
-function normalizeWhatsAppId(value) {
+function normalizeMessagingId(value) {
   if (!value) return '';
   return String(value).replace(':', '@');
 }
 
-function redactWhatsAppId(value) {
+function redactMessagingId(value) {
   const raw = String(value || '').trim();
   if (!raw) return '';
   const [userPart, domainPart = ''] = raw.split('@', 2);
@@ -219,7 +219,7 @@ function redactWhatsAppId(value) {
 }
 
 function emitDebugEvent(payload) {
-  if (!WHATSAPP_DEBUG) return;
+  if (!MESSAGING_DEBUG) return;
   try {
     console.log(JSON.stringify({ event: 'debug', ...payload }));
   } catch {}
@@ -273,7 +273,7 @@ const MAX_QUEUE_SIZE = 100;
 
 // Track recently sent message IDs.  Two purposes:
 //   1. Prevent echo-back loops with media in self-chat mode.
-//   2. (When WHATSAPP_FORWARD_OWNER_MESSAGES=true) distinguish our own
+//   2. (When MESSAGING_FORWARD_OWNER_MESSAGES=true) distinguish our own
 //      bot-API outbound messages from owner-typed messages on the linked
 //      device so we can forward only the latter.
 // Capacity bounded (see outbound_ids.js) to keep memory flat under
@@ -322,8 +322,8 @@ function logPollUpdateDiagnostic({ sourcePath, pollId, pollCreation, pollUpdates
 }
 
 function enqueuePollUpdateEvent({ key, update, selectedOptions, aggregation }) {
-  const chatId = normalizeWhatsAppId(key?.remoteJid || update?.pollUpdates?.[0]?.pollUpdateMessageKey?.remoteJid || '');
-  const senderId = normalizeWhatsAppId(
+  const chatId = normalizeMessagingId(key?.remoteJid || update?.pollUpdates?.[0]?.pollUpdateMessageKey?.remoteJid || '');
+  const senderId = normalizeMessagingId(
     key?.participant
     || update?.pollUpdates?.[0]?.pollUpdateMessageKey?.participant
     || chatId
@@ -336,7 +336,7 @@ function enqueuePollUpdateEvent({ key, update, selectedOptions, aggregation }) {
   // /send-poll returns). Arbitrary human polls in a group chat must not
   // inject agent-visible messages on every vote.
   if (!pollId || !recentlySentIds.has(pollId)) {
-    if (WHATSAPP_DEBUG) {
+    if (MESSAGING_DEBUG) {
       try { console.log(JSON.stringify({ event: 'ignored', reason: 'foreign_poll_update', pollId })); } catch {}
     }
     return;
@@ -428,7 +428,7 @@ async function startSocket() {
       if (PAIR_JSON) {
         emitPairEvent({ event: 'qr', qr });
       } else {
-        console.log('\n📱 Scan this QR code with WhatsApp on your phone:\n');
+        console.log('\n📱 Scan this QR code with Messaging on your phone:\n');
         qrcode.generate(qr, { small: true });
         console.log('\nWaiting for scan...\n');
       }
@@ -449,7 +449,7 @@ async function startSocket() {
         emitPairEvent({ event: 'disconnected', reason });
         if (!PAIR_JSON) {
           if (reason === 515) {
-            console.log('↻ WhatsApp requested restart (code 515). Reconnecting...');
+            console.log('↻ Messaging requested restart (code 515). Reconnecting...');
           } else {
             console.log(`⚠️  Connection closed (reason: ${reason}). Reconnecting in 3s...`);
           }
@@ -466,7 +466,7 @@ async function startSocket() {
         : null;
       emitPairEvent({ event: 'connected', user: connectedUser });
       if (!PAIR_JSON) {
-        console.log('✅ WhatsApp connected!');
+        console.log('✅ Messaging connected!');
       }
       if (PAIR_ONLY) {
         if (!PAIR_JSON) {
@@ -503,8 +503,8 @@ async function startSocket() {
                 getKeyAuthor(pollUpdate.pollCreationMessageKey || key, jidNormalizedUser(sock.user?.id || '')),
               ],
               voterJids: [
-                normalizeWhatsAppId(pollUpdate.pollUpdateMessageKey?.participant || ''),
-                normalizeWhatsAppId(pollUpdate.pollUpdateMessageKey?.remoteJid || key?.remoteJid || ''),
+                normalizeMessagingId(pollUpdate.pollUpdateMessageKey?.participant || ''),
+                normalizeMessagingId(pollUpdate.pollUpdateMessageKey?.remoteJid || key?.remoteJid || ''),
               ],
             }) || pollUpdate
           ));
@@ -535,8 +535,8 @@ async function startSocket() {
     if (type !== 'notify' && type !== 'append') return;
 
     const botIds = Array.from(new Set([
-      normalizeWhatsAppId(sock.user?.id),
-      normalizeWhatsAppId(sock.user?.lid),
+      normalizeMessagingId(sock.user?.id),
+      normalizeMessagingId(sock.user?.lid),
     ].filter(Boolean)));
 
     for (const msg of messages) {
@@ -550,8 +550,8 @@ async function startSocket() {
         stage: 'upsert',
         type,
         fromMe: !!msg.key.fromMe,
-        chatId: redactWhatsAppId(chatId),
-        senderId: redactWhatsAppId(senderId),
+        chatId: redactMessagingId(chatId),
+        senderId: redactMessagingId(senderId),
         messageKeys: Object.keys(msg.message || {}),
       });
 
@@ -562,19 +562,19 @@ async function startSocket() {
           emitDebugEvent({
             stage: 'ignored',
             reason: isGroup ? 'from_me_group' : 'from_me_status',
-            chatId: redactWhatsAppId(chatId),
+            chatId: redactMessagingId(chatId),
           });
           continue;
         }
 
-        if (WHATSAPP_MODE === 'bot') {
+        if (MESSAGING_MODE === 'bot') {
           // Bot mode: separate bot number. fromMe inbound is either
           //   (a) an echo of our own /send (recentlySentIds will catch it), or
           //   (b) a message the owner typed from their own phone using the
           //       linked-device session.
           //
           // We always drop (a). We drop (b) too unless the operator opts in
-          // via WHATSAPP_FORWARD_OWNER_MESSAGES so existing deployments see
+          // via MESSAGING_FORWARD_OWNER_MESSAGES so existing deployments see
           // no behavior change. When opted in, we still gate on the
           // customer chatId allowlist — without that gate, any contact
           // the owner replied to would leak into Hermes and trigger
@@ -603,9 +603,9 @@ async function startSocket() {
           fromOwner = true;
         } else {
           // Self-chat mode: only allow messages in the user's own self-chat.
-          // WhatsApp now uses LID (Linked Identity Device) format: 67427329167522@lid
-          // AND classic format: 34652029134@s.whatsapp.net
-          // sock.user has both: { id: "number:10@s.whatsapp.net", lid: "lid_number:10@lid" }
+          // Messaging now uses LID (Linked Identity Device) format: 67427329167522@lid
+          // AND classic format: 34652029134@s.messaging.net
+          // sock.user has both: { id: "number:10@s.messaging.net", lid: "lid_number:10@lid" }
           const myNumber = (sock.user?.id || '').replace(/:.*@/, '@').replace(/@.*/, '');
           const myLid = (sock.user?.lid || '').replace(/:.*@/, '@').replace(/@.*/, '');
           const chatNumber = chatId.replace(/@.*/, '');
@@ -613,16 +613,16 @@ async function startSocket() {
           emitDebugEvent({
             stage: 'self_chat_check',
             matched: !!isSelfChat,
-            chatId: redactWhatsAppId(chatId),
-            accountId: redactWhatsAppId(sock.user?.id),
-            accountLid: redactWhatsAppId(sock.user?.lid),
+            chatId: redactMessagingId(chatId),
+            accountId: redactMessagingId(sock.user?.id),
+            accountLid: redactMessagingId(sock.user?.lid),
           });
           if (!isSelfChat) {
             emitDebugEvent({
               stage: 'ignored',
               reason: 'self_chat_mismatch',
-              chatId: redactWhatsAppId(chatId),
-              senderId: redactWhatsAppId(senderId),
+              chatId: redactMessagingId(chatId),
+              senderId: redactMessagingId(senderId),
             });
             continue;
           }
@@ -635,7 +635,7 @@ async function startSocket() {
       // Python gateway, otherwise a pairing-code reply fires in response
       // to arbitrary incoming messages (#8389).
       if (!msg.key.fromMe) {
-        if (WHATSAPP_MODE === 'self-chat') {
+        if (MESSAGING_MODE === 'self-chat') {
           try {
             console.log(JSON.stringify({
               event: 'ignored',
@@ -646,7 +646,7 @@ async function startSocket() {
           } catch {}
           continue;
         }
-        if (WHATSAPP_DM_POLICY !== 'pairing' && !matchesAllowedUser(senderId, ALLOWED_USERS, SESSION_DIR)) {
+        if (MESSAGING_DM_POLICY !== 'pairing' && !matchesAllowedUser(senderId, ALLOWED_USERS, SESSION_DIR)) {
           try {
             console.log(JSON.stringify({
               event: 'ignored',
@@ -687,9 +687,9 @@ async function startSocket() {
                 getKeyAuthor(pollUpdateMessage.pollCreationMessageKey || pollKey, jidNormalizedUser(sock.user?.id || '')),
               ],
               voterJids: [
-                normalizeWhatsAppId(msg.key?.participant || ''),
-                normalizeWhatsAppId(msg.key?.remoteJid || chatId || ''),
-                normalizeWhatsAppId(senderId || ''),
+                normalizeMessagingId(msg.key?.participant || ''),
+                normalizeMessagingId(msg.key?.remoteJid || chatId || ''),
+                normalizeMessagingId(senderId || ''),
               ],
             });
             if (pollUpdate) pollUpdates = [pollUpdate];
@@ -737,11 +737,11 @@ async function startSocket() {
 
       // Ignore Hermes' own reply messages in self-chat mode to avoid loops.
       if (msg.key.fromMe && ((REPLY_PREFIX && event.body.startsWith(REPLY_PREFIX)) || recentlySentIds.has(msg.key.id))) {
-        if (WHATSAPP_DEBUG) {
+        if (MESSAGING_DEBUG) {
           emitDebugEvent({
             stage: 'ignored',
             reason: 'agent_echo',
-            chatId: redactWhatsAppId(chatId),
+            chatId: redactMessagingId(chatId),
             messageId: msg.key.id,
           });
         }
@@ -753,7 +753,7 @@ async function startSocket() {
         emitDebugEvent({
           stage: 'ignored',
           reason: 'empty',
-          chatId: redactWhatsAppId(chatId),
+          chatId: redactMessagingId(chatId),
           messageKeys: Object.keys(msg.message || {}),
         });
         continue;
@@ -763,8 +763,8 @@ async function startSocket() {
       messageQueue.push(event);
       emitDebugEvent({
         stage: 'queued',
-        chatId: redactWhatsAppId(chatId),
-        senderId: redactWhatsAppId(senderId),
+        chatId: redactMessagingId(chatId),
+        senderId: redactMessagingId(senderId),
         fromOwner: !!fromOwner,
         bodyLength: event.body.length,
         hasMedia: event.hasMedia,
@@ -822,7 +822,7 @@ app.get('/messages', (req, res) => {
 // Send a message
 app.post('/send', async (req, res) => {
   if (!sock || connectionState !== 'connected') {
-    return res.status(503).json({ error: 'Not connected to WhatsApp' });
+    return res.status(503).json({ error: 'Not connected to Messaging' });
   }
 
   const { chatId, message, replyTo } = req.body;
@@ -861,7 +861,7 @@ app.post('/send', async (req, res) => {
 // Edit a previously sent message
 app.post('/edit', async (req, res) => {
   if (!sock || connectionState !== 'connected') {
-    return res.status(503).json({ error: 'Not connected to WhatsApp' });
+    return res.status(503).json({ error: 'Not connected to Messaging' });
   }
 
   const { chatId, messageId, message } = req.body;
@@ -895,7 +895,7 @@ app.post('/edit', async (req, res) => {
 // Send media (image, video, document) natively
 app.post('/send-media', async (req, res) => {
   if (!sock || connectionState !== 'connected') {
-    return res.status(503).json({ error: 'Not connected to WhatsApp' });
+    return res.status(503).json({ error: 'Not connected to Messaging' });
   }
 
   const { chatId, filePath, mediaType, caption, fileName } = req.body;
@@ -916,7 +916,7 @@ app.post('/send-media', async (req, res) => {
     switch (type) {
       case 'image':
         if (ext === 'gif') {
-          // WhatsApp's native animated-GIF UX is an MP4 video payload with
+          // Messaging's native animated-GIF UX is an MP4 video payload with
           // gifPlayback=true. Convert when ffmpeg is available; otherwise fall
           // back to a truthful image/gif send instead of mislabeling GIF bytes
           // as video/mp4.
@@ -948,7 +948,7 @@ app.post('/send-media', async (req, res) => {
         msgPayload = mediaPayloadForFile({ buffer, filePath, mediaType: type, caption, fileName });
         break;
       case 'audio': {
-        // WhatsApp only renders a native voice bubble (ptt) when the file is ogg/opus.
+        // Messaging only renders a native voice bubble (ptt) when the file is ogg/opus.
         // If the caller passes mp3, wav, m4a etc. (e.g. from Edge TTS / NeuTTS),
         // silently convert to ogg/opus via ffmpeg so ptt is always honoured.
         let audioBuffer = buffer;
@@ -996,7 +996,7 @@ app.post('/send-media', async (req, res) => {
 // low-level transport helper.
 app.post('/send-poll', async (req, res) => {
   if (!sock || connectionState !== 'connected') {
-    return res.status(503).json({ error: 'Not connected to WhatsApp' });
+    return res.status(503).json({ error: 'Not connected to Messaging' });
   }
 
   const { chatId, question, options, selectableCount } = req.body;
@@ -1015,10 +1015,10 @@ app.post('/send-poll', async (req, res) => {
   }
 });
 
-// Send native WhatsApp location pin
+// Send native Messaging location pin
 app.post('/send-location', async (req, res) => {
   if (!sock || connectionState !== 'connected') {
-    return res.status(503).json({ error: 'Not connected to WhatsApp' });
+    return res.status(503).json({ error: 'Not connected to Messaging' });
   }
 
   const { chatId, latitude, longitude, name, address } = req.body;
@@ -1120,7 +1120,7 @@ if (PAIR_ONLY) {
   if (PAIR_JSON) {
     emitPairEvent({ event: 'started', session: SESSION_DIR });
   } else {
-    console.log('📱 WhatsApp pairing mode');
+    console.log('📱 Messaging pairing mode');
     console.log(`📁 Session: ${SESSION_DIR}`);
     console.log();
   }
@@ -1133,21 +1133,21 @@ if (PAIR_ONLY) {
   });
 } else {
   app.listen(PORT, '127.0.0.1', () => {
-    console.log(`🌉 WhatsApp bridge listening on port ${PORT} (mode: ${WHATSAPP_MODE})`);
+    console.log(`🌉 Messaging bridge listening on port ${PORT} (mode: ${MESSAGING_MODE})`);
     console.log(`📁 Session stored in: ${SESSION_DIR}`);
     if (ALLOWED_USERS.size > 0) {
       console.log(`🔒 Allowed users: ${Array.from(ALLOWED_USERS).join(', ')}`);
-    } else if (WHATSAPP_MODE === 'self-chat') {
+    } else if (MESSAGING_MODE === 'self-chat') {
       console.log(`🔒 Self-chat mode — only your own messages to yourself are processed.`);
-    } else if (WHATSAPP_MODE === 'bot' && WHATSAPP_DM_POLICY === 'pairing') {
-      console.log(`🤝 WHATSAPP_DM_POLICY=pairing — unknown DMs are forwarded for gateway pairing.`);
+    } else if (MESSAGING_MODE === 'bot' && MESSAGING_DM_POLICY === 'pairing') {
+      console.log(`🤝 MESSAGING_DM_POLICY=pairing — unknown DMs are forwarded for gateway pairing.`);
     } else {
-      console.log(`🔒 No WHATSAPP_ALLOWED_USERS set — incoming messages are rejected.`);
-      console.log(`   Set WHATSAPP_ALLOWED_USERS=<phone> to authorize specific users,`);
-      console.log(`   or WHATSAPP_ALLOWED_USERS=* for an explicit open bot.`);
+      console.log(`🔒 No MESSAGING_ALLOWED_USERS set — incoming messages are rejected.`);
+      console.log(`   Set MESSAGING_ALLOWED_USERS=<phone> to authorize specific users,`);
+      console.log(`   or MESSAGING_ALLOWED_USERS=* for an explicit open bot.`);
     }
-    if (WHATSAPP_MODE === 'bot' && FORWARD_OWNER_MESSAGES) {
-      console.log(`👤 WHATSAPP_FORWARD_OWNER_MESSAGES=true — owner-typed messages will be forwarded with fromOwner:true`);
+    if (MESSAGING_MODE === 'bot' && FORWARD_OWNER_MESSAGES) {
+      console.log(`👤 MESSAGING_FORWARD_OWNER_MESSAGES=true — owner-typed messages will be forwarded with fromOwner:true`);
     }
     console.log();
     scheduleReconnect(0);

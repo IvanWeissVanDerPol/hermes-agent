@@ -1,10 +1,10 @@
-"""Shared helpers for canonicalising WhatsApp sender identity.
+"""Shared helpers for canonicalising Messaging sender identity.
 
-WhatsApp's bridge can surface the same human under two different JID shapes
+Messaging's bridge can surface the same human under two different JID shapes
 within a single conversation:
 
 - LID form: ``999999999999999@lid``
-- Phone form: ``15551234567@s.whatsapp.net``
+- Phone form: ``15551234567@s.messaging.net``
 
 Both the authorisation path (:mod:`gateway.run`) and the session-key path
 (:mod:`gateway.session`) need to collapse these aliases to a single stable
@@ -13,18 +13,18 @@ the two paths can never drift apart.
 
 Public helpers:
 
-- :func:`normalize_whatsapp_identifier` — strip JID/LID/device/plus syntax
+- :func:`normalize_messaging_identifier` — strip JID/LID/device/plus syntax
   down to the bare numeric identifier.
-- :func:`canonical_whatsapp_identifier` — walk the bridge's
+- :func:`canonical_messaging_identifier` — walk the bridge's
   ``lid-mapping-*.json`` files and return a stable canonical identity
   across phone/LID variants.
-- :func:`expand_whatsapp_aliases` — return the full alias set for an
+- :func:`expand_messaging_aliases` — return the full alias set for an
   identifier. Used by authorisation code that needs to match any known
   form of a sender against an allow-list.
 
-Plugins that need per-sender behaviour on WhatsApp (role-based routing,
+Plugins that need per-sender behaviour on Messaging (role-based routing,
 per-contact authorisation, policy gating in a gateway hook) should use
-``canonical_whatsapp_identifier`` so their bookkeeping lines up with
+``canonical_messaging_identifier`` so their bookkeeping lines up with
 Hermes' own session keys.
 """
 
@@ -37,7 +37,7 @@ from typing import Set
 
 logger = logging.getLogger(__name__)
 
-# WhatsApp JIDs are numeric (or plus-prefixed numeric) with optional
+# Messaging JIDs are numeric (or plus-prefixed numeric) with optional
 # ``@``, ``.`` and ``:`` separators. ``\w`` is pinned to ASCII so
 # full-width digits / Unicode word chars can't sneak through.
 _SAFE_IDENTIFIER_RE = re.compile(r"^[A-Za-z0-9@.+\-]+$")
@@ -45,11 +45,11 @@ _SAFE_IDENTIFIER_RE = re.compile(r"^[A-Za-z0-9@.+\-]+$")
 from hermes_constants import get_hermes_dir
 
 
-def normalize_whatsapp_identifier(value: str) -> str:
-    """Strip WhatsApp JID/LID syntax down to its stable numeric identifier.
+def normalize_messaging_identifier(value: str) -> str:
+    """Strip Messaging JID/LID syntax down to its stable numeric identifier.
 
-    Accepts any of the identifier shapes the WhatsApp bridge may emit:
-    ``"60123456789@s.whatsapp.net"``, ``"60123456789:47@s.whatsapp.net"``,
+    Accepts any of the identifier shapes the Messaging bridge may emit:
+    ``"60123456789@s.messaging.net"``, ``"60123456789:47@s.messaging.net"``,
     ``"60123456789@lid"``, or a bare ``"+601****6789"`` / ``"60123456789"``.
     Returns just the numeric identifier (``"60123456789"``) suitable for
     equality comparisons.
@@ -74,21 +74,21 @@ def normalize_whatsapp_identifier(value: str) -> str:
 _BARE_PHONE_RE = re.compile(r"^\+?[\d\s().\-]+$")
 
 
-def to_whatsapp_jid(value: str) -> str:
-    """Normalize an *outbound* WhatsApp target to a bridge-safe JID.
+def to_messaging_jid(value: str) -> str:
+    """Normalize an *outbound* Messaging target to a bridge-safe JID.
 
     Baileys' ``jidDecode`` crashes on a bare phone number — it expects a
-    fully-qualified JID such as ``50766715226@s.whatsapp.net``. This helper
-    is the inverse of :func:`normalize_whatsapp_identifier`: instead of
+    fully-qualified JID such as ``50766715226@s.messaging.net``. This helper
+    is the inverse of :func:`normalize_messaging_identifier`: instead of
     stripping a JID down to its numeric core for comparison, it *builds* the
     JID a send must use.
 
     Behaviour:
 
-    - ``"+50766715226"`` / ``"50766715226"`` → ``"50766715226@s.whatsapp.net"``
-    - ``"50766715226@s.whatsapp.net"`` → unchanged
+    - ``"+50766715226"`` / ``"50766715226"`` → ``"50766715226@s.messaging.net"``
+    - ``"50766715226@s.messaging.net"`` → unchanged
     - ``"group-id@g.us"`` / ``"130631430344750@lid"`` → unchanged
-    - ``"user:device@s.whatsapp.net"`` style colon-before-``@`` → ``@`` form
+    - ``"user:device@s.messaging.net"`` style colon-before-``@`` → ``@`` form
     - anything that isn't a recognizable bare phone → returned unchanged so
       the bridge can surface a meaningful error rather than us mangling it.
 
@@ -100,7 +100,7 @@ def to_whatsapp_jid(value: str) -> str:
     normalized = str(value).strip()
     # Drop a device suffix before the domain: ``user:device@domain`` is a
     # legacy Baileys shape whose ``:device`` part is not addressable — collapse
-    # it to ``user@domain``. (Mirrors normalize_whatsapp_identifier, which
+    # it to ``user@domain``. (Mirrors normalize_messaging_identifier, which
     # splits the bare id on ``:`` for the same reason.)
     if ":" in normalized and "@" in normalized:
         prefix, _, domain = normalized.partition("@")
@@ -113,27 +113,27 @@ def to_whatsapp_jid(value: str) -> str:
     if _BARE_PHONE_RE.fullmatch(normalized):
         digits = re.sub(r"\D+", "", normalized)
         if digits:
-            return f"{digits}@s.whatsapp.net"
+            return f"{digits}@s.messaging.net"
 
     return normalized
 
 
-def expand_whatsapp_aliases(identifier: str) -> Set[str]:
-    """Resolve WhatsApp phone/LID aliases via bridge session mapping files.
+def expand_messaging_aliases(identifier: str) -> Set[str]:
+    """Resolve Messaging phone/LID aliases via bridge session mapping files.
 
     Returns the set of all identifiers transitively reachable through the
-    bridge's ``$HERMES_HOME/whatsapp/session/lid-mapping-*.json`` files,
+    bridge's ``$HERMES_HOME/messaging/session/lid-mapping-*.json`` files,
     starting from ``identifier``. The result always includes the
     normalized input itself, so callers can safely ``in`` check against
     the return value without a separate fallback branch.
 
     Returns an empty set if ``identifier`` normalizes to empty.
     """
-    normalized = normalize_whatsapp_identifier(identifier)
+    normalized = normalize_messaging_identifier(identifier)
     if not normalized:
         return set()
 
-    session_dir = get_hermes_dir("platforms/whatsapp/session", "whatsapp/session")
+    session_dir = get_hermes_dir("platforms/messaging/session", "messaging/session")
     resolved: Set[str] = set()
     queue = [normalized]
 
@@ -146,7 +146,7 @@ def expand_whatsapp_aliases(identifier: str) -> Set[str]:
         # filename below. The hardcoded ``lid-mapping-`` prefix already
         # prevents escape via pathlib's component split (an attacker can't
         # create ``lid-mapping-..`` as a real directory in session_dir), but
-        # this keeps the identifier space to the characters WhatsApp JIDs
+        # this keeps the identifier space to the characters Messaging JIDs
         # actually use and avoids depending on that filesystem-layout
         # invariant.
         if not _SAFE_IDENTIFIER_RE.match(current):
@@ -158,11 +158,11 @@ def expand_whatsapp_aliases(identifier: str) -> Set[str]:
             if not mapping_path.exists():
                 continue
             try:
-                mapped = normalize_whatsapp_identifier(
+                mapped = normalize_messaging_identifier(
                     json.loads(mapping_path.read_text(encoding="utf-8"))
                 )
             except (OSError, json.JSONDecodeError) as exc:
-                logger.debug("whatsapp_identity: failed to read %s: %s", mapping_path, exc)
+                logger.debug("messaging_identity: failed to read %s: %s", mapping_path, exc)
                 continue
             if mapped and mapped not in resolved:
                 queue.append(mapped)
@@ -170,20 +170,20 @@ def expand_whatsapp_aliases(identifier: str) -> Set[str]:
     return resolved
 
 
-def canonical_whatsapp_identifier(identifier: str) -> str:
-    """Return a stable WhatsApp sender identity across phone-JID/LID variants.
+def canonical_messaging_identifier(identifier: str) -> str:
+    """Return a stable Messaging sender identity across phone-JID/LID variants.
 
-    WhatsApp may surface the same person under either a phone-format JID
-    (``60123456789@s.whatsapp.net``) or a LID (``1234567890@lid``). This
+    Messaging may surface the same person under either a phone-format JID
+    (``60123456789@s.messaging.net``) or a LID (``1234567890@lid``). This
     applies to a DM ``chat_id`` *and* to the ``participant_id`` of a
     member inside a group chat — both represent a user identity, and the
     bridge may flip between the two for the same human.
 
-    This helper reads the bridge's ``whatsapp/session/lid-mapping-*.json``
+    This helper reads the bridge's ``messaging/session/lid-mapping-*.json``
     files, walks the mapping transitively, and picks the shortest
     (numeric-preferred) alias as the canonical identity.
-    :func:`gateway.session.build_session_key` uses this for both WhatsApp
-    DM chat_ids and WhatsApp group participant_ids, so callers get the
+    :func:`gateway.session.build_session_key` uses this for both Messaging
+    DM chat_ids and Messaging group participant_ids, so callers get the
     same session-key identity Hermes itself uses.
 
     Plugins that need per-sender behaviour (role-based routing,
@@ -195,12 +195,12 @@ def canonical_whatsapp_identifier(identifier: str) -> str:
     mapping files exist yet (fresh bridge install), returns the
     normalized input unchanged.
     """
-    normalized = normalize_whatsapp_identifier(identifier)
+    normalized = normalize_messaging_identifier(identifier)
     if not normalized:
         return ""
 
-    # expand_whatsapp_aliases always includes `normalized` itself in the
+    # expand_messaging_aliases always includes `normalized` itself in the
     # returned set, so the min() below degrades gracefully to `normalized`
     # when no lid-mapping files are present.
-    aliases = expand_whatsapp_aliases(normalized)
+    aliases = expand_messaging_aliases(normalized)
     return min(aliases, key=lambda candidate: (len(candidate), candidate))

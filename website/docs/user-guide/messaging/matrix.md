@@ -92,7 +92,7 @@ matrix:
     - "!abc123:matrix.org"
   ignore_user_patterns:           # Bridge/appservice ghost users to ignore
     - "^@telegram_"
-    - "^@whatsapp_"
+    - "^@messaging_"
   process_notices: false          # Ignore m.notice by default
   session_scope: room             # auto|room|thread; room is recommended for project rooms
   auto_thread: true               # Auto-create threads for responses (default: true)
@@ -107,7 +107,7 @@ MATRIX_REQUIRE_MENTION=true
 MATRIX_ALLOWED_USERS=@alice:matrix.org
 MATRIX_ALLOWED_ROOMS=!abc123:matrix.org
 MATRIX_FREE_RESPONSE_ROOMS=!abc123:matrix.org,!def456:matrix.org
-MATRIX_IGNORE_USER_PATTERNS='^@telegram_,^@whatsapp_'
+MATRIX_IGNORE_USER_PATTERNS='^@telegram_,^@messaging_'
 MATRIX_PROCESS_NOTICES=false
 MATRIX_SESSION_SCOPE=room       # recommended for stable project-room context
 MATRIX_AUTO_THREAD=true
@@ -308,7 +308,7 @@ with `_`, duplicate event IDs, old startup events, edit replacement events, and
 your bridge uses a different naming convention:
 
 ```bash
-MATRIX_IGNORE_USER_PATTERNS='^@telegram_,^@slack_,^@whatsapp_'
+MATRIX_IGNORE_USER_PATTERNS='^@telegram_,^@slack_,^@messaging_'
 ```
 
 Only enable notices when a trusted human workflow really sends `m.notice`:

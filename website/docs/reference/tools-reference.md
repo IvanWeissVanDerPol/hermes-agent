@@ -230,7 +230,7 @@ The single `video_generate` tool covers both modalities — pass `image_url` to 
 
 | Tool | Description | Requires environment |
 |------|-------------|----------------------|
-| `text_to_speech` | Convert text to speech audio. Returns a MEDIA: path that the platform delivers as a voice message. On Telegram it plays as a voice bubble, on Discord/WhatsApp as an audio attachment. In CLI mode, saves to ~/voice-memos/. Voice and provider… | — |
+| `text_to_speech` | Convert text to speech audio. Returns a MEDIA: path that the platform delivers as a voice message. On Telegram it plays as a voice bubble, on Discord/Messaging as an audio attachment. In CLI mode, saves to ~/voice-memos/. Voice and provider… | — |
 
 ## `discord` toolset
 

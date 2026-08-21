@@ -15,14 +15,14 @@ from gateway.session import (
     build_session_context,
     build_session_context_prompt,
     build_session_key,
-    canonical_whatsapp_identifier,
+    canonical_messaging_identifier,
     neutralize_untrusted_inline_text,
 )
 
 # Legacy name preserved for these tests; product renamed the function to
-# canonical_whatsapp_identifier.  Keep the tests referencing the old name
+# canonical_messaging_identifier.  Keep the tests referencing the old name
 # working without duplicating the suite.
-normalize_whatsapp_identifier = canonical_whatsapp_identifier
+normalize_messaging_identifier = canonical_messaging_identifier
 
 
 class TestSessionSourceRoundtrip:
@@ -615,8 +615,8 @@ class TestSlackWorkspaceSessionIsolation:
         )
 
 
-class TestWhatsAppSessionKeyConsistency:
-    """Regression: WhatsApp session keys must collapse JID/LID aliases to a
+class TestMessagingSessionKeyConsistency:
+    """Regression: Messaging session keys must collapse JID/LID aliases to a
     single stable identity for both DM chat_ids and group participant_ids."""
 
     @pytest.fixture()
@@ -629,35 +629,35 @@ class TestWhatsAppSessionKeyConsistency:
         return s
 
 
-    def test_whatsapp_group_participant_aliases_share_session_key(self, tmp_path, monkeypatch):
+    def test_messaging_group_participant_aliases_share_session_key(self, tmp_path, monkeypatch):
         """With group_sessions_per_user, the same human flipping between
         phone-JID and LID inside a group must not produce two isolated
         per-user sessions."""
         tmp_home = tmp_path / "hermes-home"
-        mapping_dir = tmp_home / "whatsapp" / "session"
+        mapping_dir = tmp_home / "messaging" / "session"
         mapping_dir.mkdir(parents=True, exist_ok=True)
         (mapping_dir / "lid-mapping-999999999999999.json").write_text(
-            json.dumps("15551234567@s.whatsapp.net"),
+            json.dumps("15551234567@s.messaging.net"),
             encoding="utf-8",
         )
         monkeypatch.setenv("HERMES_HOME", str(tmp_home))
 
         lid_source = SessionSource(
-            platform=Platform.WHATSAPP,
+            platform=Platform.MESSAGING,
             chat_id="120363000000000000@g.us",
             chat_type="group",
             user_id="999999999999999@lid",
             user_name="Group Member",
         )
         phone_source = SessionSource(
-            platform=Platform.WHATSAPP,
+            platform=Platform.MESSAGING,
             chat_id="120363000000000000@g.us",
             chat_type="group",
-            user_id="15551234567@s.whatsapp.net",
+            user_id="15551234567@s.messaging.net",
             user_name="Group Member",
         )
 
-        expected = "agent:main:whatsapp:group:120363000000000000@g.us:15551234567"
+        expected = "agent:main:messaging:group:120363000000000000@g.us:15551234567"
         assert build_session_key(lid_source, group_sessions_per_user=True) == expected
         assert build_session_key(phone_source, group_sessions_per_user=True) == expected
 
@@ -688,7 +688,7 @@ class TestWhatsAppSessionKeyConsistency:
         assert first_entry.session_id == second_entry.session_id
 
     def test_telegram_dm_includes_chat_id(self):
-        """Non-WhatsApp DMs should also include chat_id to separate users."""
+        """Non-Messaging DMs should also include chat_id to separate users."""
         source = SessionSource(
             platform=Platform.TELEGRAM,
             chat_id="99",
@@ -987,36 +987,36 @@ class TestSlackWorkspaceSessionKeys:
         assert restarted._db.get_session("legacy-db-session")["session_key"] == recovered.session_key
 
 
-class TestWhatsAppIdentifierPublicHelpers:
-    """Contract tests for the public WhatsApp identifier helpers.
+class TestMessagingIdentifierPublicHelpers:
+    """Contract tests for the public Messaging identifier helpers.
 
     These helpers are part of the public API for plugins that need
-    WhatsApp identity awareness. Breaking these contracts is a
+    Messaging identity awareness. Breaking these contracts is a
     breaking change for downstream plugins.
     """
 
     def test_normalize_strips_jid_suffix(self):
-        assert normalize_whatsapp_identifier("60123456789@s.whatsapp.net") == "60123456789"
+        assert normalize_messaging_identifier("60123456789@s.messaging.net") == "60123456789"
 
 
     def test_normalize_handles_empty_and_none(self):
-        assert normalize_whatsapp_identifier("") == ""
-        assert normalize_whatsapp_identifier(None) == ""  # type: ignore[arg-type]
+        assert normalize_messaging_identifier("") == ""
+        assert normalize_messaging_identifier(None) == ""  # type: ignore[arg-type]
 
 
     def test_canonical_walks_lid_mapping(self, tmp_path, monkeypatch):
         """LID is resolved to its paired phone identity via lid-mapping files."""
-        mapping_dir = tmp_path / "whatsapp" / "session"
+        mapping_dir = tmp_path / "messaging" / "session"
         mapping_dir.mkdir(parents=True, exist_ok=True)
         (mapping_dir / "lid-mapping-999999999999999.json").write_text(
-            json.dumps("15551234567@s.whatsapp.net"),
+            json.dumps("15551234567@s.messaging.net"),
             encoding="utf-8",
         )
         monkeypatch.setenv("HERMES_HOME", str(tmp_path))
 
-        canonical = canonical_whatsapp_identifier("999999999999999@lid")
+        canonical = canonical_messaging_identifier("999999999999999@lid")
         assert canonical == "15551234567"
-        assert canonical_whatsapp_identifier("15551234567@s.whatsapp.net") == "15551234567"
+        assert canonical_messaging_identifier("15551234567@s.messaging.net") == "15551234567"
 
 
 class TestSessionEntryFromDictTraversalValidation:

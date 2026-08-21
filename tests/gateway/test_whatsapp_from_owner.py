@@ -1,10 +1,10 @@
-"""Tests for WhatsApp owner-message metadata and source-level text tagging.
+"""Tests for Messaging owner-message metadata and source-level text tagging.
 
 The Node bridge sets ``fromOwner: true`` on inbound `fromMe` messages that
 look owner-typed (linked-device send, not echoed from /send) when the
-operator opts into ``WHATSAPP_FORWARD_OWNER_MESSAGES``.  These tests pin
+operator opts into ``MESSAGING_FORWARD_OWNER_MESSAGES``.  These tests pin
 the adapter's responsibility: lift that flag onto
-``MessageEvent.metadata["whatsapp_from_owner"]``, prefix ``MessageEvent.text``
+``MessageEvent.metadata["messaging_from_owner"]``, prefix ``MessageEvent.text``
 with ``[owner reply] ``, and otherwise leave metadata absent and text
 unchanged.  The env-var gate itself lives in the bridge — the adapter just
 trusts the payload.
@@ -18,22 +18,22 @@ from unittest.mock import AsyncMock, MagicMock
 import pytest
 
 from gateway.config import Platform, PlatformConfig
-from plugins.platforms.whatsapp.adapter import WhatsAppAdapter
+from plugins.platforms.messaging.adapter import MessagingAdapter
 
 
 @pytest.fixture(autouse=True)
-def _whatsapp_open_optin(monkeypatch):
-    """Opt into WhatsApp allow-all so ``dm_policy: open`` dispatch tests run.
+def _messaging_open_optin(monkeypatch):
+    """Opt into Messaging allow-all so ``dm_policy: open`` dispatch tests run.
 
     The adapter fails closed on ``open`` without an allow-all opt-in
     (SECURITY.md 2.6); these owner-DM tests set ``_dm_policy = "open"``.
     """
-    monkeypatch.setenv("WHATSAPP_ALLOW_ALL_USERS", "true")
+    monkeypatch.setenv("MESSAGING_ALLOW_ALL_USERS", "true")
 
 
 def _make_adapter():
-    adapter = WhatsAppAdapter.__new__(WhatsAppAdapter)
-    adapter.platform = Platform.WHATSAPP
+    adapter = MessagingAdapter.__new__(MessagingAdapter)
+    adapter.platform = Platform.MESSAGING
     adapter.config = PlatformConfig(enabled=True)
     adapter._message_handler = AsyncMock()
     adapter._dm_policy = "open"
@@ -42,15 +42,15 @@ def _make_adapter():
     adapter._group_allow_from = set()
     adapter._mention_patterns = []
     adapter._free_response_chats = set()
-    adapter._whatsapp_free_response_chats = lambda: set()
+    adapter._messaging_free_response_chats = lambda: set()
     return adapter
 
 
 def _dm_payload(**overrides):
     payload = {
         "messageId": "M1",
-        "chatId": "6281234567890@s.whatsapp.net",
-        "senderId": "6281234567890@s.whatsapp.net",
+        "chatId": "6281234567890@s.messaging.net",
+        "senderId": "6281234567890@s.messaging.net",
         "senderName": "Customer",
         "chatName": "Customer",
         "isGroup": False,
@@ -74,7 +74,7 @@ def test_metadata_flag_set_when_payload_has_from_owner():
     event = asyncio.run(adapter._build_message_event(payload))
 
     assert event is not None
-    assert event.metadata.get("whatsapp_from_owner") is True
+    assert event.metadata.get("messaging_from_owner") is True
     assert event.text.startswith("[owner reply] ")
     assert event.text == "[owner reply] hi from the linked phone"
 
@@ -89,7 +89,7 @@ def test_from_owner_does_not_double_prefix_when_already_tagged():
     event = asyncio.run(adapter._build_message_event(payload))
 
     assert event is not None
-    assert event.metadata.get("whatsapp_from_owner") is True
+    assert event.metadata.get("messaging_from_owner") is True
     assert event.text == "[owner reply] already tagged"
 
 

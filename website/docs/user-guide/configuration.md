@@ -1802,7 +1802,7 @@ display:
       tool_progress: 'off'    # quiet in shared Slack workspace
 ```
 
-Platforms without an override fall back to the global `tool_progress` value. Valid platform keys: `telegram`, `discord`, `slack`, `signal`, `whatsapp`, `matrix`, `mattermost`, `email`, `sms`, `homeassistant`, `dingtalk`, `feishu`, `wecom`, `weixin`, `bluebubbles`, `qqbot`. The legacy `display.tool_progress_overrides` key still loads for backward compatibility but is deprecated and migrated into `display.platforms` on first load.
+Platforms without an override fall back to the global `tool_progress` value. Valid platform keys: `telegram`, `discord`, `slack`, `signal`, `messaging`, `matrix`, `mattermost`, `email`, `sms`, `homeassistant`, `dingtalk`, `feishu`, `wecom`, `weixin`, `bluebubbles`, `qqbot`. The legacy `display.tool_progress_overrides` key still loads for backward compatibility but is deprecated and migrated into `display.platforms` on first load.
 
 Signal is listed as a valid platform key because the setting can be saved per platform, but the current Signal adapter cannot edit sent messages and does not render tool-progress bubbles. Keep Signal `tool_progress` set to `off`; use the CLI or an editing-capable messaging platform if you need to watch each tool call live.
 
@@ -1821,13 +1821,13 @@ When `redact_pii` is `true`, the gateway redacts personally identifiable informa
 
 | Field | Treatment |
 |-------|-----------|
-| Phone numbers (user ID on WhatsApp/Signal) | Hashed to `user_<12-char-sha256>` |
+| Phone numbers (user ID on Messaging/Signal) | Hashed to `user_<12-char-sha256>` |
 | User IDs | Hashed to `user_<12-char-sha256>` |
 | Chat IDs | Numeric portion hashed, platform prefix preserved (`telegram:<hash>`) |
 | Home channel IDs | Numeric portion hashed |
 | User names / usernames | **Not affected** (user-chosen, publicly visible) |
 
-**Platform support:** Redaction applies to WhatsApp, Signal, and Telegram. Discord and Slack are excluded because their mention systems (`<@user_id>`) require the real ID in the LLM context.
+**Platform support:** Redaction applies to Messaging, Signal, and Telegram. Discord and Slack are excluded because their mention systems (`<@user_id>`) require the real ID in the LLM context.
 
 Hashes are deterministic — the same user always maps to the same hash, so the model can still distinguish between users in group chats. Routing and delivery use the original values internally.
 
@@ -1857,7 +1857,7 @@ stt:
 
 Language resolution is the same for **every** STT provider (local, groq, openai, mistral, xai, elevenlabs, deepinfra, command providers, and plugins): `stt.<provider>.language` → `stt.language` → `HERMES_LOCAL_STT_LANGUAGE` env var → provider auto-detect. **The default is `stt.language: "en"`** — Whisper auto-detection frequently misidentifies short or accented clips, which shows up as voice notes transcribed in the wrong language. Non-English speakers should set `stt.language` to their language code once (e.g. `"es"`, `"zh"`, `"uk"`); set it to `""` to restore auto-detection for multilingual use.
 
-Set `stt.echo_transcripts: false` when the gateway should transcribe voice notes for the agent but must not post the raw transcript back to the chat (for example, customer-facing WhatsApp bots).
+Set `stt.echo_transcripts: false` when the gateway should transcribe voice notes for the agent but must not post the raw transcript back to the chat (for example, customer-facing Messaging bots).
 
 Provider behavior:
 
@@ -1976,7 +1976,7 @@ Control what Hermes does when an unknown user sends a direct message:
 ```yaml
 unauthorized_dm_behavior: pair
 
-whatsapp:
+messaging:
   unauthorized_dm_behavior: ignore
 ```
 
@@ -2014,7 +2014,7 @@ Usage: type `/status`, `/disk`, `/update`, `/gpu`, or `/restart` in the CLI or a
 - **Priority** — quick commands are checked before skill commands, so you can override skill names
 - **Autocomplete** — quick commands are resolved at dispatch time and are not shown in the built-in slash-command autocomplete tables
 - **Type** — supported types are `exec` and `alias`; other types show an error
-- **Works everywhere** — CLI, Telegram, Discord, Slack, WhatsApp, Signal, Email, Home Assistant
+- **Works everywhere** — CLI, Telegram, Discord, Slack, Messaging, Signal, Email, Home Assistant
 
 String-only prompt shortcuts are not valid quick commands. For reusable prompt workflows, create a skill or alias to an existing slash command.
 

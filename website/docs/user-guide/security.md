@@ -339,7 +339,7 @@ Set allowed user IDs as comma-separated values in `~/.hermes/.env`:
 # Platform-specific allowlists
 TELEGRAM_ALLOWED_USERS=123456789,987654321
 DISCORD_ALLOWED_USERS=111222333444555666
-WHATSAPP_ALLOWED_USERS=15551234567
+MESSAGING_ALLOWED_USERS=15551234567
 SLACK_ALLOWED_USERS=U01ABC123
 
 # Cross-platform allowlist (checked for all platforms)
@@ -378,14 +378,14 @@ Control how unauthorized direct messages are handled in `~/.hermes/config.yaml`:
 ```yaml
 unauthorized_dm_behavior: pair
 
-whatsapp:
+messaging:
   unauthorized_dm_behavior: ignore
 ```
 
 - `pair` is the default for chat-style DM platforms. Unauthorized DMs get a pairing code reply.
 - `ignore` silently drops unauthorized DMs.
 - Email defaults to `ignore` unless `platforms.email.unauthorized_dm_behavior: pair` is set, because inboxes can contain unrelated unread mail.
-- Platform sections override the global default, so you can keep pairing on Telegram while keeping WhatsApp silent.
+- Platform sections override the global default, so you can keep pairing on Telegram while keeping Messaging silent.
 
 **Security features** (based on OWASP + NIST SP 800-63-4 guidance):
 

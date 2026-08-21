@@ -29,7 +29,7 @@ incoming `MessageEvent` and used for routing, isolation, and context injection.
 
 | Field | Type | Default | Description |
 |---|---|---|---|
-| `platform` | `Platform` | *(required)* | Enum identifying the messaging platform (telegram, discord, slack, signal, whatsapp, matrix, local, etc.). |
+| `platform` | `Platform` | *(required)* | Enum identifying the messaging platform (telegram, discord, slack, signal, messaging, matrix, local, etc.). |
 | `chat_id` | `str` | *(required)* | Platform-level chat/group/channel identifier. Routed through the adapter's `chat_id_key` transform. |
 | `chat_name` | `Optional[str]` | `None` | Human-readable name of the chat or group. |
 | `chat_type` | `str` | `"dm"` | One of `"dm"`, `"group"`, `"channel"`, `"thread"`. Controls session key generation and isolation. |
@@ -223,7 +223,7 @@ agent:main:{platform}:{chat_type}[:{chat_id}][:{thread_id}][:{participant_id}]
 | DM with chat_id + thread | `agent:main:telegram:dm:12345:thread_678` |
 | DM without chat_id, with participant_id | `agent:main:signal:dm:user_abc` |
 | DM without chat_id or participant_id | `agent:main:telegram:dm` |
-| WhatsApp DM (canonicalized) | `agent:main:whatsapp:dm:{canonical_number}` |
+| Messaging DM (canonicalized) | `agent:main:messaging:dm:{canonical_number}` |
 
 - DMs always include `chat_id` when present, isolating each private conversation.
 - `thread_id` further differentiates threaded DMs within the same DM chat.
@@ -239,7 +239,7 @@ agent:main:{platform}:{chat_type}[:{chat_id}][:{thread_id}][:{participant_id}]
 | Thread in group, shared | `agent:main:discord:group:12345:thread_678` |
 | Thread in group, per-user | `agent:main:discord:group:12345:thread_678:user_abc` |
 | Channel | `agent:main:slack:channel:C12345` |
-| WhatsApp group (canonicalized) | `agent:main:whatsapp:group:{canonical_id}:{participant}` |
+| Messaging group (canonicalized) | `agent:main:messaging:group:{canonical_id}:{participant}` |
 
 - `chat_id` identifies the parent group/channel.
 - `thread_id` differentiates threads within that parent.
@@ -248,12 +248,12 @@ agent:main:{platform}:{chat_type}[:{chat_id}][:{thread_id}][:{participant_id}]
   - `thread_sessions_per_user` (default: `False`) — threads are **shared** by default
     (Telegram forum topics, Discord threads, Slack threads all share one session per thread).
 - `participant_id` = `user_id_alt` or `user_id` (in that priority).
-- WhatsApp identifiers are canonicalized to handle JID/LID alias flips.
+- Messaging identifiers are canonicalized to handle JID/LID alias flips.
 
 ### Special Case: WhatApp
 
-WhatsApp phone numbers go through `canonical_whatsapp_identifier()` which strips the
-`@s.whatsapp.net` suffix and normalizes to E.164 format. This prevents session fragmentation
+Messaging phone numbers go through `canonical_messaging_identifier()` which strips the
+`@s.messaging.net` suffix and normalizes to E.164 format. This prevents session fragmentation
 when the bridge returns different alias forms of the same phone number.
 
 ---

@@ -43,7 +43,7 @@ status display, gateway setup, and more.
 
 **Subclassing for platform-specific UX.** When a platform has a hard
 time-window constraint that the base adapter can't anticipate (LINE's
-60s single-use reply token, WhatsApp's 24h session window, etc.), an
+60s single-use reply token, Messaging's 24h session window, etc.), an
 adapter can override `_keep_typing` to layer a mid-flight bubble at a
 threshold without expanding the kwarg surface. Always
 `await super()._keep_typing(...)` so the typing heartbeat keeps running,
@@ -55,16 +55,16 @@ orphans) and the developer-guide page for the prose walkthrough.
 **Sibling adapters that share behavior.** When a single platform has
 two transport modes the user picks between — unofficial vs official
 APIs, polling vs websocket, library A vs library B — the right
-structure is two adapters that share a behavior mixin. WhatsApp does
-this: `gateway/platforms/whatsapp.py` (Baileys bridge) and
-`gateway/platforms/whatsapp_cloud.py` (Meta Cloud API) both inherit
-from `WhatsAppBehaviorMixin` in `gateway/platforms/whatsapp_common.py`.
+structure is two adapters that share a behavior mixin. Messaging does
+this: `gateway/platforms/messaging.py` (Baileys bridge) and
+`gateway/platforms/messaging_cloud.py` (Meta Cloud API) both inherit
+from `MessagingBehaviorMixin` in `gateway/platforms/messaging_common.py`.
 The mixin owns gating, allow-lists, mention parsing, broadcast
-filters, and the WhatsApp-flavored markdown conversion — everything
+filters, and the Messaging-flavored markdown conversion — everything
 that's platform-protocol-agnostic. Each adapter owns its transport.
 Both register distinct `Platform.*` enum values so the gateway can run
 both simultaneously against different phone numbers. The mixin must
-come **first** in the bases list — `class WhatsAppAdapter(Mixin,
+come **first** in the bases list — `class MessagingAdapter(Mixin,
 BasePlatformAdapter)` — so the mixin's `format_message` overrides
 `BasePlatformAdapter`'s generic default.
 
@@ -122,7 +122,7 @@ If your platform supports interactive button/menu messages, implement these for 
 | `send_model_picker(...)` | Interactive `/model` picker. Used by Telegram and Discord. |
 | `send_choice_picker(...)` | Flat single-level picker for finite-choice commands (`/reasoning`, `/fast`). Implemented by Telegram (inline keyboard), Discord (select menu), and Matrix (reactions). Platforms without it fall back to the text status card automatically. |
 
-See `gateway/platforms/telegram.py`, `discord.py`, and `whatsapp_cloud.py` for reference implementations. The button-callback id convention (`cl:<id>:<idx>`, `appr:<id>:<choice>`, `sc:<choice>:<id>`) is shared across adapters — match it so the gateway-side resolvers work without modification.
+See `gateway/platforms/telegram.py`, `discord.py`, and `messaging_cloud.py` for reference implementations. The button-callback id convention (`cl:<id>:<idx>`, `appr:<id>:<choice>`, `sc:<choice>:<id>`) is shared across adapters — match it so the gateway-side resolvers work without modification.
 
 ### Required function
 
@@ -168,7 +168,7 @@ if your_token:
 ```
 
 Update `get_connected_platforms()` if your platform doesn't use token/api_key
-(e.g., WhatsApp uses `enabled` flag, Signal uses `extra` dict).
+(e.g., Messaging uses `enabled` flag, Signal uses `extra` dict).
 
 ---
 
@@ -307,7 +307,7 @@ If your platform can't enumerate chats (most can't), add it to the
 session-based discovery list:
 
 ```python
-for plat_name in ("telegram", "whatsapp", "signal", "your_platform"):
+for plat_name in ("telegram", "messaging", "signal", "your_platform"):
 ```
 
 ---
@@ -398,7 +398,7 @@ After implementing everything, verify with:
 python -m pytest tests/ -q
 
 # Grep for your platform name to find any missed integration points
-grep -r "telegram\|discord\|whatsapp\|slack" gateway/ tools/ agent/ cron/ hermes_cli/ toolsets.py \
+grep -r "telegram\|discord\|messaging\|slack" gateway/ tools/ agent/ cron/ hermes_cli/ toolsets.py \
   --include="*.py" -l | sort -u
 # Check each file in the output — if it mentions other platforms but not yours, you missed it
 ```

@@ -164,7 +164,7 @@ class TestEmailAdapterUnscopedUnderMultiplex(unittest.TestCase):
     ``_profile_runtime_scope``; the default profile's adapter is constructed
     with no scope installed while multiplexing is active. A bare
     ``get_secret`` raises ``UnscopedSecretError`` there and would crash the
-    email path on startup — the exact WhatsApp defect fixed in 5438e9c629.
+    email path on startup — the exact Messaging defect fixed in 5438e9c629.
     The Slack-pattern helper (``_get_esecret``) must swallow that and read
     the default profile's own ``os.environ`` values instead.
     """

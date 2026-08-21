@@ -60,7 +60,7 @@ On Termux, the installer automatically:
 - creates the venv with `python -m venv`
 - attempts the broad `.[termux-all]` extra first and falls back to the smaller `.[termux]` extra (then a base install) — the curl installer matches this order automatically
 - links `hermes` into `$PREFIX/bin` so it stays on your Termux PATH
-- skips the untested browser / WhatsApp bootstrap
+- skips the untested browser / Messaging bootstrap
 
 If you want the explicit commands or need to debug a failed install, use the manual path below.
 
@@ -164,7 +164,7 @@ npm install
 
 The browser tool automatically includes Termux directories (`/data/data/com.termux/files/usr/bin`) in its PATH search, so `agent-browser` and `npx` are discovered without any extra PATH configuration.
 
-Treat browser / WhatsApp tooling on Android as experimental until documented otherwise.
+Treat browser / Messaging tooling on Android as experimental until documented otherwise.
 
 ---
 

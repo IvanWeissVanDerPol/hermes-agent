@@ -704,7 +704,7 @@ memory:
 # =============================================================================
 # Session Reset Policy (Messaging Platforms)
 # =============================================================================
-# Controls when messaging sessions (Telegram, Discord, WhatsApp, Slack) are
+# Controls when messaging sessions (Telegram, Discord, Messaging, Slack) are
 # automatically cleared. Default is "none": sessions never auto-reset —
 # conversation context lives until you /reset or /new manually, or context
 # compression kicks in. Opt in to automatic resets if you prefer sessions to
@@ -948,7 +948,7 @@ agent:
 #   - A preset like "hermes-cli" or "hermes-telegram" (curated tool set)
 #   - A list of individual toolsets to compose your own (see list below)
 #
-# Supported platform keys: cli, telegram, discord, whatsapp, slack, qqbot, teams, google_chat
+# Supported platform keys: cli, telegram, discord, messaging, slack, qqbot, teams, google_chat
 #
 # Examples:
 #
@@ -973,7 +973,7 @@ agent:
 #   cli:           hermes-cli            (everything + cronjob management)
 #   telegram:      hermes-telegram       (terminal, file, web, vision, image, tts, browser, skills, todo, cronjob, messaging)
 #   discord:       hermes-discord        (same as telegram)
-#   whatsapp:      hermes-whatsapp       (same as telegram)
+#   messaging:      hermes-messaging       (same as telegram)
 #   slack:         hermes-slack          (same as telegram)
 #   signal:        hermes-signal         (same as telegram)
 #   homeassistant: hermes-homeassistant  (same as telegram)
@@ -985,7 +985,7 @@ platform_toolsets:
   cli: [hermes-cli]
   telegram: [hermes-telegram]
   discord: [hermes-discord]
-  whatsapp: [hermes-whatsapp]
+  messaging: [hermes-messaging]
   slack: [hermes-slack]
   signal: [hermes-signal]
   homeassistant: [hermes-homeassistant]
@@ -1066,7 +1066,7 @@ platform_toolsets:
 #   hermes-telegram  - terminal, file, web, vision, image_gen, tts, browser,
 #                      skills, todo, cronjob, send_message
 #   hermes-discord   - Same as hermes-telegram
-#   hermes-whatsapp  - Same as hermes-telegram
+#   hermes-messaging  - Same as hermes-telegram
 #   hermes-slack     - Same as hermes-telegram
 #
 # COMPOSITE:

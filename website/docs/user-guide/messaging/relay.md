@@ -13,7 +13,7 @@ may change without a deprecation cycle while the system is being validated.
 
 Hermes Relay is not a chat platform itself — it is a **connector system** that
 lets your gateway front one or more real messaging platforms (Discord,
-Telegram, Slack, WhatsApp, …) **without holding any platform credentials**. A
+Telegram, Slack, Messaging, …) **without holding any platform credentials**. A
 separate service, the *connector*, owns the platform bot tokens and sockets.
 Your gateway dials **out** to the connector over a single authenticated
 WebSocket, receives a capability descriptor at handshake, and then exchanges
@@ -128,7 +128,7 @@ negotiation, the relay supports:
   reach the gateway. Media re-hosts are capped at 25 MB and expire (~1 hour).
 - **Native interactive prompts** — exec approvals, confirmations, and clarify
   questions render with **native platform controls** (Discord buttons,
-  Telegram inline keyboards, Slack Block Kit actions, WhatsApp button/list
+  Telegram inline keyboards, Slack Block Kit actions, Messaging button/list
   messages) instead of numbered-text fallbacks. Button presses come back as
   authenticated prompt responses from the actual clicking user, so the
   gateway's authorization gates apply exactly as to a typed reply. Prompt
@@ -140,7 +140,7 @@ negotiation, the relay supports:
   (including LLM-titled semantic renames) through platform-abstract
   `thread_create` / `thread_rename` operations, with a no-clobber guard so a
   human's manual rename wins. Availability depends on the platform (e.g.
-  Slack threads can't be renamed; WhatsApp has no threads).
+  Slack threads can't be renamed; Messaging has no threads).
 - **Typing indicators** — the gateway egresses typing (and stop-typing) through
   the connector while processing.
 - **Chat metadata** — `get_chat_info` lookups are proxied to the connector

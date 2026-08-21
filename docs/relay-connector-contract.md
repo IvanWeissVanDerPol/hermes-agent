@@ -51,7 +51,7 @@ JSON object. Source of truth: `gateway/relay/descriptor.py`.
 | `emoji` | string | no | Display emoji (default 🔌). |
 | `platform_hint` | string | no | System-prompt platform hint. |
 | `pii_safe` | bool | no | Redact PII in session descriptions. |
-| `supports_context` | bool | no | Whether the connector can supply surrounding channel/group **context** for an addressed turn on this platform (Model A on-demand history fetch — Discord/Slack/Matrix; Model B passive buffer — Telegram/Signal/WhatsApp). Default false ⇒ no `context` is attached to inbound events. See §3. |
+| `supports_context` | bool | no | Whether the connector can supply surrounding channel/group **context** for an addressed turn on this platform (Model A on-demand history fetch — Discord/Slack/Matrix; Model B passive buffer — Telegram/Signal/Messaging). Default false ⇒ no `context` is attached to inbound events. See §3. |
 | `supported_ops` | string[] | no | Op-level capability discovery: the outbound op names the connector's sender for this platform actually implements (e.g. `["send", "edit", "typing", "follow_up", "get_chat_info"]`). Absent/empty ⇒ the connector predates the field and the gateway assumes the legacy op set (`send`/`edit`/`typing`/`follow_up`); a NEW op is used only when explicitly advertised. |
 
 Most fields are a projection of the gateway's existing `PlatformEntry`; the
@@ -412,7 +412,7 @@ scheme as the WS upgrade; response `{id, size}` → reference
 fal.media generation) the connector downloads directly. `media_kind` is one of
 `image` / `voice` / `audio` / `video` / `document` and selects the
 platform-native upload lane (Telegram `sendPhoto`/`sendVoice`/…, Discord
-multipart attachment, Slack external upload, WhatsApp media upload + media
+multipart attachment, Slack external upload, Messaging media upload + media
 message). The caption rides `content` and renders through the platform's
 normal markdown lane; platforms without native captions get a follow-up text
 send (connector-side). Both routes and the op are gated on `supported_ops`
@@ -423,7 +423,7 @@ media sends degrade to their pre-media text fallbacks). Size cap 25 MB
 **Inbound media (Phase 2 media ingress).** An inbound event's `media_urls`
 carry fetchable references: platform-public URLs pass through (Discord CDN);
 auth-gated/expiring platform URLs (Telegram file API, Slack `url_private`,
-WhatsApp Graph media) are downloaded connector-side with the PLATFORM
+Messaging Graph media) are downloaded connector-side with the PLATFORM
 credential and re-hosted as `{connector}/relay/media/{id}` — the platform
 credential never crosses the wire. Re-host references are readable by any
 authenticated gateway (capability-URL semantics: the id is 128-bit random and
@@ -437,7 +437,7 @@ attachment's kind (`image`/`audio`/`document`).
 **`prompt` (Phase 3 interactive).** One platform-abstract op renders the
 gateway's highest-stakes interactions (exec approvals, slash confirms,
 clarify pickers) with NATIVE controls: Discord button components, Telegram
-inline keyboards, Slack Block Kit actions, WhatsApp button messages (≤3
+inline keyboards, Slack Block Kit actions, Messaging button messages (≤3
 options) / list messages (4–10; >10 degrades to the numbered-text fallback).
 `prompt_kind` (`approval`/`clarify`/`choice`) is a styling hint only.
 `prompt_id` is gateway-minted (8 hex) and opaque to the connector; each
@@ -456,17 +456,17 @@ a bare platform `custom_id`. The event's `text` mirrors `/{option_id}` with
 `message_type: "command"` so a gateway predating the field routes the press
 as a typed reply instead of dropping it. The SOURCE is the authentic
 CLICKING user (connector-observed: Telegram `callback_query.from`, Slack
-`block_actions.user`, WhatsApp `messages[].from`, Discord interaction
+`block_actions.user`, Messaging `messages[].from`, Discord interaction
 member/user), so gateway-side authorization gates apply to a button press
 exactly as to a typed `/approve`. Ingest lanes: Telegram `callback_query`
 (polled, `allowed_updates` widened; best-effort `answerCallbackQuery`
 spinner-stop), Slack `POST /slack/interactions` (raw-bytes HMAC + replay
-window, same posture as `/slack/commands`), WhatsApp interactive
+window, same posture as `/slack/commands`), Messaging interactive
 `button_reply`/`list_reply` (webhook normalize arm), Discord type-3
 component interactions (passthrough §5.1 sanitized forward; the type-3 edge
 ack is `DEFERRED_UPDATE` so no visible "thinking…" reply). Foreign
 callback payloads (another integration's buttons) never become prompt
-events: Telegram/Slack/WhatsApp drop them at the connector; Discord type-3
+events: Telegram/Slack/Messaging drop them at the connector; Discord type-3
 forwards keep the legacy custom_id-as-text shape.
 
 **`react` (Phase 3 ack lifecycle).** Adds/removes the bot's own `emoji`
@@ -476,7 +476,7 @@ Slack sender maps to Slack's name vocabulary (`eyes`, `white_check_mark`, …)
 and treats `already_reacted`/`no_reaction` as success (idempotent). Telegram
 uses `setMessageReaction` (empty set = remove; Telegram's curated-emoji
 restriction can reject glyphs — the failure is structured and the gateway
-treats reactions as cosmetic). WhatsApp sends a reaction message (empty
+treats reactions as cosmetic). Messaging sends a reaction message (empty
 emoji = remove). Reactions are best-effort by contract: a `react` failure
 must never fail a turn.
 
@@ -494,7 +494,7 @@ CONNECTOR-side: Discord reads the current name first and no-ops (structured
 `success:false`) on mismatch; Telegram has no topic-name read, so a GUARDED
 rename is unsatisfiable and fails safe (unguarded renames proceed). Slack
 does not advertise `thread_rename` (a root message's text is content, not a
-name). WhatsApp advertises neither (no threads).
+name). Messaging advertises neither (no threads).
 
 **Auto-thread markers + gateway-declared command manifest (Phase 4
 inbound/handshake).** When the connector's auto-thread egress policy creates
@@ -515,7 +515,7 @@ keeps Discord's registry in sync with what the gateway's dispatcher handles.
 `reply_to: {text?, author?, is_own?}` alongside `reply_to_message_id` — what
 the user QUOTED, populated only from data the connector already had in hand
 (Discord's inline `referenced_message`, Telegram's inline
-`reply_to_message`, WhatsApp `context.from` + a bounded per-instance
+`reply_to_message`, Messaging `context.from` + a bounded per-instance
 inbound-text cache for the text leg). Absent fields mean the platform didn't
 carry the data — never triggers an extra platform API call. `is_own` = the
 quoted message was authored by the fronted bot (same evidence as the

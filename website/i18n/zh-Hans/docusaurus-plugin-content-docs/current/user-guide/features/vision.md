@@ -159,7 +159,7 @@ powershell.exe -NoProfile -Command "Add-Type -AssemblyName System.Windows.Forms;
 
 3. **X11 转发**——使用 `ssh -X` 连接以转发 X11。这允许远程机器上的 `xclip` 访问你本地的 X11 剪贴板。需要本地运行 X 服务器（macOS 上为 XQuartz，Linux X11 桌面内置）。大图像传输较慢。
 
-4. **使用消息平台**——通过 Telegram、Discord、Slack 或 WhatsApp 向 Hermes 发送图像。这些平台原生支持图像上传，不受剪贴板/终端限制的影响。
+4. **使用消息平台**——通过 Telegram、Discord、Slack 或 Messaging 向 Hermes 发送图像。这些平台原生支持图像上传，不受剪贴板/终端限制的影响。
 
 ## 为什么终端无法粘贴图像
 

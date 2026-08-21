@@ -1,12 +1,12 @@
 ---
 sidebar_position: 1
 title: "消息网关"
-description: "通过 Telegram、Discord、Slack、WhatsApp、Signal、SMS、Email、Home Assistant、Mattermost、Matrix、DingTalk、Yuanbao、Microsoft Teams、LINE、Webhooks 或任何兼容 OpenAI 的前端与 Hermes 对话 — 架构与配置概览"
+description: "通过 Telegram、Discord、Slack、Messaging、Signal、SMS、Email、Home Assistant、Mattermost、Matrix、DingTalk、Yuanbao、Microsoft Teams、LINE、Webhooks 或任何兼容 OpenAI 的前端与 Hermes 对话 — 架构与配置概览"
 ---
 
 # 消息网关
 
-通过 Telegram、Discord、Slack、WhatsApp、Signal、SMS、Email、Home Assistant、Mattermost、Matrix、DingTalk、Feishu/Lark、WeCom、Weixin、BlueBubbles（iMessage）、QQ、Yuanbao、Microsoft Teams、LINE、ntfy 或浏览器与 Hermes 对话。网关是一个单一后台进程，连接所有已配置的平台，管理会话，运行 cron 任务，并传递语音消息。
+通过 Telegram、Discord、Slack、Messaging、Signal、SMS、Email、Home Assistant、Mattermost、Matrix、DingTalk、Feishu/Lark、WeCom、Weixin、BlueBubbles（iMessage）、QQ、Yuanbao、Microsoft Teams、LINE、ntfy 或浏览器与 Hermes 对话。网关是一个单一后台进程，连接所有已配置的平台，管理会话，运行 cron 任务，并传递语音消息。
 
 完整的语音功能集——包括 CLI 麦克风模式、消息中的语音回复以及 Discord 语音频道对话——请参阅 [Voice Mode](/user-guide/features/voice-mode) 和 [Use Voice Mode with Hermes](/guides/use-voice-mode-with-hermes)。
 
@@ -18,7 +18,7 @@ description: "通过 Telegram、Discord、Slack、WhatsApp、Signal、SMS、Emai
 | Discord | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | Slack | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | Google Chat | — | ✅ | ✅ | ✅ | — | ✅ | — |
-| WhatsApp | — | ✅ | ✅ | — | — | ✅ | ✅ |
+| Messaging | — | ✅ | ✅ | — | — | ✅ | ✅ |
 | Signal | — | ✅ | ✅ | — | — | ✅ | ✅ |
 | SMS | — | — | — | — | — | — | — |
 | Email | — | ✅ | ✅ | ✅ | — | — | — |
@@ -47,7 +47,7 @@ flowchart TB
         subgraph Adapters["Platform adapters"]
             tg[Telegram]
             dc[Discord]
-            wa[WhatsApp]
+            wa[Messaging]
             sl[Slack]
             gc[Google Chat]
             sig[Signal]
@@ -410,7 +410,7 @@ tail -f ~/.hermes/logs/gateway.log   # 查看日志
 
 生成的 plist 文件位于 `~/Library/LaunchAgents/ai.hermes.gateway.plist`。它包含三个环境变量：
 
-- **PATH** — 安装时你的完整 shell PATH，并在前面添加了 venv `bin/` 和 `node_modules/.bin`。这确保用户安装的工具（Node.js、ffmpeg 等）可供网关子进程（如 WhatsApp 桥接）使用。
+- **PATH** — 安装时你的完整 shell PATH，并在前面添加了 venv `bin/` 和 `node_modules/.bin`。这确保用户安装的工具（Node.js、ffmpeg 等）可供网关子进程（如 Messaging 桥接）使用。
 - **VIRTUAL_ENV** — 指向 Python 虚拟环境，使工具能正确解析包。
 - **HERMES_HOME** — 将网关限定到你的 Hermes 安装。
 
@@ -431,7 +431,7 @@ launchd plist 是静态的——如果你在配置网关后安装了新工具（
 | CLI | `hermes-cli` | 完全访问 |
 | Telegram | `hermes-telegram` | 完整工具，包括终端 |
 | Discord | `hermes-discord` | 完整工具，包括终端 |
-| WhatsApp | `hermes-whatsapp` | 完整工具，包括终端 |
+| Messaging | `hermes-messaging` | 完整工具，包括终端 |
 | Slack | `hermes-slack` | 完整工具，包括终端 |
 | Google Chat | `hermes-google_chat` | 完整工具，包括终端 |
 | Signal | `hermes-signal` | 完整工具，包括终端 |
@@ -551,7 +551,7 @@ display:
 - [Discord 配置](discord.md)
 - [Slack 配置](slack.md)
 - [Google Chat 配置](google_chat.md)
-- [WhatsApp 配置](whatsapp.md)
+- [Messaging 配置](messaging.md)
 - [Signal 配置](signal.md)
 - [SMS 配置（Twilio）](sms.md)
 - [Email 配置](email.md)

@@ -203,7 +203,7 @@ sequenceDiagram
 
 - Changing model streaming semantics in `run_agent.py`.
 - Reworking Telegram draft streaming, which is DM-only and not the forum-topic path in the screenshot.
-- Changing general platform message splitting for Discord, Slack, WhatsApp, or Matrix unless a shared helper must be corrected for the Telegram fix.
+- Changing general platform message splitting for Discord, Slack, Messaging, or Matrix unless a shared helper must be corrected for the Telegram fix.
 - Altering tool-progress display settings or terminal progress rendering.
 
 ### Deferred to Follow-Up Work

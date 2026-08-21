@@ -155,7 +155,7 @@ configure them only on the default profile.
 
 Port-binding platforms covered by this rule: `webhook`, `api_server`,
 `msgraph_webhook`, `feishu`, `wecom_callback`, `bluebubbles`, `sms`,
-`whatsapp_cloud`, `line`. Configure any of these **only on the default profile**;
+`messaging_cloud`, `line`. Configure any of these **only on the default profile**;
 every profile is reachable through its `/p/<profile>/` prefix.
 
 Authentication follows the profile named in the URL. Unprefixed endpoints keep
@@ -472,7 +472,7 @@ and reboots.
 ## Token-conflict safety
 
 Each profile must use unique bot tokens for each platform. If two profiles
-share a Telegram, Discord, Slack, WhatsApp, or Signal token, the second
+share a Telegram, Discord, Slack, Messaging, or Signal token, the second
 gateway refuses to start with an error naming the conflicting profile.
 
 To audit:

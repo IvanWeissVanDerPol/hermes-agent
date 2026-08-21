@@ -580,7 +580,7 @@ def _looks_like_gateway_provider_error(text: str) -> bool:
 def _sanitize_gateway_final_response(platform: Any, text: str) -> str:
     """Sanitize final gateway replies before sending them to chat surfaces.
 
-    Every human-facing chat surface (Telegram, WhatsApp, Discord, Slack,
+    Every human-facing chat surface (Telegram, Messaging, Discord, Slack,
     Signal, Matrix, plugin platforms, etc.) should receive concise, safe
     provider failure categories with secrets redacted instead of raw HTTP
     bodies, request IDs, leaked credentials, or policy text. Only programmatic
@@ -2287,10 +2287,10 @@ from gateway.restart import (
 )
 
 
-from gateway.whatsapp_identity import (
-    canonical_whatsapp_identifier as _canonical_whatsapp_identifier,  # noqa: F401
-    expand_whatsapp_aliases as _expand_whatsapp_auth_aliases,
-    normalize_whatsapp_identifier as _normalize_whatsapp_identifier,
+from gateway.messaging_identity import (
+    canonical_messaging_identifier as _canonical_messaging_identifier,  # noqa: F401
+    expand_messaging_aliases as _expand_messaging_auth_aliases,
+    normalize_messaging_identifier as _normalize_messaging_identifier,
 )
 
 
@@ -2302,7 +2302,7 @@ _OWN_POLICY_OPEN_ENV = {
     Platform.WEIXIN: ("WEIXIN_DM_POLICY", "WEIXIN_GROUP_POLICY", "WEIXIN_ALLOW_ALL_USERS"),
     Platform.YUANBAO: ("YUANBAO_DM_POLICY", "YUANBAO_GROUP_POLICY", "YUANBAO_ALLOW_ALL_USERS"),
     Platform.QQBOT: (None, None, "QQ_ALLOW_ALL_USERS"),
-    Platform.WHATSAPP: ("WHATSAPP_DM_POLICY", "WHATSAPP_GROUP_POLICY", "WHATSAPP_ALLOW_ALL_USERS"),
+    Platform.MESSAGING: ("MESSAGING_DM_POLICY", "MESSAGING_GROUP_POLICY", "MESSAGING_ALLOW_ALL_USERS"),
 }
 
 
@@ -7239,7 +7239,7 @@ class GatewayRunner(GatewayAuthorizationMixin, GatewayKanbanWatchersMixin, Gatew
             #   • cron jobs still run
             #   • the reconnect watcher can recover platforms when the
             #     underlying problem clears (proxy comes back, user runs
-            #     `hermes whatsapp`, etc.)
+            #     `hermes messaging`, etc.)
             # We used to exit-with-failure here to trigger systemd restart,
             # but that converted a transient outage into a restart loop and
             # killed in-process state every time. The reconnect watcher
@@ -10706,7 +10706,7 @@ class GatewayRunner(GatewayAuthorizationMixin, GatewayKanbanWatchersMixin, Gatew
         # Warn if no user allowlists are configured and open access is not opted in
         _builtin_allowed_vars = (
             "TELEGRAM_ALLOWED_USERS", "DISCORD_ALLOWED_USERS",
-            "WHATSAPP_ALLOWED_USERS", "WHATSAPP_CLOUD_ALLOWED_USERS",
+            "MESSAGING_ALLOWED_USERS", "MESSAGING_CLOUD_ALLOWED_USERS",
             "SLACK_ALLOWED_USERS",
             "SIGNAL_ALLOWED_USERS", "SIGNAL_GROUP_ALLOWED_USERS",
             "TELEGRAM_GROUP_ALLOWED_USERS",
@@ -10725,7 +10725,7 @@ class GatewayRunner(GatewayAuthorizationMixin, GatewayKanbanWatchersMixin, Gatew
         )
         _builtin_allow_all_vars = (
             "TELEGRAM_ALLOW_ALL_USERS", "DISCORD_ALLOW_ALL_USERS",
-            "WHATSAPP_ALLOW_ALL_USERS", "WHATSAPP_CLOUD_ALLOW_ALL_USERS",
+            "MESSAGING_ALLOW_ALL_USERS", "MESSAGING_CLOUD_ALLOW_ALL_USERS",
             "SLACK_ALLOW_ALL_USERS",
             "SIGNAL_ALLOW_ALL_USERS", "EMAIL_ALLOW_ALL_USERS",
             "SMS_ALLOW_ALL_USERS", "MATTERMOST_ALLOW_ALL_USERS",
@@ -11162,7 +11162,7 @@ class GatewayRunner(GatewayAuthorizationMixin, GatewayKanbanWatchersMixin, Gatew
                 return True
             if startup_nonretryable_errors:
                 # Mixed failure mode (NS-609): some platforms are fatally
-                # misconfigured (e.g. WhatsApp enabled but never paired) while
+                # misconfigured (e.g. Messaging enabled but never paired) while
                 # others hit merely transient errors (e.g. Telegram TimedOut
                 # during polling startup).  Exiting with
                 # GATEWAY_FATAL_CONFIG_EXIT_CODE here is wrong in both
@@ -11189,7 +11189,7 @@ class GatewayRunner(GatewayAuthorizationMixin, GatewayKanbanWatchersMixin, Gatew
                     #   • cron jobs still run
                     #   • the reconnect watcher gets a chance to recover the
                     #     failing platforms once the underlying problem is
-                    #     fixed (e.g. user runs `hermes whatsapp`, fixes
+                    #     fixed (e.g. user runs `hermes messaging`, fixes
                     #     proxy, etc.)
                     # Exiting here used to convert a single misconfigured
                     # platform into an infinite systemd restart loop.
@@ -11641,7 +11641,7 @@ class GatewayRunner(GatewayAuthorizationMixin, GatewayKanbanWatchersMixin, Gatew
 
         # Try to create a fresh thread on the destination so the handoff
         # has its own scrollback. Adapter returns None if threading isn't
-        # supported (Matrix/WhatsApp/Signal/SMS) or if creation failed
+        # supported (Matrix/Messaging/Signal/SMS) or if creation failed
         # (no permission, topics-mode off, parent is a DM, etc.). When
         # None we fall through to using the home channel directly — the
         # synthetic turn still lands; just without thread isolation.
@@ -13637,17 +13637,17 @@ class GatewayRunner(GatewayAuthorizationMixin, GatewayKanbanWatchersMixin, Gatew
             logger.debug("Platform registry lookup for '%s' failed: %s", platform.value, e)
         # Fall through to built-in adapters below
 
-        if platform == Platform.WHATSAPP_CLOUD:
-            from gateway.platforms.whatsapp_cloud import (
-                WhatsAppCloudAdapter,
-                check_whatsapp_cloud_requirements,
+        if platform == Platform.MESSAGING_CLOUD:
+            from gateway.platforms.messaging_cloud import (
+                MessagingCloudAdapter,
+                check_messaging_cloud_requirements,
             )
-            if not check_whatsapp_cloud_requirements():
+            if not check_messaging_cloud_requirements():
                 logger.warning(
-                    "WhatsApp Cloud: aiohttp/httpx missing — reinstall hermes-agent"
+                    "Messaging Cloud: aiohttp/httpx missing — reinstall hermes-agent"
                 )
                 return None
-            return WhatsAppCloudAdapter(config)
+            return MessagingCloudAdapter(config)
         
         elif platform == Platform.SIGNAL:
             from gateway.platforms.signal import (
@@ -19025,7 +19025,7 @@ class GatewayRunner(GatewayAuthorizationMixin, GatewayKanbanWatchersMixin, Gatew
 
             # Platform-aware output path: platforms whose native voice
             # bubbles require Ogg/Opus (OPUS_VOICE_PLATFORMS — Telegram,
-            # Matrix, Feishu, WhatsApp, Signal) get an explicit .ogg path;
+            # Matrix, Feishu, Messaging, Signal) get an explicit .ogg path;
             # the TTS tool's central container repair guarantees real
             # Ogg/Opus bytes for every provider. Others keep MP3.
             audio_path = build_auto_tts_output_path(event.source.platform)
@@ -20526,7 +20526,7 @@ class GatewayRunner(GatewayAuthorizationMixin, GatewayKanbanWatchersMixin, Gatew
     # ``allow_update_command=True`` on their ``PlatformEntry`` and are
     # honored via the registry fallback at ``_handle_update_command`` below.
     _UPDATE_ALLOWED_PLATFORMS = frozenset({
-        Platform.TELEGRAM, Platform.SLACK, Platform.WHATSAPP,
+        Platform.TELEGRAM, Platform.SLACK, Platform.MESSAGING,
         Platform.SIGNAL, Platform.MATRIX,
         Platform.EMAIL, Platform.SMS, Platform.DINGTALK,
         Platform.FEISHU, Platform.WECOM, Platform.WECOM_CALLBACK, Platform.WEIXIN, Platform.BLUEBUBBLES, Platform.QQBOT, Platform.LOCAL,

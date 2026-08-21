@@ -2538,7 +2538,7 @@ def _get_section_config_summary(config: dict, section_key: str) -> Optional[str]
     elif section_key == "gateway":
         from hermes_cli.gateway import _all_platforms, _platform_status
         # Count any non-empty status other than the "not configured" sentinel —
-        # platforms like WhatsApp ("enabled, not paired"), Matrix ("configured
+        # platforms like Messaging ("enabled, not paired"), Matrix ("configured
         # + E2EE"), and Signal ("partially configured") all indicate the user
         # has already started setup and we shouldn't force the section to rerun.
         configured = [
@@ -2630,7 +2630,7 @@ _HIGH_IMPACT_KIND_KEYWORDS = {
     "telegram": "⚠ Telegram — this will point Hermes at your OpenClaw Telegram bot",
     "slack": "⚠ Slack — this will point Hermes at your OpenClaw Slack workspace",
     "discord": "⚠ Discord — this will point Hermes at your OpenClaw Discord bot",
-    "whatsapp": "⚠ WhatsApp — this will point Hermes at your OpenClaw WhatsApp connection",
+    "messaging": "⚠ Messaging — this will point Hermes at your OpenClaw Messaging connection",
     "config": "⚠ Config values — OpenClaw settings may not map 1:1 to Hermes equivalents",
     "soul": "⚠ Instruction file — may contain OpenClaw-specific setup/restart procedures",
     "memory": "⚠ Memory/context file — may reference OpenClaw-specific infrastructure",

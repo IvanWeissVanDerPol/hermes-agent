@@ -650,7 +650,7 @@ class TestQuickSnapshot:
         (home / ".env").write_text("OPENROUTER_API_KEY=test-key-123\n")
         (home / "auth.json").write_text('{"providers": {}}\n')
         (home / "channel_aliases.json").write_text(
-            '{"whatsapp": {"120363408391911677@g.us": "general"}}\n'
+            '{"messaging": {"120363408391911677@g.us": "general"}}\n'
         )
         (home / "cron").mkdir()
         (home / "cron" / "jobs.json").write_text('{"jobs": []}\n')

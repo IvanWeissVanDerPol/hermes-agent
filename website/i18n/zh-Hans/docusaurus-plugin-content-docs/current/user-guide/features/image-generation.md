@@ -142,7 +142,7 @@ export IMAGE_TOOLS_DEBUG=true
 | **Telegram** | 以图片消息发送，附提示词为说明 |
 | **Discord** | 嵌入消息 |
 | **Slack** | URL 由 Slack 展开预览 |
-| **WhatsApp** | 媒体消息 |
+| **Messaging** | 媒体消息 |
 | **其他** | 纯文本中的 URL |
 
 ## 限制

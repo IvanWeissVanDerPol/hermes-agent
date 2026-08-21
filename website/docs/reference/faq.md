@@ -93,7 +93,7 @@ Hermes Agent itself is **free and open-source** (MIT license). You pay only for 
 
 ### Can multiple people use one instance?
 
-Yes. The [messaging gateway](../user-guide/messaging/index.md) lets multiple users interact with the same Hermes Agent instance via Telegram, Discord, Slack, WhatsApp, or Home Assistant. Access is controlled through allowlists (specific user IDs) and DM pairing (first user to message claims access).
+Yes. The [messaging gateway](../user-guide/messaging/index.md) lets multiple users interact with the same Hermes Agent instance via Telegram, Discord, Slack, Messaging, or Home Assistant. Access is controlled through allowlists (specific user IDs) and DM pairing (first user to message claims access).
 
 ### What's the difference between memory and skills?
 
@@ -397,7 +397,7 @@ cat ~/.hermes/logs/gateway.log | tail -50
 **Solution:**
 - Verify your bot token is valid with `hermes gateway setup`
 - Check gateway logs: `cat ~/.hermes/logs/gateway.log | tail -50`
-- For webhook-based platforms (Slack, WhatsApp), ensure your server is publicly accessible
+- For webhook-based platforms (Slack, Messaging), ensure your server is publicly accessible
 
 #### Allowlist confusion — who can talk to the bot?
 
@@ -467,7 +467,7 @@ For reliable auto-start, use Windows Task Scheduler to launch WSL + the gateway 
 
 #### macOS: Node.js / ffmpeg / other tools not found by gateway
 
-**Cause:** launchd services inherit a minimal PATH (`/usr/bin:/bin:/usr/sbin:/sbin`) that doesn't include Homebrew, nvm, cargo, or other user-installed tool directories. This commonly breaks the WhatsApp bridge (`node not found`) or voice transcription (`ffmpeg not found`).
+**Cause:** launchd services inherit a minimal PATH (`/usr/bin:/bin:/usr/sbin:/sbin`) that doesn't include Homebrew, nvm, cargo, or other user-installed tool directories. This commonly breaks the Messaging bridge (`node not found`) or voice transcription (`ffmpeg not found`).
 
 **Solution:** The gateway captures your shell PATH when you run `hermes gateway install`. If you installed tools after setting up the gateway, re-run the install to capture the updated PATH:
 
@@ -654,11 +654,11 @@ Each `/model` switch resets the prompt cache — the cache key includes the mode
 
 See [Subagent Delegation](../user-guide/features/delegation.md) for more on how delegation works.
 
-### Running multiple agents on one WhatsApp number (per-chat binding)
+### Running multiple agents on one Messaging number (per-chat binding)
 
-**Scenario:** In OpenClaw, you had multiple independent agents bound to specific WhatsApp chats — one for a family shopping list group, another for your private chat. Can Hermes do this?
+**Scenario:** In OpenClaw, you had multiple independent agents bound to specific Messaging chats — one for a family shopping list group, another for your private chat. Can Hermes do this?
 
-**Current limitation:** Hermes profiles each require their own WhatsApp number/session. You cannot bind multiple profiles to different chats on the same WhatsApp number — the WhatsApp bridge (Baileys) uses one authenticated session per number.
+**Current limitation:** Hermes profiles each require their own Messaging number/session. You cannot bind multiple profiles to different chats on the same Messaging number — the Messaging bridge (Baileys) uses one authenticated session per number.
 
 **Workarounds:**
 
@@ -666,11 +666,11 @@ See [Subagent Delegation](../user-guide/features/delegation.md) for more on how 
 
 2. **Use cron jobs for specialized tasks.** For a shopping list tracker, set up a cron job that monitors a specific chat and manages the list — no separate agent needed.
 
-3. **Use separate numbers.** If you need truly independent agents, pair each profile with its own WhatsApp number. Virtual numbers from services like Google Voice work for this.
+3. **Use separate numbers.** If you need truly independent agents, pair each profile with its own Messaging number. Virtual numbers from services like Google Voice work for this.
 
 4. **Use Telegram or Discord instead.** These platforms support per-chat binding more naturally — each Telegram group or Discord channel gets its own session, and you can run multiple bot tokens (one per profile) on the same account.
 
-See [Profiles](../user-guide/profiles.md) and [WhatsApp setup](../user-guide/messaging/whatsapp.md) for more details.
+See [Profiles](../user-guide/profiles.md) and [Messaging setup](../user-guide/messaging/messaging.md) for more details.
 
 ### Controlling what shows up in Telegram (hiding logs and reasoning)
 

@@ -44,7 +44,7 @@ signal-cli **不在** apt 或 snap 仓库中。上述 Linux 安装方式直接�
 
 ## 第一步：关联你的 Signal 账号
 
-signal-cli 作为**关联设备**运行——类似 WhatsApp Web，但用于 Signal。你的手机仍是主设备。
+signal-cli 作为**关联设备**运行——类似 Messaging Web，但用于 Signal。你的手机仍是主设备。
 
 ```bash
 # 生成关联 URI（显示二维码或链接）

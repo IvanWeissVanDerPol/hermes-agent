@@ -62,7 +62,7 @@ Delivery targets are case-sensitive and require the correct platform to be confi
 | `telegram` | `TELEGRAM_BOT_TOKEN` in `~/.hermes/.env` |
 | `discord` | `DISCORD_BOT_TOKEN` in `~/.hermes/.env` |
 | `slack` | `SLACK_BOT_TOKEN` in `~/.hermes/.env` |
-| `whatsapp` | WhatsApp gateway configured |
+| `messaging` | Messaging gateway configured |
 | `signal` | Signal gateway configured |
 | `matrix` | Matrix homeserver configured |
 | `email` | SMTP configured in `config.yaml` |

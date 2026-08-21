@@ -23,7 +23,7 @@ test('non-fromMe messages always pass through', () => {
     recentlySent: makeRecentlySent(),
     allowlistMatches: makeAllowlist([]),
     messageId: 'M1',
-    chatId: '6281234567890@s.whatsapp.net',
+    chatId: '6281234567890@s.messaging.net',
   });
   assert.deepEqual(decision, { action: 'pass' });
 });
@@ -35,7 +35,7 @@ test('fromMe echo of our own /send is dropped', () => {
     recentlySent: makeRecentlySent(['M-OWN-1']),
     allowlistMatches: makeAllowlist('*'),
     messageId: 'M-OWN-1',
-    chatId: '6281234567890@s.whatsapp.net',
+    chatId: '6281234567890@s.messaging.net',
   });
   assert.deepEqual(decision, { action: 'drop_echo' });
 });
@@ -47,7 +47,7 @@ test('fromMe is dropped when forwarding is disabled', () => {
     recentlySent: makeRecentlySent(),
     allowlistMatches: makeAllowlist('*'),
     messageId: 'M-OWN-2',
-    chatId: '6281234567890@s.whatsapp.net',
+    chatId: '6281234567890@s.messaging.net',
   });
   assert.deepEqual(decision, { action: 'drop_disabled' });
 });
@@ -61,7 +61,7 @@ test('fromMe is dropped when chatId is not on the allowlist (regression)', () =>
     fromMe: true,
     fromOwnerEnabled: true,
     recentlySent: makeRecentlySent(),
-    allowlistMatches: makeAllowlist(['6281234567890@s.whatsapp.net']),
+    allowlistMatches: makeAllowlist(['6281234567890@s.messaging.net']),
     messageId: 'M-OWN-3',
     chatId: '111600547700784@lid',
   });
@@ -73,9 +73,9 @@ test('fromMe is forwarded as owner when chatId is allowlisted', () => {
     fromMe: true,
     fromOwnerEnabled: true,
     recentlySent: makeRecentlySent(),
-    allowlistMatches: makeAllowlist(['6281234567890@s.whatsapp.net']),
+    allowlistMatches: makeAllowlist(['6281234567890@s.messaging.net']),
     messageId: 'M-OWN-4',
-    chatId: '6281234567890@s.whatsapp.net',
+    chatId: '6281234567890@s.messaging.net',
   });
   assert.deepEqual(decision, { action: 'forward_owner' });
 });
@@ -111,7 +111,7 @@ test('echo check fires before allowlist check', () => {
 });
 
 test('disabled flag fires before allowlist check', () => {
-  // Pre-existing deployments with WHATSAPP_FORWARD_OWNER_MESSAGES unset
+  // Pre-existing deployments with MESSAGING_FORWARD_OWNER_MESSAGES unset
   // must see drop_disabled regardless of allowlist state, otherwise
   // every fromMe message would log a misleading allowlist_mismatch.
   const decision = classifyOwnerMessageGate({

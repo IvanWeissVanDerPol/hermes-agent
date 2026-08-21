@@ -1,7 +1,7 @@
 {
-  "name": "hermes-whatsapp-bridge",
+  "name": "hermes-messaging-bridge",
   "version": "1.0.0",
-  "description": "WhatsApp bridge for Hermes Agent using Baileys",
+  "description": "Messaging bridge for Hermes Agent using Baileys",
   "private": true,
   "type": "module",
   "scripts": {

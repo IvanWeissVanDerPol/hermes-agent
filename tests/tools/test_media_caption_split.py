@@ -3,10 +3,10 @@
 `hermes send` strips the MEDIA: tag and leaves the remaining prose as the
 accompanying text. Historically every standalone sender posted that text as a
 *separate* message before an uncaptioned media bubble, splitting
-``hermes send --to whatsapp "MEDIA:/x.png This Caption"`` into two parts.
+``hermes send --to messaging "MEDIA:/x.png This Caption"`` into two parts.
 
 `_media_caption_split` is the single enforced decision point that all standalone
-senders (WhatsApp, Telegram, Discord) consult to decide whether the text should
+senders (Messaging, Telegram, Discord) consult to decide whether the text should
 ride on the media bubble as a native caption. This test pins that contract so
 the platforms can't diverge.
 """

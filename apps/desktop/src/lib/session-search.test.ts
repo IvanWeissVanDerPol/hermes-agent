@@ -60,8 +60,8 @@ describe('sessionMatchesSearch', () => {
 
   it('matches sessions by source platform and aliases', () => {
     expect(sessionMatchesSearch(makeSession({ source: 'telegram' }), 'Telegram')).toBe(true)
-    expect(sessionMatchesSearch(makeSession({ source: 'whatsapp' }), 'WhatsApp')).toBe(true)
-    expect(sessionMatchesSearch(makeSession({ source: 'whatsapp' }), 'wa')).toBe(true)
+    expect(sessionMatchesSearch(makeSession({ source: 'messaging' }), 'Messaging')).toBe(true)
+    expect(sessionMatchesSearch(makeSession({ source: 'messaging' }), 'wa')).toBe(true)
     expect(sessionMatchesSearch(makeSession({ source: 'slack' }), 'slack')).toBe(true)
     expect(sessionMatchesSearch(makeSession({ source: 'bluebubbles' }), 'imessage')).toBe(true)
   })

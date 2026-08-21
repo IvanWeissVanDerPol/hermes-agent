@@ -171,7 +171,7 @@ nano ~/.hermes/profiles/assistant/.env
 
 ### Safety: token locks
 
-If two profiles accidentally use the same bot token, the second gateway will be blocked with a clear error naming the conflicting profile. Supported for Telegram, Discord, Slack, WhatsApp, and Signal.
+If two profiles accidentally use the same bot token, the second gateway will be blocked with a clear error naming the conflicting profile. Supported for Telegram, Discord, Slack, Messaging, and Signal.
 
 ### Persistent services
 

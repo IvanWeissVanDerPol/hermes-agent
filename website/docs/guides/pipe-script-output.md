@@ -74,10 +74,10 @@ hermes send --list telegram
 | `platform:chat_id` | `telegram:-1001234567890` | Specific numeric chat / group / user |
 | `platform:chat_id:thread_id` | `telegram:-1001234567890:17585` | Specific thread or Telegram forum topic |
 | `platform:#channel` | `discord:#ops` | Human-friendly channel name (resolved against the channel directory) |
-| `platform:+E164` | `signal:+15551234567` | Phone-addressed platforms: Signal, SMS, WhatsApp |
+| `platform:+E164` | `signal:+15551234567` | Phone-addressed platforms: Signal, SMS, Messaging |
 
 Any platform Hermes ships adapters for works as a target:
-`telegram`, `discord`, `slack`, `signal`, `sms`, `whatsapp`, `matrix`,
+`telegram`, `discord`, `slack`, `signal`, `sms`, `messaging`, `matrix`,
 `mattermost`, `feishu`, `dingtalk`, `wecom`, `weixin`, `email`, and
 others.
 
@@ -184,7 +184,7 @@ msg_id=$(hermes send --to discord:#ops --json "build started" \
 ## Does `hermes send` Need the Gateway Running?
 
 **Usually no.** For any bot-token platform — Telegram, Discord, Slack,
-Signal, SMS, WhatsApp Cloud API, and most others — `hermes send` calls
+Signal, SMS, Messaging Cloud API, and most others — `hermes send` calls
 the platform's REST endpoint directly using credentials from
 `~/.hermes/.env` and `~/.hermes/config.yaml`. It's a standalone subprocess
 that exits as soon as the message is delivered.

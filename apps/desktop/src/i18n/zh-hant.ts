@@ -1328,14 +1328,14 @@ export const zhHant = defineLocale({
       },
       SIGNAL_ACCOUNT: { label: '電話號碼', help: '在 signal-cli 橋接中註冊的號碼。' },
       SIGNAL_ALLOWED_USERS: { label: '允許的 Signal 使用者', help: '建議設定。逗號分隔的 Signal 識別碼。' },
-      WHATSAPP_ENABLED: {
-        label: '啟用 WhatsApp 橋接',
+      MESSAGING_ENABLED: {
+        label: '啟用 Messaging 橋接',
         help: '由下方切換開關自動設定。除非確知需要，否則請勿變更。'
       },
-      WHATSAPP_MODE: { label: '橋接模式' },
-      WHATSAPP_ALLOWED_USERS: {
-        label: '允許的 WhatsApp 使用者',
-        help: '建議設定。逗號分隔的電話號碼或 WhatsApp ID。'
+      MESSAGING_MODE: { label: '橋接模式' },
+      MESSAGING_ALLOWED_USERS: {
+        label: '允許的 Messaging 使用者',
+        help: '建議設定。逗號分隔的電話號碼或 Messaging ID。'
       }
     },
     platformIntro: {}

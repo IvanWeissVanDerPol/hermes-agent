@@ -1,7 +1,7 @@
 /**
  * Bounded FIFO set of outbound message IDs.
  *
- * Used by the WhatsApp bridge to distinguish "echo of our own /send" from
+ * Used by the Messaging bridge to distinguish "echo of our own /send" from
  * "owner-typed message on the linked device" when forwarding `fromMe`
  * inbound events back to the Python adapter.
  *

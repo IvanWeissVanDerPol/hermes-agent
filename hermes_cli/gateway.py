@@ -5233,9 +5233,9 @@ _PLATFORMS = [
             },
         ],
     },
-    # WhatsApp moved to plugins/platforms/whatsapp/ — setup metadata discovered
+    # Messaging moved to plugins/platforms/messaging/ — setup metadata discovered
     # dynamically via the platform registry entry registered by
-    # plugins/platforms/whatsapp/adapter.py::register(). #41112.
+    # plugins/platforms/messaging/adapter.py::register(). #41112.
     {
         "key": "signal",
         "label": "Signal",
@@ -5463,9 +5463,9 @@ def _platform_status(platform: dict) -> str:
     if not token_var:
         return "not configured"
     val = get_env_value(token_var)
-    if token_var == "WHATSAPP_ENABLED":
+    if token_var == "MESSAGING_ENABLED":
         if val and val.lower() == "true":
-            session_file = get_hermes_home() / "whatsapp" / "session" / "creds.json"
+            session_file = get_hermes_home() / "messaging" / "session" / "creds.json"
             if session_file.exists():
                 return "configured + paired"
             return "enabled, not paired"
@@ -5766,8 +5766,8 @@ def _setup_standard_platform(platform: dict):
     print_success(f"{emoji} {label} configured!")
 
 
-# _setup_whatsapp and _setup_dingtalk moved into their plugins:
-# plugins/platforms/{whatsapp,dingtalk}/adapter.py::interactive_setup
+# _setup_messaging and _setup_dingtalk moved into their plugins:
+# plugins/platforms/{messaging,dingtalk}/adapter.py::interactive_setup
 # (registered via setup_fn, dispatched through the plugin path). #41112.
 
 
@@ -6302,8 +6302,8 @@ def _builtin_setup_fn(key: str):
         "bluebubbles": _s._setup_bluebubbles,
         "webhooks": _s._setup_webhooks,
         "signal": _setup_signal,
-        # whatsapp + dingtalk moved into plugins: setup_fn registered by
-        # plugins/platforms/{whatsapp,dingtalk}/adapter.py::register() and
+        # messaging + dingtalk moved into plugins: setup_fn registered by
+        # plugins/platforms/{messaging,dingtalk}/adapter.py::register() and
         # dispatched via the plugin path in _configure_platform(). #41112.
         "weixin": _setup_weixin,
         # feishu moved into the plugin: setup_fn registered by
@@ -6465,7 +6465,7 @@ def gateway_setup():
     # Consider any platform (built-in or plugin) where the user has made
     # meaningful progress.  ``_platform_status`` already handles plugin
     # entries via their check_fn and per-platform dual-states like
-    # WhatsApp's "enabled, not paired".
+    # Messaging's "enabled, not paired".
     def _is_progress(status: str) -> bool:
         s = status.lower()
         return not (

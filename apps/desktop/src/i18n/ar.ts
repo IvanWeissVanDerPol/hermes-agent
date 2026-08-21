@@ -1272,16 +1272,16 @@ export const ar = defineLocale({
         label: 'مستخدمو Signal المسموح بهم',
         help: 'موصى به. معرّفات Signal مفصولة بفواصل.'
       },
-      WHATSAPP_ENABLED: {
-        label: 'تفعيل جسر WhatsApp',
+      MESSAGING_ENABLED: {
+        label: 'تفعيل جسر Messaging',
         help: 'يُضبط تلقائيا عبر المفتاح أدناه. اتركه دون تغيير ما لم تكن متأكدا من حاجتك إليه.'
       },
-      WHATSAPP_MODE: {
+      MESSAGING_MODE: {
         label: 'وضع الجسر'
       },
-      WHATSAPP_ALLOWED_USERS: {
-        label: 'مستخدمو WhatsApp المسموح بهم',
-        help: 'موصى به. أرقام هواتف أو معرّفات WhatsApp مفصولة بفواصل.'
+      MESSAGING_ALLOWED_USERS: {
+        label: 'مستخدمو Messaging المسموح بهم',
+        help: 'موصى به. أرقام هواتف أو معرّفات Messaging مفصولة بفواصل.'
       }
     },
     platformIntro: {}

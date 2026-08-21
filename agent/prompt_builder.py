@@ -686,26 +686,26 @@ STEER_CHANNEL_NOTE = (
 DEVELOPER_ROLE_MODELS = ("gpt-5", "codex")
 
 PLATFORM_HINTS = {
-    "whatsapp": (
-        "You are on a text messaging communication platform, WhatsApp. "
+    "messaging": (
+        "You are on a text messaging communication platform, Messaging. "
         "Standard markdown (**bold**, *italic*, ~~strike~~, # headers, "
         "`code`, ```code blocks```, [links](url)) is auto-converted to "
-        "WhatsApp's native syntax (*bold*, _italic_, ~strike~, monospace) — "
+        "Messaging's native syntax (*bold*, _italic_, ~strike~, monospace) — "
         "feel free to write in markdown, and use bullet lists ('- item') "
         "freely. Tables are NOT supported — prefer bullet lists or labeled "
         "key:value pairs. "
         "You can send media files natively: to deliver a file to the user, "
         "include MEDIA:/absolute/path/to/file in your response. The file "
-        "will be sent as a native WhatsApp attachment — images (.jpg, .png, "
+        "will be sent as a native Messaging attachment — images (.jpg, .png, "
         ".webp) appear as photos, videos (.mp4, .mov) play inline, and other "
         "files arrive as downloadable documents. You can also include image "
         "URLs in markdown format ![alt](url) and they will be sent as photos."
     ),
-    "whatsapp_cloud": (
-        "You are on a text messaging communication platform, WhatsApp "
+    "messaging_cloud": (
+        "You are on a text messaging communication platform, Messaging "
         "(via Meta's official Business Cloud API). Standard markdown "
         "(**bold**, ~~strike~~, # headers, [links](url)) is auto-converted "
-        "to WhatsApp's native syntax (*bold*, ~strike~, etc.) — feel free "
+        "to Messaging's native syntax (*bold*, ~strike~, etc.) — feel free "
         "to write in markdown. Tables are NOT supported — prefer bullet "
         "lists or labeled key:value pairs. "
         "You can send media files natively: include MEDIA:/absolute/path/to/file "

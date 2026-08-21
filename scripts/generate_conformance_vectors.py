@@ -13,14 +13,14 @@ Oracles (all imported, never reimplemented):
             (standard markdown → Telegram MarkdownV2)
   slack     plugins.platforms.slack.adapter.SlackAdapter.format_message
             (standard markdown → Slack mrkdwn)
-  whatsapp  gateway.platforms.whatsapp_common.WhatsAppBehaviorMixin
-            .format_message (standard markdown → WhatsApp formatting)
+  messaging  gateway.platforms.messaging_common.MessagingBehaviorMixin
+            .format_message (standard markdown → Messaging formatting)
   discord   plugins.platforms.discord.adapter.DiscordAdapter.format_message
             (GFM tables → bullet groups; otherwise identity)
 
 Expect semantics (consumed by the gg runner):
   parity    connector render must BYTE-EQUAL native_output
-            (Slack / WhatsApp — same-dialect ports; most Discord).
+            (Slack / Messaging — same-dialect ports; most Discord).
   semantic  connector renders a DIFFERENT representation on purpose
             (Telegram: connector sends HTML, native sends MarkdownV2);
             the runner asserts plain-text content equivalence instead.
@@ -141,9 +141,9 @@ def _oracles() -> Dict[str, Callable[[str], str]]:
     from plugins.platforms.telegram.adapter import TelegramAdapter
     from plugins.platforms.slack.adapter import SlackAdapter
     from plugins.platforms.discord.adapter import DiscordAdapter
-    from gateway.platforms.whatsapp_common import WhatsAppBehaviorMixin
+    from gateway.platforms.messaging_common import MessagingBehaviorMixin
 
-    wa = object.__new__(WhatsAppBehaviorMixin)  # format_message needs no __init__
+    wa = object.__new__(MessagingBehaviorMixin)  # format_message needs no __init__
 
     return {
         # These format_message implementations are self-free (asserted by
@@ -151,7 +151,7 @@ def _oracles() -> Dict[str, Callable[[str], str]]:
         "telegram": lambda s: TelegramAdapter.format_message(None, s),  # type: ignore[arg-type]
         "slack": lambda s: SlackAdapter.format_message(None, s),  # type: ignore[arg-type]
         "discord": lambda s: DiscordAdapter.format_message(None, s),  # type: ignore[arg-type]
-        "whatsapp": wa.format_message,
+        "messaging": wa.format_message,
     }
 
 
@@ -172,7 +172,7 @@ _EXPECT_OVERRIDES: Dict[str, Dict[str, tuple]] = {
         "placeholder-injection": ("divergent", "\\x00SL tokens are the native renderer's own placeholder alphabet; connector uses a different scheme"),
         "unclosed-fence": ("divergent", "unterminated fence handling differs; both degrade without dropping content"),
     },
-    "whatsapp": {
+    "messaging": {
         "placeholder-injection": ("divergent", "placeholder alphabets are renderer-internal"),
         "unclosed-fence": ("divergent", "unterminated fence handling differs; both degrade without dropping content"),
     },

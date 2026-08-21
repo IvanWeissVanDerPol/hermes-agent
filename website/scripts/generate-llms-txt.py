@@ -92,7 +92,7 @@ SECTIONS: list[tuple[str, list[tuple[str, str, str | None]]]] = [
         ("user-guide/messaging/telegram", "Telegram", None),
         ("user-guide/messaging/discord", "Discord", None),
         ("user-guide/messaging/slack", "Slack", None),
-        ("user-guide/messaging/whatsapp", "WhatsApp", None),
+        ("user-guide/messaging/messaging", "Messaging", None),
         ("user-guide/messaging/signal", "Signal", None),
         ("user-guide/messaging/email", "Email", None),
         ("user-guide/messaging/sms", "SMS", None),

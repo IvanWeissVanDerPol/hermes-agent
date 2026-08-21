@@ -2004,25 +2004,25 @@ def run_doctor(args):
         # glob (which pulls in Electron, node-pty, etc.) is never resolved
         # for a routine security check. The web and ui-tui workspaces are
         # audited separately via --workspace flags. See #38772.
-        # The WhatsApp bridge may live under a writable HERMES_HOME mirror
+        # The Messaging bridge may live under a writable HERMES_HOME mirror
         # instead of the (possibly read-only) install tree in Docker — resolve
         # it through the shared helper so we audit the dir that actually holds
         # node_modules. See #49561.
         try:
-            from gateway.platforms.whatsapp_common import resolve_whatsapp_bridge_dir
-            _whatsapp_bridge_dir = resolve_whatsapp_bridge_dir()
+            from gateway.platforms.messaging_common import resolve_messaging_bridge_dir
+            _messaging_bridge_dir = resolve_messaging_bridge_dir()
         except Exception:
-            _whatsapp_bridge_dir = PROJECT_ROOT / "scripts" / "whatsapp-bridge"
+            _messaging_bridge_dir = PROJECT_ROOT / "scripts" / "messaging-bridge"
         npm_audit_targets = [
             (PROJECT_ROOT, "Browser tools (agent-browser)", ["--workspaces=false"]),
             (PROJECT_ROOT, "web workspace", ["--workspace", "web"]),
             (PROJECT_ROOT, "ui-tui workspace", ["--workspace", "ui-tui"]),
-            (_whatsapp_bridge_dir, "WhatsApp bridge", []),
+            (_messaging_bridge_dir, "Messaging bridge", []),
         ]
         for npm_dir, label, audit_extra in npm_audit_targets:
             # For workspace-scoped audits run from PROJECT_ROOT the
             # node_modules check must use the workspace root; standalone dirs
-            # (whatsapp-bridge) check their own node_modules.
+            # (messaging-bridge) check their own node_modules.
             check_dir = PROJECT_ROOT if audit_extra else npm_dir
             if not (check_dir / "node_modules").exists():
                 continue

@@ -6,7 +6,7 @@
     "generator": "scripts/generate_conformance_vectors.py",
     "generator_version": 1
   },
-  "platform": "whatsapp",
+  "platform": "messaging",
   "vectors": [
     {
       "id": "plain-text",

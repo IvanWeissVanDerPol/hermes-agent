@@ -139,7 +139,7 @@ TTS 设置从 OpenClaw 配置的**两个**位置读取，优先级如下：
 | Slack | `channels.slack.botToken` 或 `.accounts.default.botToken` | `SLACK_BOT_TOKEN` | |
 | Slack | `channels.slack.appToken` 或 `.accounts.default.appToken` | `SLACK_APP_TOKEN` | |
 | Slack | `channels.slack.allowFrom` 或 `.accounts.default.allowFrom` | `SLACK_ALLOWED_USERS` | |
-| WhatsApp | `channels.whatsapp.allowFrom` 或 `.accounts.default.allowFrom` | `WHATSAPP_ALLOWED_USERS` | 通过 Baileys 二维码配对认证——迁移后需重新配对 |
+| Messaging | `channels.messaging.allowFrom` 或 `.accounts.default.allowFrom` | `MESSAGING_ALLOWED_USERS` | 通过 Baileys 二维码配对认证——迁移后需重新配对 |
 | Signal | `channels.signal.account` 或 `.accounts.default.account` | `SIGNAL_ACCOUNT` | |
 | Signal | `channels.signal.httpUrl` 或 `.accounts.default.httpUrl` | `SIGNAL_HTTP_URL` | |
 | Signal | `channels.signal.allowFrom` 或 `.accounts.default.allowFrom` | `SIGNAL_ALLOWED_USERS` | |
@@ -227,7 +227,7 @@ OpenClaw 配置中 token 和 API 密钥的值支持三种格式：
 
 6. **检查会话策略** — 验证 `hermes config get session_reset` 是否符合预期。
 
-7. **重新配对 WhatsApp** — WhatsApp 使用二维码配对（Baileys），不支持 token 迁移。运行 `hermes whatsapp` 进行配对。
+7. **重新配对 Messaging** — Messaging 使用二维码配对（Baileys），不支持 token 迁移。运行 `hermes messaging` 进行配对。
 
 8. **清理归档** — 确认一切正常后，运行 `hermes claw cleanup` 将残留的 OpenClaw 目录重命名为 `.pre-migration/`（防止状态混淆）。
 

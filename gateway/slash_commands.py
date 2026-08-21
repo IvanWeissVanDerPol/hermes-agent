@@ -1434,8 +1434,8 @@ class GatewaySlashCommandsMixin:
 
         Examples:
             ``/platform list``           — show connected + failed/paused platforms
-            ``/platform pause whatsapp`` — stop the reconnect watcher hammering whatsapp
-            ``/platform resume whatsapp`` — re-queue a paused platform for retry
+            ``/platform pause messaging`` — stop the reconnect watcher hammering messaging
+            ``/platform resume messaging`` — re-queue a paused platform for retry
         """
         text = (getattr(event, "content", "") or "").strip()
         # Strip the leading "/platform" (or "/PLATFORM") token if present

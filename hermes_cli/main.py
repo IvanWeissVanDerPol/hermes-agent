@@ -445,7 +445,7 @@ from hermes_cli.subcommands.profile import build_profile_parser
 from hermes_cli.subcommands.model import build_model_parser
 from hermes_cli.subcommands.setup import build_setup_parser
 
-from hermes_cli.subcommands.whatsapp import build_whatsapp_parser
+from hermes_cli.subcommands.messaging import build_messaging_parser
 from hermes_cli.subcommands.slack import build_slack_parser
 from hermes_cli.subcommands.login import build_login_parser
 from hermes_cli.subcommands.logout import build_logout_parser
@@ -2758,26 +2758,26 @@ def cmd_proxy(args):
         raise SystemExit(rc)
 
 
-def cmd_whatsapp(args):
-    """Set up WhatsApp: choose mode, configure, install bridge, pair via QR."""
-    _require_tty("whatsapp")
+def cmd_messaging(args):
+    """Set up Messaging: choose mode, configure, install bridge, pair via QR."""
+    _require_tty("messaging")
     from hermes_cli.config import get_env_value, save_env_value
     from hermes_constants import find_node_executable, with_hermes_node_path
 
     print()
-    print("⚕ WhatsApp Setup")
+    print("⚕ Messaging Setup")
     print("=" * 50)
 
     # ── Step 1: Choose mode ──────────────────────────────────────────────
-    current_mode = get_env_value("WHATSAPP_MODE") or ""
+    current_mode = get_env_value("MESSAGING_MODE") or ""
     if not current_mode:
         print()
-        print("How will you use WhatsApp with Hermes?")
+        print("How will you use Messaging with Hermes?")
         print()
         print("  1. Separate bot number (recommended)")
         print("     People message the bot's number directly — cleanest experience.")
         print(
-            "     Requires a second phone number with WhatsApp installed on a device."
+            "     Requires a second phone number with Messaging installed on a device."
         )
         print()
         print("  2. Personal number (self-chat)")
@@ -2791,24 +2791,24 @@ def cmd_whatsapp(args):
             return
 
         if choice == "1":
-            save_env_value("WHATSAPP_MODE", "bot")
+            save_env_value("MESSAGING_MODE", "bot")
             wa_mode = "bot"
             print("  ✓ Mode: separate bot number")
             print()
             print("  ┌─────────────────────────────────────────────────┐")
             print("  │  Getting a second number for the bot:           │")
             print("  │                                                 │")
-            print("  │  Easiest: Install WhatsApp Business (free app)  │")
+            print("  │  Easiest: Install Messaging Business (free app)  │")
             print("  │  on your phone with a second number:            │")
             print("  │    • Dual-SIM: use your 2nd SIM slot            │")
             print("  │    • Google Voice: free US number (voice.google) │")
             print("  │    • Prepaid SIM: $3-10, verify once            │")
             print("  │                                                 │")
-            print("  │  WhatsApp Business runs alongside your personal │")
-            print("  │  WhatsApp — no second phone needed.             │")
+            print("  │  Messaging Business runs alongside your personal │")
+            print("  │  Messaging — no second phone needed.             │")
             print("  └─────────────────────────────────────────────────┘")
         else:
-            save_env_value("WHATSAPP_MODE", "self-chat")
+            save_env_value("MESSAGING_MODE", "self-chat")
             wa_mode = "self-chat"
             print("  ✓ Mode: personal number (self-chat)")
     else:
@@ -2818,21 +2818,21 @@ def cmd_whatsapp(args):
         )
         print(f"\n✓ Mode: {mode_label}")
 
-    # ── Step 2: Mode is selected, will enable WhatsApp only after pairing ──
-    # We intentionally don't write WHATSAPP_ENABLED=true here.  If the user
+    # ── Step 2: Mode is selected, will enable Messaging only after pairing ──
+    # We intentionally don't write MESSAGING_ENABLED=true here.  If the user
     # aborts the wizard later (Ctrl+C, failed npm install, missed QR scan),
-    # we'd otherwise leave .env claiming WhatsApp is ready when the bridge
+    # we'd otherwise leave .env claiming Messaging is ready when the bridge
     # has no creds.json.  Every subsequent `hermes gateway` then paid a 30s
-    # bridge-bootstrap timeout and queued WhatsApp for indefinite retries.
-    # Now: aborted setup leaves WHATSAPP_ENABLED unset → gateway skips it.
-    # Re-runs that already have WHATSAPP_ENABLED=true (from a prior
+    # bridge-bootstrap timeout and queued Messaging for indefinite retries.
+    # Now: aborted setup leaves MESSAGING_ENABLED unset → gateway skips it.
+    # Re-runs that already have MESSAGING_ENABLED=true (from a prior
     # successful pairing) stay enabled — we just don't write it pre-emptively.
     print()
-    if (get_env_value("WHATSAPP_ENABLED") or "").lower() == "true":
-        print("✓ WhatsApp is already enabled")
+    if (get_env_value("MESSAGING_ENABLED") or "").lower() == "true":
+        print("✓ Messaging is already enabled")
 
     # ── Step 3: Allowed users ────────────────────────────────────────────
-    current_users = get_env_value("WHATSAPP_ALLOWED_USERS") or ""
+    current_users = get_env_value("MESSAGING_ALLOWED_USERS") or ""
     if current_users:
         print(f"✓ Allowed users: {current_users}")
         try:
@@ -2847,7 +2847,7 @@ def cmd_whatsapp(args):
             else:
                 phone = input("  Your phone number (e.g. 15551234567): ").strip()
             if phone:
-                save_env_value("WHATSAPP_ALLOWED_USERS", phone.replace(" ", ""))
+                save_env_value("MESSAGING_ALLOWED_USERS", phone.replace(" ", ""))
                 print(f"  ✓ Updated to: {phone}")
     else:
         print()
@@ -2859,14 +2859,14 @@ def cmd_whatsapp(args):
         else:
             phone = input("  Your phone number (e.g. 15551234567): ").strip()
         if phone:
-            save_env_value("WHATSAPP_ALLOWED_USERS", phone.replace(" ", ""))
+            save_env_value("MESSAGING_ALLOWED_USERS", phone.replace(" ", ""))
             print(f"  ✓ Allowed users set: {phone}")
         else:
             print("  ⚠ No allowlist — the agent will respond to ALL incoming messages")
 
     # ── Step 4: Install bridge dependencies ──────────────────────────────
-    from gateway.platforms.whatsapp_common import resolve_whatsapp_bridge_dir
-    bridge_dir = resolve_whatsapp_bridge_dir()
+    from gateway.platforms.messaging_common import resolve_messaging_bridge_dir
+    bridge_dir = resolve_messaging_bridge_dir()
     bridge_script = bridge_dir / "bridge.js"
 
     if not bridge_script.exists():
@@ -2875,7 +2875,7 @@ def cmd_whatsapp(args):
 
     if not (bridge_dir / "node_modules").exists():
         print(
-            "\n→ Installing WhatsApp bridge dependencies (this can take a few minutes)..."
+            "\n→ Installing Messaging bridge dependencies (this can take a few minutes)..."
         )
         npm = find_node_executable("npm")
         if not npm:
@@ -2906,11 +2906,11 @@ def cmd_whatsapp(args):
         print("✓ Bridge dependencies already installed")
 
     # ── Step 5: Check for existing session ───────────────────────────────
-    session_dir = get_hermes_home() / "whatsapp" / "session"
+    session_dir = get_hermes_home() / "messaging" / "session"
     session_dir.mkdir(parents=True, exist_ok=True)
 
     if (session_dir / "creds.json").exists():
-        print("✓ Existing WhatsApp session found")
+        print("✓ Existing Messaging session found")
         try:
             response = input(
                 "\n  Re-pair? This will clear the existing session. [y/N] "
@@ -2922,13 +2922,13 @@ def cmd_whatsapp(args):
             session_dir.mkdir(parents=True, exist_ok=True)
             print("  ✓ Session cleared")
         else:
-            # Existing pairing — ensure WHATSAPP_ENABLED reflects that.
+            # Existing pairing — ensure MESSAGING_ENABLED reflects that.
             # (Older installs may have lost the env var; covers re-runs
             # where the user picked "no, keep my session" but the var
             # was never set or got removed.)
-            if (get_env_value("WHATSAPP_ENABLED") or "").lower() != "true":
-                save_env_value("WHATSAPP_ENABLED", "true")
-            print("\n✓ WhatsApp is configured and paired!")
+            if (get_env_value("MESSAGING_ENABLED") or "").lower() != "true":
+                save_env_value("MESSAGING_ENABLED", "true")
+            print("\n✓ Messaging is configured and paired!")
             print("  Start the gateway with: hermes gateway")
             return
 
@@ -2936,10 +2936,10 @@ def cmd_whatsapp(args):
     print()
     print("─" * 50)
     if wa_mode == "bot":
-        print("📱 Open WhatsApp (or WhatsApp Business) on the")
+        print("📱 Open Messaging (or Messaging Business) on the")
         print("   phone with the BOT's number, then scan:")
     else:
-        print("📱 Open WhatsApp on your phone, then scan:")
+        print("📱 Open Messaging on your phone, then scan:")
     print()
     print("   Settings → Linked Devices → Link a Device")
     print("─" * 50)
@@ -2963,24 +2963,24 @@ def cmd_whatsapp(args):
     # ── Step 7: Post-pairing ─────────────────────────────────────────────
     print()
     if (session_dir / "creds.json").exists():
-        # Only enable WhatsApp now that pairing actually succeeded.  If the
-        # user Ctrl+C'd at any earlier step, WHATSAPP_ENABLED stays unset
+        # Only enable Messaging now that pairing actually succeeded.  If the
+        # user Ctrl+C'd at any earlier step, MESSAGING_ENABLED stays unset
         # and `hermes gateway` skips it cleanly instead of paying a 30s
         # bridge timeout + queueing the platform for indefinite retries.
-        save_env_value("WHATSAPP_ENABLED", "true")
-        print("✓ WhatsApp paired successfully!")
+        save_env_value("MESSAGING_ENABLED", "true")
+        print("✓ Messaging paired successfully!")
         print()
         if wa_mode == "bot":
             print("  Next steps:")
             print("    1. Start the gateway:  hermes gateway")
-            print("    2. Send a message to the bot's WhatsApp number")
+            print("    2. Send a message to the bot's Messaging number")
             print("    3. The agent will reply automatically")
             print()
             print("  Tip: Agent responses are prefixed with '⚕ Hermes Agent'")
         else:
             print("  Next steps:")
             print("    1. Start the gateway:  hermes gateway")
-            print("    2. Open WhatsApp → Message Yourself")
+            print("    2. Open Messaging → Message Yourself")
             print("    3. Type a message — the agent will reply")
             print()
             print("  Tip: Agent responses are prefixed with '⚕ Hermes Agent'")
@@ -2988,11 +2988,11 @@ def cmd_whatsapp(args):
         print()
         print("  Or install as a service: hermes gateway install")
     else:
-        print("⚠ Pairing may not have completed. Run 'hermes whatsapp' to try again.")
+        print("⚠ Pairing may not have completed. Run 'hermes messaging' to try again.")
 
 
-def cmd_whatsapp_cloud(args):
-    """Set up WhatsApp Business Cloud API (official Meta integration).
+def cmd_messaging_cloud(args):
+    """Set up Messaging Business Cloud API (official Meta integration).
 
     Walks the user through the Meta-side credentials (Phone Number ID,
     Access Token, App Secret, optional App/WABA IDs) plus webhook
@@ -3000,14 +3000,14 @@ def cmd_whatsapp_cloud(args):
     common setup mistakes (e.g. pasting a phone number into the Phone
     Number ID field).
 
-    Distinct from ``hermes whatsapp`` (the Baileys bridge wizard) — the
+    Distinct from ``hermes messaging`` (the Baileys bridge wizard) — the
     two adapters are complementary, not alternatives. See
-    ``hermes_cli/setup_whatsapp_cloud.py``.
+    ``hermes_cli/setup_messaging_cloud.py``.
     """
-    _require_tty("whatsapp-cloud")
-    from hermes_cli.setup_whatsapp_cloud import run_whatsapp_cloud_setup
+    _require_tty("messaging-cloud")
+    from hermes_cli.setup_messaging_cloud import run_messaging_cloud_setup
 
-    return run_whatsapp_cloud_setup()
+    return run_messaging_cloud_setup()
 
 
 def cmd_setup(args):
@@ -5139,7 +5139,7 @@ def _record_bytecode_fingerprint() -> None:
 def _sweep_stale_bytecode_if_checkout_changed() -> None:
     """Clear ``__pycache__`` at launch when the checkout changed underneath us.
 
-    The stale-bytecode bug class (issues #6207, #60242; Dhruv's WhatsApp
+    The stale-bytecode bug class (issues #6207, #60242; Dhruv's Messaging
     ``cannot import name 'parse_model_flags_detailed'`` report) has one
     shared shape: the checkout's ``.py`` files change (git pull inside
     ``hermes update``, a manual ``git pull``, a ZIP update, a file-sync
@@ -9156,8 +9156,8 @@ def _coalesce_session_name_args(argv: list) -> list:
         "model",
         "gateway",
         "setup",
-        "whatsapp",
-        "whatsapp-cloud",
+        "messaging",
+        "messaging-cloud",
         "login",
         "logout",
         "auth",
@@ -10586,7 +10586,7 @@ _BUILTIN_SUBCOMMANDS = frozenset(
         "prompt-size",
         "send", "sessions", "setup",
         "skin", "skills", "slack", "status", "sync", "tools", "uninstall", "update",
-        "version", "webhook", "whatsapp", "whatsapp-cloud", "chat", "secrets", "security",
+        "version", "webhook", "messaging", "messaging-cloud", "chat", "secrets", "security",
         # Help-ish invocations — plugin commands not being listed in
         # top-level --help is an acceptable trade-off for skipping an
         # expensive eager import of every bundled plugin module.
@@ -11402,24 +11402,24 @@ def main():
 
 
     # =========================================================================
-    # whatsapp command  (parser built in hermes_cli/subcommands/whatsapp.py)
+    # messaging command  (parser built in hermes_cli/subcommands/messaging.py)
     # =========================================================================
-    build_whatsapp_parser(subparsers, cmd_whatsapp=cmd_whatsapp)
+    build_messaging_parser(subparsers, cmd_messaging=cmd_messaging)
 
     # =========================================================================
-    # whatsapp-cloud command (official Meta Cloud API; complement to Baileys)
+    # messaging-cloud command (official Meta Cloud API; complement to Baileys)
     # =========================================================================
-    whatsapp_cloud_parser = subparsers.add_parser(
-        "whatsapp-cloud",
-        help="Set up WhatsApp Business Cloud API integration",
+    messaging_cloud_parser = subparsers.add_parser(
+        "messaging-cloud",
+        help="Set up Messaging Business Cloud API integration",
         description=(
-            "Configure the official Meta WhatsApp Business Cloud API "
+            "Configure the official Meta Messaging Business Cloud API "
             "adapter (Business account required, public webhook URL "
-            "required). Distinct from `hermes whatsapp` which sets up "
+            "required). Distinct from `hermes messaging` which sets up "
             "the Baileys bridge for personal accounts."
         ),
     )
-    whatsapp_cloud_parser.set_defaults(func=cmd_whatsapp_cloud)
+    messaging_cloud_parser.set_defaults(func=cmd_messaging_cloud)
 
     # =========================================================================
     # slack command  (parser built in hermes_cli/subcommands/slack.py)

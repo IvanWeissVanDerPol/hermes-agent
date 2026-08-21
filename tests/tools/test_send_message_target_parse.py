@@ -29,11 +29,11 @@ def test_e164_target_still_requires_phone_platform() -> None:
     assert _parse_target_ref("matrix", "+15551234567")[2] is False
 
 
-def test_send_message_routes_whatsapp_group_jid_without_home_fallback() -> None:
-    whatsapp_cfg = SimpleNamespace(enabled=True, token=None, extra={"api_url": "http://bridge"})
+def test_send_message_routes_messaging_group_jid_without_home_fallback() -> None:
+    messaging_cfg = SimpleNamespace(enabled=True, token=None, extra={"api_url": "http://bridge"})
     config = SimpleNamespace(
-        platforms={Platform.WHATSAPP: whatsapp_cfg},
-        get_home_channel=lambda _platform: SimpleNamespace(chat_id="15551234567@s.whatsapp.net"),
+        platforms={Platform.MESSAGING: messaging_cfg},
+        get_home_channel=lambda _platform: SimpleNamespace(chat_id="15551234567@s.messaging.net"),
     )
 
     with patch("gateway.config.load_gateway_config", return_value=config), \
@@ -46,7 +46,7 @@ def test_send_message_routes_whatsapp_group_jid_without_home_fallback() -> None:
             send_message_tool(
                 {
                     "action": "send",
-                    "target": "whatsapp:120363408391911677@g.us",
+                    "target": "messaging:120363408391911677@g.us",
                     "message": "hello group",
                 }
             )
@@ -55,8 +55,8 @@ def test_send_message_routes_whatsapp_group_jid_without_home_fallback() -> None:
     assert result["success"] is True
     assert "note" not in result
     send_mock.assert_awaited_once_with(
-        Platform.WHATSAPP,
-        whatsapp_cfg,
+        Platform.MESSAGING,
+        messaging_cfg,
         "120363408391911677@g.us",
         "hello group",
         thread_id=None,

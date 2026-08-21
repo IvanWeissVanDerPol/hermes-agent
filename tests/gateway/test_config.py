@@ -245,7 +245,7 @@ class TestGatewayConfigRoundtrip:
         config = GatewayConfig(
             unauthorized_dm_behavior="ignore",
             platforms={
-                Platform.WHATSAPP: PlatformConfig(
+                Platform.MESSAGING: PlatformConfig(
                     enabled=True,
                     extra={"unauthorized_dm_behavior": "pair"},
                 ),
@@ -255,7 +255,7 @@ class TestGatewayConfigRoundtrip:
         restored = GatewayConfig.from_dict(config.to_dict())
 
         assert restored.unauthorized_dm_behavior == "ignore"
-        assert restored.platforms[Platform.WHATSAPP].extra["unauthorized_dm_behavior"] == "pair"
+        assert restored.platforms[Platform.MESSAGING].extra["unauthorized_dm_behavior"] == "pair"
 
     def test_email_defaults_to_ignore_for_unauthorized_dm_behavior(self):
         config = GatewayConfig(
@@ -795,7 +795,7 @@ class TestLoadGatewayConfig:
         config_path = hermes_home / "config.yaml"
         config_path.write_text(
             "unauthorized_dm_behavior: ignore\n"
-            "whatsapp:\n"
+            "messaging:\n"
             "  unauthorized_dm_behavior: pair\n",
             encoding="utf-8",
         )
@@ -805,7 +805,7 @@ class TestLoadGatewayConfig:
         config = load_gateway_config()
 
         assert config.unauthorized_dm_behavior == "ignore"
-        assert config.platforms[Platform.WHATSAPP].extra["unauthorized_dm_behavior"] == "pair"
+        assert config.platforms[Platform.MESSAGING].extra["unauthorized_dm_behavior"] == "pair"
 
 
     def test_loads_telegram_rich_messages_from_gateway_platform_extra(self, tmp_path, monkeypatch):
@@ -981,11 +981,11 @@ class TestHomeChannelEnvOverrides:
                 ("C123", "Ops"),
             ),
             (
-                Platform.WHATSAPP,
+                Platform.MESSAGING,
                 PlatformConfig(enabled=True),
                 {
-                    "WHATSAPP_HOME_CHANNEL": "1234567890@lid",
-                    "WHATSAPP_HOME_CHANNEL_NAME": "Owner DM",
+                    "MESSAGING_HOME_CHANNEL": "1234567890@lid",
+                    "MESSAGING_HOME_CHANNEL_NAME": "Owner DM",
                 },
                 ("1234567890@lid", "Owner DM"),
             ),

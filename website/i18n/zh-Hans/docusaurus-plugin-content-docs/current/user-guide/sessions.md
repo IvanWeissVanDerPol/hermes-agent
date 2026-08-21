@@ -10,7 +10,7 @@ Hermes Agent 自动将每次对话保存为一个 session。Session 支持对话
 
 ## Session 的工作原理
 
-每次对话——无论来自 CLI、Telegram、Discord、Slack、WhatsApp、Signal、Matrix、Teams 还是其他任何消息平台——都会以完整消息历史的形式存储为一个 session。Session 记录在：
+每次对话——无论来自 CLI、Telegram、Discord、Slack、Messaging、Signal、Matrix、Teams 还是其他任何消息平台——都会以完整消息历史的形式存储为一个 session。Session 记录在：
 
 1. **SQLite 数据库**（`~/.hermes/state.db`）——包含 FTS5 全文搜索的结构化 session 元数据，以及完整消息历史
 
@@ -53,7 +53,7 @@ Hermes 存储 session 历史以便恢复对话，但不会在每次对话时重�
 | `telegram` | Telegram 消息 |
 | `discord` | Discord 服务器/私信 |
 | `slack` | Slack 工作区 |
-| `whatsapp` | WhatsApp 消息 |
+| `messaging` | Messaging 消息 |
 | `signal` | Signal 消息 |
 | `matrix` | Matrix 房间和私信 |
 | `mattermost` | Mattermost 频道 |
@@ -162,7 +162,7 @@ Session ID 格式为 `YYYYMMDD_HHMMSS_<hex>`——CLI/TUI session 使用 6 位�
    - **Telegram** — 开启新的论坛话题（如果在聊天中启用了 Bot API 9.4+ Topics 模式则为私信话题，或论坛超级群组话题）。
    - **Discord** — 在主文字频道下创建 1440 分钟自动归档的线程。
    - **Slack** — 发布一条种子消息并使用其 `ts` 作为线程锚点。
-   - **WhatsApp / Signal / Matrix / SMS** — 无原生线程，回退到直接使用主频道。
+   - **Messaging / Signal / Matrix / SMS** — 无原生线程，回退到直接使用主频道。
 4. Gateway 将目标键重新绑定到你现有的 CLI session id，然后伪造一个合成用户轮次，要求 agent 确认并总结。回复会出现在新线程中。
 5. Gateway 确认成功后，CLI 打印 `/resume` 提示并干净退出：
 
@@ -228,7 +228,7 @@ hermes sessions rename 20250305_091523_a1b2c3d4 "refactoring auth module"
 
 ### 在消息平台中使用 /title
 
-`/title` 命令在所有 gateway 平台（Telegram、Discord、Slack、WhatsApp）中均可使用：
+`/title` 命令在所有 gateway 平台（Telegram、Discord、Slack、Messaging）中均可使用：
 
 - `/title My Research` — 设置 session 标题
 - `/title` — 显示当前标题
@@ -512,7 +512,7 @@ Agent 被提示在以下情况自动使用 session 搜索：
 |-----------|--------------------|----------|
 | Telegram 私信 | `agent:main:telegram:dm:<chat_id>` | 每个私信聊天一个 session |
 | Discord 私信 | `agent:main:discord:dm:<chat_id>` | 每个私信聊天一个 session |
-| WhatsApp 私信 | `agent:main:whatsapp:dm:<canonical_identifier>` | 每个私信用户一个 session（存在映射时 LID/手机号别名合并为一个身份） |
+| Messaging 私信 | `agent:main:messaging:dm:<canonical_identifier>` | 每个私信用户一个 session（存在映射时 LID/手机号别名合并为一个身份） |
 | 群聊 | `agent:main:<platform>:group:<chat_id>:<user_id>` | 当平台暴露用户 ID 时，群内每用户独立 session |
 | 群组线程/话题 | `agent:main:<platform>:group:<chat_id>:<thread_id>` | 所有线程参与者共享 session（默认）。设置 `thread_sessions_per_user: true` 则每用户独立。 |
 | 频道 | `agent:main:<platform>:channel:<chat_id>:<user_id>` | 当平台暴露用户 ID 时，频道内每用户独立 session |

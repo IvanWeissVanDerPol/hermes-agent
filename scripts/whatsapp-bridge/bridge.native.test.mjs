@@ -1,5 +1,5 @@
 /**
- * Unit tests for WhatsApp-native bridge payload helpers.
+ * Unit tests for Messaging-native bridge payload helpers.
  *
  * These tests avoid importing bridge.js because that file starts an HTTP
  * server and Baileys socket at module load. Keep the helper module pure.
@@ -29,7 +29,7 @@ import {
   const groupKey = {
     id: 'incoming-group-1',
     remoteJid: '120363001234567890@g.us',
-    participant: '15550001111@s.whatsapp.net',
+    participant: '15550001111@s.messaging.net',
     fromMe: false,
   };
 
@@ -51,15 +51,15 @@ import {
   store.remember({
     key: {
       id: 'inbound-1',
-      remoteJid: '15551234567@s.whatsapp.net',
-      participant: '15550001111@s.whatsapp.net',
+      remoteJid: '15551234567@s.messaging.net',
+      participant: '15550001111@s.messaging.net',
       fromMe: false,
     },
     message: { conversation: 'original text' },
   });
 
   const { content, options } = buildTextSendPayload('reply text', {
-    chatId: '15551234567@s.whatsapp.net',
+    chatId: '15551234567@s.messaging.net',
     replyTo: 'inbound-1',
     messageStore: store,
   });
@@ -73,7 +73,7 @@ import {
 {
   const store = createBoundedMessageStore(2);
   const { content, options } = buildTextSendPayload('plain text', {
-    chatId: '15551234567@s.whatsapp.net',
+    chatId: '15551234567@s.messaging.net',
     replyTo: 'missing-id',
     messageStore: store,
   });
@@ -89,8 +89,8 @@ import {
     msg: {
       key: {
         id: 'incoming-1',
-        remoteJid: '15551234567@s.whatsapp.net',
-        participant: '15550001111@s.whatsapp.net',
+        remoteJid: '15551234567@s.messaging.net',
+        participant: '15550001111@s.messaging.net',
         fromMe: false,
       },
       pushName: 'Tester',
@@ -100,28 +100,28 @@ import {
           text: 'approved',
           contextInfo: {
             stanzaId: 'outbound-1',
-            participant: '15559998888@s.whatsapp.net',
-            remoteJid: '15551234567@s.whatsapp.net',
+            participant: '15559998888@s.messaging.net',
+            remoteJid: '15551234567@s.messaging.net',
             quotedMessage: { conversation: 'approve deploy?' },
           },
         },
       },
     },
-    chatId: '15551234567@s.whatsapp.net',
-    senderId: '15550001111@s.whatsapp.net',
+    chatId: '15551234567@s.messaging.net',
+    senderId: '15550001111@s.messaging.net',
     senderNumber: '15550001111',
-    botIds: ['15559998888@s.whatsapp.net'],
+    botIds: ['15559998888@s.messaging.net'],
     downloadMedia: async () => Buffer.from(''),
   });
 
   assert.equal(event.quotedMessageId, 'outbound-1');
-  assert.equal(event.quotedParticipant, '15559998888@s.whatsapp.net');
-  assert.equal(event.quotedRemoteJid, '15551234567@s.whatsapp.net');
+  assert.equal(event.quotedParticipant, '15559998888@s.messaging.net');
+  assert.equal(event.quotedRemoteJid, '15551234567@s.messaging.net');
   assert.equal(event.quotedText, 'approve deploy?');
   assert.deepEqual(event.readReceiptKey, {
     id: 'incoming-1',
-    remoteJid: '15551234567@s.whatsapp.net',
-    participant: '15550001111@s.whatsapp.net',
+    remoteJid: '15551234567@s.messaging.net',
+    participant: '15550001111@s.messaging.net',
     fromMe: false,
   });
   assert.equal(event.hasQuotedMessage, true);
@@ -132,7 +132,7 @@ import {
 {
   const event = await extractBridgeEvent({
     msg: {
-      key: { id: 'doc-1', remoteJid: '15551234567@s.whatsapp.net', fromMe: false },
+      key: { id: 'doc-1', remoteJid: '15551234567@s.messaging.net', fromMe: false },
       messageTimestamp: 123,
       message: {
         documentMessage: {
@@ -142,8 +142,8 @@ import {
         },
       },
     },
-    chatId: '15551234567@s.whatsapp.net',
-    senderId: '15550001111@s.whatsapp.net',
+    chatId: '15551234567@s.messaging.net',
+    senderId: '15550001111@s.messaging.net',
     senderNumber: '15550001111',
     downloadMedia: async () => Buffer.from('pdf'),
     writeMediaFile: async () => '/tmp/report.pdf',
@@ -162,7 +162,7 @@ import {
   const cacheDir = mkdtempSync(path.join(tmpdir(), 'hermes-wa-doc-'));
   const event = await extractBridgeEvent({
     msg: {
-      key: { id: 'doc-2', remoteJid: '15551234567@s.whatsapp.net', fromMe: false },
+      key: { id: 'doc-2', remoteJid: '15551234567@s.messaging.net', fromMe: false },
       messageTimestamp: 123,
       message: {
         documentMessage: {
@@ -172,8 +172,8 @@ import {
         },
       },
     },
-    chatId: '15551234567@s.whatsapp.net',
-    senderId: '15550001111@s.whatsapp.net',
+    chatId: '15551234567@s.messaging.net',
+    senderId: '15550001111@s.messaging.net',
     senderNumber: '15550001111',
     downloadMedia: async () => Buffer.from('pdf'),
     cacheDirs: { document: cacheDir },
@@ -187,7 +187,7 @@ import {
 {
   const event = await extractBridgeEvent({
     msg: {
-      key: { id: 'loc-1', remoteJid: '15551234567@s.whatsapp.net', fromMe: false },
+      key: { id: 'loc-1', remoteJid: '15551234567@s.messaging.net', fromMe: false },
       messageTimestamp: 123,
       message: {
         locationMessage: {
@@ -197,8 +197,8 @@ import {
         },
       },
     },
-    chatId: '15551234567@s.whatsapp.net',
-    senderId: '15550001111@s.whatsapp.net',
+    chatId: '15551234567@s.messaging.net',
+    senderId: '15550001111@s.messaging.net',
     senderNumber: '15550001111',
   });
 
@@ -217,7 +217,7 @@ import {
 {
   const event = await extractBridgeEvent({
     msg: {
-      key: { id: 'poll-1', remoteJid: '15551234567@s.whatsapp.net', fromMe: false },
+      key: { id: 'poll-1', remoteJid: '15551234567@s.messaging.net', fromMe: false },
       messageTimestamp: 123,
       message: {
         pollCreationMessage: {
@@ -227,8 +227,8 @@ import {
         },
       },
     },
-    chatId: '15551234567@s.whatsapp.net',
-    senderId: '15550001111@s.whatsapp.net',
+    chatId: '15551234567@s.messaging.net',
+    senderId: '15550001111@s.messaging.net',
     senderNumber: '15550001111',
   });
 
@@ -283,7 +283,7 @@ import {
   const pollCreation = {
     key: {
       id: 'poll-creation',
-      remoteJid: '15551234567@s.whatsapp.net',
+      remoteJid: '15551234567@s.messaging.net',
       fromMe: true,
     },
     message: {
@@ -299,8 +299,8 @@ import {
   };
   const voteKey = {
     id: 'vote-message',
-    remoteJid: '15551234567@s.whatsapp.net',
-    participant: '15550001111@s.whatsapp.net',
+    remoteJid: '15551234567@s.messaging.net',
+    participant: '15550001111@s.messaging.net',
     fromMe: false,
   };
   const encryptedVote = {
@@ -325,17 +325,17 @@ import {
       if (ctx.pollCreatorJid !== 'creator-lid@lid') {
         throw new Error('wrong creator jid');
       }
-      assert.equal(ctx.voterJid, '15550001111@s.whatsapp.net');
+      assert.equal(ctx.voterJid, '15550001111@s.messaging.net');
       return {
         selectedOptions: [createHash('sha256').update(Buffer.from('Approve')).digest()],
       };
     },
     getKeyAuthor: (key, meId = 'me') => (key?.fromMe ? meId : key?.participant || key?.remoteJid || ''),
-    meId: 'classic-me@s.whatsapp.net',
-    pollCreatorJids: ['classic-me@s.whatsapp.net', 'creator-lid@lid'],
+    meId: 'classic-me@s.messaging.net',
+    pollCreatorJids: ['classic-me@s.messaging.net', 'creator-lid@lid'],
   });
 
-  assert.deepEqual(attempts.map(item => item.pollCreatorJid), ['classic-me@s.whatsapp.net', 'creator-lid@lid']);
+  assert.deepEqual(attempts.map(item => item.pollCreatorJid), ['classic-me@s.messaging.net', 'creator-lid@lid']);
 
   assert.equal(pollUpdate.pollUpdateMessageKey.id, 'vote-message');
   assert.equal(pollUpdate.senderTimestampMs, 123);
@@ -346,7 +346,7 @@ import {
   assert.deepEqual(
     aggregation.map(option => ({ name: option.name, voters: option.voters })),
     [
-      { name: 'Approve', voters: ['15550001111@s.whatsapp.net'] },
+      { name: 'Approve', voters: ['15550001111@s.messaging.net'] },
       { name: 'Deny', voters: [] },
     ],
   );
@@ -376,14 +376,14 @@ import {
   // the message was silently dropped.
   const event = await extractBridgeEvent({
     msg: {
-      key: { id: 'img-fail-1', remoteJid: '15551234567@s.whatsapp.net', fromMe: false },
+      key: { id: 'img-fail-1', remoteJid: '15551234567@s.messaging.net', fromMe: false },
       messageTimestamp: 123,
       message: { imageMessage: { caption: '', mimetype: 'image/jpeg' } },
     },
-    chatId: '15551234567@s.whatsapp.net',
-    senderId: '15551234567@s.whatsapp.net',
+    chatId: '15551234567@s.messaging.net',
+    senderId: '15551234567@s.messaging.net',
     senderNumber: '15551234567',
-    downloadMedia: async () => { throw new Error('Failed to fetch stream from https://mmg.whatsapp.net/x'); },
+    downloadMedia: async () => { throw new Error('Failed to fetch stream from https://mmg.messaging.net/x'); },
     cacheDirs: { image: mkdtempSync(path.join(tmpdir(), 'wa-media-')) },
   });
   assert.equal(event.hasMedia, true);
@@ -396,12 +396,12 @@ import {
   // Captioned message keeps the caption and appends the failure note.
   const event = await extractBridgeEvent({
     msg: {
-      key: { id: 'doc-fail-1', remoteJid: '15551234567@s.whatsapp.net', fromMe: false },
+      key: { id: 'doc-fail-1', remoteJid: '15551234567@s.messaging.net', fromMe: false },
       messageTimestamp: 123,
       message: { documentMessage: { caption: 'see attached', fileName: 'q.pdf', mimetype: 'application/pdf' } },
     },
-    chatId: '15551234567@s.whatsapp.net',
-    senderId: '15551234567@s.whatsapp.net',
+    chatId: '15551234567@s.messaging.net',
+    senderId: '15551234567@s.messaging.net',
     senderNumber: '15551234567',
     downloadMedia: async () => { throw new Error('boom'); },
     cacheDirs: { document: mkdtempSync(path.join(tmpdir(), 'wa-media-')) },
@@ -411,4 +411,4 @@ import {
   console.log('  ✓ captioned failed download keeps caption and appends note');
 }
 
-console.log('\n✅ All WhatsApp native bridge helper tests passed.');
+console.log('\n✅ All Messaging native bridge helper tests passed.');

@@ -152,7 +152,7 @@ plugins/platforms/                  # 插件打包的适配器（每个一个目
 ├── telegram/adapter.py     # Telegram Bot API（长轮询或 webhook）
 ├── discord/adapter.py      # Discord bot（通过 discord.py）
 ├── slack/adapter.py        # Slack Socket Mode
-├── whatsapp/adapter.py     # WhatsApp Business Cloud API
+├── messaging/adapter.py     # Messaging Business Cloud API
 ├── matrix/adapter.py       # Matrix（通过 mautrix，可选 E2EE）
 ├── mattermost/adapter.py   # Mattermost WebSocket API
 ├── email/adapter.py        # 电子邮件（通过 IMAP/SMTP）

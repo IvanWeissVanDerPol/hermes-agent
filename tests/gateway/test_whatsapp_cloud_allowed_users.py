@@ -1,8 +1,8 @@
 """Regression tests for PR #58448 salvage: the documented
-WHATSAPP_CLOUD_ALLOWED_USERS / WHATSAPP_CLOUD_ALLOW_ALL_USERS env vars
+MESSAGING_CLOUD_ALLOWED_USERS / MESSAGING_CLOUD_ALLOW_ALL_USERS env vars
 must actually drive the DM intake gate.
 
-Before the fix, the adapter only read WHATSAPP_CLOUD_ALLOW_FROM and the
+Before the fix, the adapter only read MESSAGING_CLOUD_ALLOW_FROM and the
 dm_policy default was "open" (which fails closed without an allow-all
 opt-in), so a wizard-configured install using the documented vars
 silently dropped every inbound message.
@@ -18,17 +18,17 @@ from gateway.config import Platform
 
 
 def _build_adapter(monkeypatch, env: dict[str, str], extra: dict | None = None):
-    """Construct a real WhatsAppCloudAdapter through __init__ with env vars."""
-    from gateway.platforms.whatsapp_cloud import WhatsAppCloudAdapter
+    """Construct a real MessagingCloudAdapter through __init__ with env vars."""
+    from gateway.platforms.messaging_cloud import MessagingCloudAdapter
 
     for var in (
-        "WHATSAPP_CLOUD_ALLOW_FROM",
-        "WHATSAPP_CLOUD_ALLOWED_USERS",
-        "WHATSAPP_CLOUD_ALLOW_ALL_USERS",
-        "WHATSAPP_CLOUD_DM_POLICY",
-        "WHATSAPP_DM_POLICY",
+        "MESSAGING_CLOUD_ALLOW_FROM",
+        "MESSAGING_CLOUD_ALLOWED_USERS",
+        "MESSAGING_CLOUD_ALLOW_ALL_USERS",
+        "MESSAGING_CLOUD_DM_POLICY",
+        "MESSAGING_DM_POLICY",
         "GATEWAY_ALLOW_ALL_USERS",
-        "WHATSAPP_ALLOW_ALL_USERS",
+        "MESSAGING_ALLOW_ALL_USERS",
     ):
         monkeypatch.delenv(var, raising=False)
     for key, value in env.items():
@@ -40,7 +40,7 @@ def _build_adapter(monkeypatch, env: dict[str, str], extra: dict | None = None):
         "access_token": "test-token",
         **(extra or {}),
     }
-    return WhatsAppCloudAdapter(config)
+    return MessagingCloudAdapter(config)
 
 
 def _dm_message(sender: str) -> dict:
@@ -49,7 +49,7 @@ def _dm_message(sender: str) -> dict:
 
 def test_allowed_users_env_populates_allowlist_and_enforces_it(monkeypatch):
     adapter = _build_adapter(
-        monkeypatch, {"WHATSAPP_CLOUD_ALLOWED_USERS": "15551234567"}
+        monkeypatch, {"MESSAGING_CLOUD_ALLOWED_USERS": "15551234567"}
     )
 
     # The documented var must populate the allowlist...
@@ -65,15 +65,15 @@ def test_allow_from_still_takes_precedence(monkeypatch):
     adapter = _build_adapter(
         monkeypatch,
         {
-            "WHATSAPP_CLOUD_ALLOW_FROM": "15550000001",
-            "WHATSAPP_CLOUD_ALLOWED_USERS": "15559999999",
+            "MESSAGING_CLOUD_ALLOW_FROM": "15550000001",
+            "MESSAGING_CLOUD_ALLOWED_USERS": "15559999999",
         },
     )
 
     # Legacy ALLOW_FROM wins when both are set (documented precedence).
     assert "15550000001" in adapter._allow_from
     assert "15559999999" not in adapter._allow_from
-    assert adapter._dm_allowlist_source == "WHATSAPP_CLOUD_ALLOW_FROM"
+    assert adapter._dm_allowlist_source == "MESSAGING_CLOUD_ALLOW_FROM"
     assert adapter._is_dm_allowed("15550000001") is True
     assert adapter._is_dm_allowed("15559999999") is False
 
@@ -83,8 +83,8 @@ def test_explicit_config_beats_cloud_env_on_live_checks(monkeypatch):
     adapter = _build_adapter(
         monkeypatch,
         {
-            "WHATSAPP_CLOUD_ALLOW_FROM": "15550000002",
-            "WHATSAPP_CLOUD_ALLOWED_USERS": "15550000003",
+            "MESSAGING_CLOUD_ALLOW_FROM": "15550000002",
+            "MESSAGING_CLOUD_ALLOWED_USERS": "15550000003",
         },
         extra={"dm_policy": "allowlist", "allow_from": ["15550000001"]},
     )
@@ -97,7 +97,7 @@ def test_explicit_config_beats_cloud_env_on_live_checks(monkeypatch):
     assert adapter._is_dm_intake_allowed("15550000002") is False
 
     # Mutating lower-precedence env must not replace the config allowlist.
-    monkeypatch.setenv("WHATSAPP_CLOUD_ALLOWED_USERS", "15550000003,15550000004")
+    monkeypatch.setenv("MESSAGING_CLOUD_ALLOWED_USERS", "15550000003,15550000004")
     assert adapter._is_dm_allowed("15550000001") is True
     assert adapter._is_dm_allowed("15550000003") is False
     assert adapter._is_dm_allowed("15550000004") is False
@@ -108,8 +108,8 @@ def test_explicit_empty_allow_from_blocks_cloud_env_grants(monkeypatch):
     adapter = _build_adapter(
         monkeypatch,
         {
-            "WHATSAPP_CLOUD_ALLOW_FROM": "15550000002",
-            "WHATSAPP_CLOUD_ALLOWED_USERS": "15550000003",
+            "MESSAGING_CLOUD_ALLOW_FROM": "15550000002",
+            "MESSAGING_CLOUD_ALLOWED_USERS": "15550000003",
         },
         extra={"dm_policy": "allowlist", "allow_from": []},
     )
@@ -125,13 +125,13 @@ def test_explicit_empty_allow_from_blocks_cloud_env_grants(monkeypatch):
 def test_cloud_allowed_users_live_reread_when_env_seeded(monkeypatch):
     adapter = _build_adapter(
         monkeypatch,
-        {"WHATSAPP_CLOUD_ALLOWED_USERS": "15551234567"},
+        {"MESSAGING_CLOUD_ALLOWED_USERS": "15551234567"},
     )
 
-    assert adapter._dm_allowlist_source == "WHATSAPP_CLOUD_ALLOWED_USERS"
+    assert adapter._dm_allowlist_source == "MESSAGING_CLOUD_ALLOWED_USERS"
     assert adapter._is_dm_allowed("15551234567") is True
 
-    monkeypatch.setenv("WHATSAPP_CLOUD_ALLOWED_USERS", "")
+    monkeypatch.setenv("MESSAGING_CLOUD_ALLOWED_USERS", "")
     assert adapter._is_dm_allowed("15551234567") is False
 
 
@@ -139,10 +139,10 @@ def test_cloud_live_allowlist_denies_when_env_key_removed(monkeypatch):
     """Sole-entry revoke removes the key — stale construction snapshot must not authorize."""
     adapter = _build_adapter(
         monkeypatch,
-        {"WHATSAPP_CLOUD_ALLOWED_USERS": "15551234567"},
+        {"MESSAGING_CLOUD_ALLOWED_USERS": "15551234567"},
     )
     assert "15551234567" in adapter._allow_from
 
-    monkeypatch.delenv("WHATSAPP_CLOUD_ALLOWED_USERS", raising=False)
+    monkeypatch.delenv("MESSAGING_CLOUD_ALLOWED_USERS", raising=False)
     assert adapter._live_dm_allow_from() == set()
     assert adapter._is_dm_allowed("15551234567") is False

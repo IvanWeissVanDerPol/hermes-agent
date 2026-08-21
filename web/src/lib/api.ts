@@ -78,7 +78,7 @@ const PROFILE_SCOPED_PREFIXES = [
   "/api/mcp",
   "/api/messaging/platforms",
   "/api/messaging/telegram/onboarding",
-  "/api/messaging/whatsapp/onboarding",
+  "/api/messaging/messaging/onboarding",
   "/api/model/info",
   "/api/model/set",
   "/api/model/auxiliary",
@@ -905,37 +905,37 @@ export const api = {
       `/api/messaging/telegram/onboarding/${encodeURIComponent(pairingId)}`,
       { method: "DELETE" },
     ),
-  startWhatsAppOnboarding: (body: {
+  startMessagingOnboarding: (body: {
     mode?: "bot" | "self-chat";
     allowed_users?: string;
   }) =>
-    fetchJSON<WhatsAppOnboardingStartResponse>(
-      "/api/messaging/whatsapp/onboarding/start",
+    fetchJSON<MessagingOnboardingStartResponse>(
+      "/api/messaging/messaging/onboarding/start",
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       },
     ),
-  getWhatsAppOnboardingStatus: (pairingId: string) =>
-    fetchJSON<WhatsAppOnboardingStatusResponse>(
-      `/api/messaging/whatsapp/onboarding/${encodeURIComponent(pairingId)}`,
+  getMessagingOnboardingStatus: (pairingId: string) =>
+    fetchJSON<MessagingOnboardingStatusResponse>(
+      `/api/messaging/messaging/onboarding/${encodeURIComponent(pairingId)}`,
     ),
-  applyWhatsAppOnboarding: (
+  applyMessagingOnboarding: (
     pairingId: string,
     body: { mode?: "bot" | "self-chat"; allowed_users?: string; profile?: string },
   ) =>
-    fetchJSON<WhatsAppOnboardingApplyResponse>(
-      `/api/messaging/whatsapp/onboarding/${encodeURIComponent(pairingId)}/apply`,
+    fetchJSON<MessagingOnboardingApplyResponse>(
+      `/api/messaging/messaging/onboarding/${encodeURIComponent(pairingId)}/apply`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       },
     ),
-  cancelWhatsAppOnboarding: (pairingId: string) =>
+  cancelMessagingOnboarding: (pairingId: string) =>
     fetchJSON<{ ok: boolean }>(
-      `/api/messaging/whatsapp/onboarding/${encodeURIComponent(pairingId)}`,
+      `/api/messaging/messaging/onboarding/${encodeURIComponent(pairingId)}`,
       { method: "DELETE" },
     ),
 
@@ -1559,7 +1559,7 @@ export interface MessagingPlatform {
   error_message: string | null;
   updated_at: string | null;
   home_channel: { platform: string; chat_id: string; name: string; thread_id?: string } | null;
-  whatsapp_setup?: {
+  messaging_setup?: {
     mode?: string;
     allowed_users_set?: boolean;
     home_channel_set?: boolean;
@@ -1957,7 +1957,7 @@ export interface TelegramOnboardingApplyResponse {
   restart_error?: string;
 }
 
-export interface WhatsAppOnboardingStartResponse {
+export interface MessagingOnboardingStartResponse {
   pairing_id: string;
   status:
     | "starting"
@@ -1977,11 +1977,11 @@ export interface WhatsAppOnboardingStartResponse {
   error?: string | null;
 }
 
-export type WhatsAppOnboardingStatusResponse = WhatsAppOnboardingStartResponse;
+export type MessagingOnboardingStatusResponse = MessagingOnboardingStartResponse;
 
-export interface WhatsAppOnboardingApplyResponse {
+export interface MessagingOnboardingApplyResponse {
   ok: boolean;
-  platform: "whatsapp";
+  platform: "messaging";
   needs_restart: boolean;
   restart_started?: boolean;
   restart_action?: string;

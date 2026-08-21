@@ -491,8 +491,8 @@ TOOLSETS = {
         "includes": []
     },
     
-    "hermes-whatsapp": {
-        "description": "WhatsApp bot toolset - similar to Telegram (personal messaging, more trusted)",
+    "hermes-messaging": {
+        "description": "Messaging bot toolset - similar to Telegram (personal messaging, more trusted)",
         "tools": _HERMES_CORE_TOOLS,
         "includes": []
     },
@@ -609,7 +609,7 @@ TOOLSETS = {
     "hermes-gateway": {
         "description": "Gateway toolset - union of all messaging platform tools",
         "tools": [],
-        "includes": ["hermes-telegram", "hermes-discord", "hermes-whatsapp", "hermes-slack", "hermes-signal", "hermes-bluebubbles", "hermes-homeassistant", "hermes-email", "hermes-sms", "hermes-mattermost", "hermes-matrix", "hermes-dingtalk", "hermes-feishu", "hermes-wecom", "hermes-wecom-callback", "hermes-weixin", "hermes-qqbot", "hermes-webhook", "hermes-yuanbao"]
+        "includes": ["hermes-telegram", "hermes-discord", "hermes-messaging", "hermes-slack", "hermes-signal", "hermes-bluebubbles", "hermes-homeassistant", "hermes-email", "hermes-sms", "hermes-mattermost", "hermes-matrix", "hermes-dingtalk", "hermes-feishu", "hermes-wecom", "hermes-wecom-callback", "hermes-weixin", "hermes-qqbot", "hermes-webhook", "hermes-yuanbao"]
     }
 }
 

@@ -1,14 +1,14 @@
 """Regression tests — Slack-pattern scoped credential reads at adapter startup.
 
 Class-closure follow-up to the profile secret-scope cluster (#76462, Slack
-pattern #59739, WhatsApp ``_get_wsecret``): the 13 platform adapters below
+pattern #59739, Messaging ``_get_wsecret``): the 13 platform adapters below
 read credentials at ``__init__`` / availability-check / standalone-send time
 with bare ``os.getenv`` (SMS even used ``os.environ[...]``, which KeyErrors).
 Under ``gateway.multiplex_profiles`` those reads leak the default profile's
 credential into secondary profiles' adapters.
 
 Each migrated module now carries a module-level ``_get_scoped_secret`` helper
-mirroring ``gateway/platforms/whatsapp_common.py::_get_wsecret``:
+mirroring ``gateway/platforms/messaging_common.py::_get_wsecret``:
 
 - scope installed → scope is authoritative; scoped miss returns the default
   (NO borrow from ``os.environ``)
@@ -61,7 +61,7 @@ def _helper(module_name):
     helper = getattr(mod, "_get_scoped_secret", None)
     assert helper is not None, (
         f"{module_name} must define the module-level _get_scoped_secret helper "
-        "(Slack pattern #59739 / whatsapp_common._get_wsecret)"
+        "(Slack pattern #59739 / messaging_common._get_wsecret)"
     )
     return helper
 

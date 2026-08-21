@@ -1379,14 +1379,14 @@ export const ja = defineLocale({
         label: '許可する Signal ユーザー',
         help: '推奨。カンマ区切りの Signal 識別子。'
       },
-      WHATSAPP_ENABLED: {
-        label: 'WhatsApp ブリッジを有効にする',
+      MESSAGING_ENABLED: {
+        label: 'Messaging ブリッジを有効にする',
         help: '以下のトグルで自動的に設定されます。必要な場合を除いてそのままにしてください。'
       },
-      WHATSAPP_MODE: { label: 'ブリッジモード' },
-      WHATSAPP_ALLOWED_USERS: {
-        label: '許可する WhatsApp ユーザー',
-        help: '推奨。カンマ区切りの電話番号または WhatsApp ID。'
+      MESSAGING_MODE: { label: 'ブリッジモード' },
+      MESSAGING_ALLOWED_USERS: {
+        label: '許可する Messaging ユーザー',
+        help: '推奨。カンマ区切りの電話番号または Messaging ID。'
       }
     },
     platformIntro: {}

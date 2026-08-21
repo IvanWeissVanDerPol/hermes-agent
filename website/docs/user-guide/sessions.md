@@ -12,7 +12,7 @@ Hermes Agent automatically saves every conversation as a session. Sessions enabl
 
 ## How Sessions Work
 
-Every conversation — whether from the CLI, Telegram, Discord, Slack, WhatsApp, Signal, Matrix, Teams, or any other messaging platform — is stored as a session with full message history. Sessions are tracked in:
+Every conversation — whether from the CLI, Telegram, Discord, Slack, Messaging, Signal, Matrix, Teams, or any other messaging platform — is stored as a session with full message history. Sessions are tracked in:
 
 1. **SQLite database** (`~/.hermes/state.db`) — structured session metadata with FTS5 full-text search, plus full message history
 
@@ -76,7 +76,7 @@ Each session is tagged with its source platform:
 | `telegram` | Telegram messenger |
 | `discord` | Discord server/DM |
 | `slack` | Slack workspace |
-| `whatsapp` | WhatsApp messenger |
+| `messaging` | Messaging messenger |
 | `signal` | Signal messenger |
 | `matrix` | Matrix rooms and DMs |
 | `mattermost` | Mattermost channels |
@@ -204,7 +204,7 @@ What happens:
    - **Telegram** — opens a new forum topic (DM topics if Bot API 9.4+ Topics mode is enabled in the chat, or a forum supergroup topic).
    - **Discord** — creates a 1440-min auto-archive thread under the home text channel.
    - **Slack** — posts a seed message and uses its `ts` as the thread anchor.
-   - **WhatsApp / Signal / Matrix / SMS** — no native threads, falls back to the home channel directly.
+   - **Messaging / Signal / Matrix / SMS** — no native threads, falls back to the home channel directly.
 4. The gateway re-binds the destination key to your existing CLI session id, then forges a synthetic user turn asking the agent to confirm and summarize. The reply lands in the new thread.
 5. When the gateway acknowledges success, the CLI prints a `/resume` hint and exits cleanly:
 
@@ -270,7 +270,7 @@ When you resume by name (`hermes -c "my project"`), it automatically picks the m
 
 ### /title in Messaging Platforms
 
-The `/title` command works in all gateway platforms (Telegram, Discord, Slack, WhatsApp):
+The `/title` command works in all gateway platforms (Telegram, Discord, Slack, Messaging):
 
 - `/title My Research` — set the session title
 - `/title` — show the current title
@@ -624,7 +624,7 @@ On messaging platforms, sessions are keyed by a deterministic session key built 
 |-----------|--------------------|----------|
 | Telegram DM | `agent:main:telegram:dm:<chat_id>` | One session per DM chat |
 | Discord DM | `agent:main:discord:dm:<chat_id>` | One session per DM chat |
-| WhatsApp DM | `agent:main:whatsapp:dm:<canonical_identifier>` | One session per DM user (LID/phone aliases collapse to one identity when mapping exists) |
+| Messaging DM | `agent:main:messaging:dm:<canonical_identifier>` | One session per DM user (LID/phone aliases collapse to one identity when mapping exists) |
 | Group chat | `agent:main:<platform>:group:<chat_id>:<user_id>` | Per-user inside the group when the platform exposes a user ID |
 | Group thread/topic | `agent:main:<platform>:group:<chat_id>:<thread_id>` | Shared session for all thread participants (default). Per-user with `thread_sessions_per_user: true`. |
 | Channel | `agent:main:<platform>:channel:<chat_id>:<user_id>` | Per-user inside the channel when the platform exposes a user ID |
@@ -679,7 +679,7 @@ kept for backward compatibility (disable with
 `gateway.write_sessions_json: false`). It maps messaging session keys
 (`agent:main:<platform>:...`) to active session IDs.
 It only ever contains gateway/messaging entries, so if you run a messaging
-platform you'll see only those (e.g. `agent:main:whatsapp:dm:...`).
+platform you'll see only those (e.g. `agent:main:messaging:dm:...`).
 
 This is **expected** and does **not** mean your CLI sessions are missing.
 `hermes sessions list`, `/sessions`, and the dashboard all read `state.db`,

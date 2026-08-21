@@ -1,6 +1,6 @@
-"""WhatsApp DM/group allowlist must resolve phone↔LID aliases at intake.
+"""Messaging DM/group allowlist must resolve phone↔LID aliases at intake.
 
-Regression for #14486: WhatsApp now delivers inbound DM senders in LID form
+Regression for #14486: Messaging now delivers inbound DM senders in LID form
 (``<id>@lid``) while operators configure the allowlist with phone numbers.
 The adapter-level gate (``_is_dm_allowed`` / ``_is_group_allowed`` →
 ``_should_process_message``) did a raw set-membership check with no LID
@@ -8,7 +8,7 @@ resolution, so every DM from an allowed user was silently dropped before the
 gateway authz layer ever ran.
 
 The fix routes the adapter gate through the shared
-``gateway.whatsapp_identity.expand_whatsapp_aliases`` helper, which reads the
+``gateway.messaging_identity.expand_messaging_aliases`` helper, which reads the
 bridge's ``lid-mapping-*.json`` session files (the same source the gateway
 authz and session-key paths already use).
 """
@@ -25,7 +25,7 @@ LID = "77214955630717"
 
 
 def _make_adapter(dm_policy=None, allow_from=None, group_policy=None, group_allow_from=None):
-    from plugins.platforms.whatsapp.adapter import WhatsAppAdapter
+    from plugins.platforms.messaging.adapter import MessagingAdapter
 
     extra = {}
     if dm_policy is not None:
@@ -37,14 +37,14 @@ def _make_adapter(dm_policy=None, allow_from=None, group_policy=None, group_allo
     if group_allow_from is not None:
         extra["group_allow_from"] = group_allow_from
 
-    adapter = object.__new__(WhatsAppAdapter)
-    adapter.platform = Platform.WHATSAPP
+    adapter = object.__new__(MessagingAdapter)
+    adapter.platform = Platform.MESSAGING
     adapter.config = PlatformConfig(enabled=True, extra=extra)
     adapter._message_handler = AsyncMock()
     adapter._dm_policy = str(extra.get("dm_policy", "open")).strip().lower()
-    adapter._allow_from = WhatsAppAdapter._coerce_allow_list(extra.get("allow_from"))
+    adapter._allow_from = MessagingAdapter._coerce_allow_list(extra.get("allow_from"))
     adapter._group_policy = str(extra.get("group_policy", "open")).strip().lower()
-    adapter._group_allow_from = WhatsAppAdapter._coerce_allow_list(
+    adapter._group_allow_from = MessagingAdapter._coerce_allow_list(
         extra.get("group_allow_from")
     )
     return adapter
@@ -52,7 +52,7 @@ def _make_adapter(dm_policy=None, allow_from=None, group_policy=None, group_allo
 
 def _write_lid_mapping(phone=PHONE, lid=LID):
     """Mirror what the JS bridge writes: phone→lid and lid→phone (reverse)."""
-    session_dir = get_hermes_home() / "whatsapp" / "session"
+    session_dir = get_hermes_home() / "messaging" / "session"
     session_dir.mkdir(parents=True, exist_ok=True)
     (session_dir / f"lid-mapping-{phone}.json").write_text(json.dumps(lid), encoding="utf-8")
     (session_dir / f"lid-mapping-{lid}_reverse.json").write_text(

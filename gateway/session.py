@@ -90,9 +90,9 @@ from .config import (
     SessionResetPolicy,  # noqa: F401 — re-exported via gateway/__init__.py
     HomeChannel,
 )
-from .whatsapp_identity import (
-    canonical_whatsapp_identifier,
-    normalize_whatsapp_identifier,  # noqa: F401 - re-exported for gateway.session callers
+from .messaging_identity import (
+    canonical_messaging_identifier,
+    normalize_messaging_identifier,  # noqa: F401 - re-exported for gateway.session callers
 )
 from utils import atomic_replace
 from agent.turn_context import extract_api_content_sidecar
@@ -347,7 +347,7 @@ class SessionContext:
 
 
 _PII_SAFE_PLATFORMS = frozenset({
-    Platform.WHATSAPP,
+    Platform.MESSAGING,
     Platform.SIGNAL,
     Platform.TELEGRAM,
     Platform.BLUEBUBBLES,
@@ -1102,8 +1102,8 @@ def build_session_key(
     )
     if source.chat_type == "dm":
         dm_chat_id = source.chat_id
-        if source.platform == Platform.WHATSAPP:
-            dm_chat_id = canonical_whatsapp_identifier(source.chat_id)
+        if source.platform == Platform.MESSAGING:
+            dm_chat_id = canonical_messaging_identifier(source.chat_id)
 
         dm_parts = [ns, platform, "dm"]
         if slack_scope_id:
@@ -1120,9 +1120,9 @@ def build_session_key(
         # single cached agent ends up serving multiple people's conversations —
         # cross-user history bleed.  participant_id keeps DMs isolated per user.
         dm_participant_id = source.user_id_alt or source.user_id
-        if dm_participant_id and source.platform == Platform.WHATSAPP:
+        if dm_participant_id and source.platform == Platform.MESSAGING:
             dm_participant_id = (
-                canonical_whatsapp_identifier(str(dm_participant_id))
+                canonical_messaging_identifier(str(dm_participant_id))
                 or dm_participant_id
             )
         if dm_participant_id:
@@ -1135,11 +1135,11 @@ def build_session_key(
         return ":".join(str(part) for part in dm_parts)
 
     participant_id = source.user_id_alt or source.user_id
-    if participant_id and source.platform == Platform.WHATSAPP:
+    if participant_id and source.platform == Platform.MESSAGING:
         # Same JID/LID-flip bug as the DM case: without canonicalisation, a
         # single group member gets two isolated per-user sessions when the
         # bridge reshuffles alias forms.
-        participant_id = canonical_whatsapp_identifier(str(participant_id)) or participant_id
+        participant_id = canonical_messaging_identifier(str(participant_id)) or participant_id
     # Discord auto-thread continuity: a channel-initiating message carries no
     # thread_id yet, but the connector tells us the thread its reply WILL be
     # auto-threaded into (prospective_thread_id == the message id, which becomes

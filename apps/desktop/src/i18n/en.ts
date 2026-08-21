@@ -1476,14 +1476,14 @@ export const en: Translations = {
       },
       SIGNAL_ACCOUNT: { label: 'Phone number', help: 'The number registered with your signal-cli bridge.' },
       SIGNAL_ALLOWED_USERS: { label: 'Allowed Signal users', help: 'Recommended. Comma-separated Signal identifiers.' },
-      WHATSAPP_ENABLED: {
-        label: 'Enable WhatsApp bridge',
+      MESSAGING_ENABLED: {
+        label: 'Enable Messaging bridge',
         help: 'Set automatically by the toggle below. Leave alone unless you know you need it.'
       },
-      WHATSAPP_MODE: { label: 'Bridge mode' },
-      WHATSAPP_ALLOWED_USERS: {
-        label: 'Allowed WhatsApp users',
-        help: 'Recommended. Comma-separated phone numbers or WhatsApp IDs.'
+      MESSAGING_MODE: { label: 'Bridge mode' },
+      MESSAGING_ALLOWED_USERS: {
+        label: 'Allowed Messaging users',
+        help: 'Recommended. Comma-separated phone numbers or Messaging IDs.'
       }
     },
     platformIntro: {}

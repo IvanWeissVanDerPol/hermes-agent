@@ -4,7 +4,7 @@
 to ``send_image`` / ``send_image_file`` / ``send_animation`` on every send.
 An override whose signature stops at ``reply_to`` raises ``TypeError:
 send_image() got an unexpected keyword argument 'metadata'`` at runtime —
-which is exactly how image delivery broke on WhatsApp and email.
+which is exactly how image delivery broke on Messaging and email.
 
 This mirrors ``test_discord_media_metadata.py`` but covers the two
 adapters that previously slipped, plus a best-effort sweep over every
@@ -24,7 +24,7 @@ def _accepts_metadata(method) -> bool:
     if "metadata" in params:
         return True
     # A ``**kwargs`` catch-all also absorbs metadata (the convention used by
-    # WhatsApp's send_video / send_voice / send_document overrides).
+    # Messaging's send_video / send_voice / send_document overrides).
     return any(p.kind is inspect.Parameter.VAR_KEYWORD for p in params.values())
 
 
@@ -33,7 +33,7 @@ def _accepts_metadata(method) -> bool:
 @pytest.mark.parametrize(
     "module_name, class_name",
     [
-        ("plugins.platforms.whatsapp.adapter", "WhatsAppAdapter"),
+        ("plugins.platforms.messaging.adapter", "MessagingAdapter"),
         ("plugins.platforms.email.adapter", "EmailAdapter"),
     ],
 )
@@ -61,7 +61,7 @@ _ALL_ADAPTERS = [
     ("plugins.platforms.telegram.adapter", "TelegramAdapter"),
     ("plugins.platforms.wecom.adapter", "WeComAdapter"),
     ("gateway.platforms.weixin", "WeixinAdapter"),
-    ("plugins.platforms.whatsapp.adapter", "WhatsAppAdapter"),
+    ("plugins.platforms.messaging.adapter", "MessagingAdapter"),
     ("gateway.platforms.yuanbao", "YuanbaoAdapter"),
 ]
 

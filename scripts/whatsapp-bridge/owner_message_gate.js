@@ -1,5 +1,5 @@
 /**
- * Pure classifier for the WhatsApp bridge's bot-mode dispatch loop.
+ * Pure classifier for the Messaging bridge's bot-mode dispatch loop.
  *
  * Centralises the "should this fromMe message be forwarded as fromOwner?"
  * decision so the gate can be unit-tested without spinning up Baileys or

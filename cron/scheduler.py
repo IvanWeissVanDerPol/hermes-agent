@@ -247,7 +247,7 @@ def _resolve_cron_enabled_toolsets(job: dict, cfg: dict) -> list[str] | None:
 # Valid delivery platforms — used to validate user-supplied platform names
 # in cron delivery targets, preventing env var enumeration via crafted names.
 _KNOWN_DELIVERY_PLATFORMS = frozenset({
-    "telegram", "discord", "slack", "whatsapp", "signal",
+    "telegram", "discord", "slack", "messaging", "signal",
     "matrix", "mattermost", "homeassistant", "dingtalk", "feishu",
     "wecom", "wecom_callback", "weixin", "sms", "email", "webhook", "bluebubbles",
     "qqbot", "yuanbao",
@@ -270,8 +270,8 @@ _HOME_TARGET_ENV_VARS = {
     "weixin": "WEIXIN_HOME_CHANNEL",
     "bluebubbles": "BLUEBUBBLES_HOME_CHANNEL",
     "qqbot": "QQBOT_HOME_CHANNEL",
-    "whatsapp": "WHATSAPP_HOME_CHANNEL",
-    "whatsapp_cloud": "WHATSAPP_CLOUD_HOME_CHANNEL",
+    "messaging": "MESSAGING_HOME_CHANNEL",
+    "messaging_cloud": "MESSAGING_CLOUD_HOME_CHANNEL",
 }
 
 # Legacy env var names kept for back-compat.  Each entry is the current
@@ -754,7 +754,7 @@ def _open_continuable_cron_thread(
     """Open a dedicated thread for a continuable cron job (thread-preferred).
 
     Returns the new ``thread_id`` on success, or ``None`` when the platform has
-    no thread primitive (WhatsApp/Signal/SMS) or creation failed — the ``None``
+    no thread primitive (Messaging/Signal/SMS) or creation failed — the ``None``
     return is the caller's signal to fall back to the origin-DM mirror, the same
     open-thread-or-fallback shape as ``GatewayRunner._process_handoff``. Reuses
     the shipped ``adapter.create_handoff_thread``; no new adapter surface.
@@ -1697,7 +1697,7 @@ def _deliver_result(job: dict, content: str, adapters=None, loop=None) -> Option
         # for this job and deliver the brief into it. On thread-capable
         # platforms (Telegram/Discord/Slack) the brief + the user's replies live
         # in their own scrollback; the thread-keyed session is seeded so a reply
-        # continues with full context. On DM-only platforms (WhatsApp/Signal)
+        # continues with full context. On DM-only platforms (Messaging/Signal)
         # create_handoff_thread returns None and we fall back to mirroring into
         # the origin DM session (handled after delivery). Cf. _process_handoff.
         #

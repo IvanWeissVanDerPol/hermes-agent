@@ -189,7 +189,7 @@ hermes cron create "30m"             # 单次：30 分钟后运行一次
 --deliver local                          # 仅保存到 ~/.hermes/cron/output/
 ```
 
-对于使用 bot token 的平台（Telegram、Discord、Slack、Signal、SMS、WhatsApp），脚本运行时无需运行中的 gateway——工具直接使用 `~/.hermes/.env` / `~/.hermes/config.yaml` 中已有的凭据调用各平台的 REST 端点。
+对于使用 bot token 的平台（Telegram、Discord、Slack、Signal、SMS、Messaging），脚本运行时无需运行中的 gateway——工具直接使用 `~/.hermes/.env` / `~/.hermes/config.yaml` 中已有的凭据调用各平台的 REST 端点。
 
 ## 编辑与生命周期
 

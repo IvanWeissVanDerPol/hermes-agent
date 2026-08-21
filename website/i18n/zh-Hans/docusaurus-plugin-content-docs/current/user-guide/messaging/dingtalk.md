@@ -124,7 +124,7 @@ DINGTALK_ALLOWED_USERS=user-id-1
 # 多个允许用户（逗号分隔）
 # DINGTALK_ALLOWED_USERS=user-id-1,user-id-2
 
-# 可选：群聊门控（与 Slack/Telegram/Discord/WhatsApp 保持一致）
+# 可选：群聊门控（与 Slack/Telegram/Discord/Messaging 保持一致）
 # DINGTALK_REQUIRE_MENTION=true
 # DINGTALK_FREE_RESPONSE_CHATS=cidABC==,cidDEF==
 # DINGTALK_MENTION_PATTERNS=^小马

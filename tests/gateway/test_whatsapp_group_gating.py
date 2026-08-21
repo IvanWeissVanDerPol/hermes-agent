@@ -6,7 +6,7 @@ from gateway.config import Platform, PlatformConfig, load_gateway_config
 
 def _make_adapter(require_mention=None, mention_patterns=None, free_response_chats=None,
                   dm_policy=None, allow_from=None, group_policy=None, group_allow_from=None):
-    from plugins.platforms.whatsapp.adapter import WhatsAppAdapter
+    from plugins.platforms.messaging.adapter import MessagingAdapter
 
     extra = {}
     if require_mention is not None:
@@ -24,16 +24,16 @@ def _make_adapter(require_mention=None, mention_patterns=None, free_response_cha
     if group_allow_from is not None:
         extra["group_allow_from"] = group_allow_from
 
-    adapter = object.__new__(WhatsAppAdapter)
-    adapter.platform = Platform.WHATSAPP
+    adapter = object.__new__(MessagingAdapter)
+    adapter.platform = Platform.MESSAGING
     adapter.config = PlatformConfig(enabled=True, extra=extra)
     adapter._message_handler = AsyncMock()
     adapter._dm_policy = str(extra.get("dm_policy", "pairing")).strip().lower()
-    adapter._allow_from = WhatsAppAdapter._coerce_allow_list(extra.get("allow_from"))
+    adapter._allow_from = MessagingAdapter._coerce_allow_list(extra.get("allow_from"))
     adapter._group_policy = str(extra.get("group_policy", "pairing")).strip().lower()
-    adapter._group_allow_from = WhatsAppAdapter._coerce_allow_list(extra.get("group_allow_from"))
+    adapter._group_allow_from = MessagingAdapter._coerce_allow_list(extra.get("group_allow_from"))
     adapter._mention_patterns = adapter._compile_mention_patterns()
-    adapter._free_response_chats = adapter._whatsapp_free_response_chats()
+    adapter._free_response_chats = adapter._messaging_free_response_chats()
     return adapter
 
 
@@ -43,7 +43,7 @@ def _group_message(body="hello", **overrides):
         "body": body,
         "chatId": "120363001234567890@g.us",
         "mentionedIds": [],
-        "botIds": ["15551230000@s.whatsapp.net", "15551230000@lid"],
+        "botIds": ["15551230000@s.messaging.net", "15551230000@lid"],
         "quotedParticipant": "",
     }
     data.update(overrides)
@@ -54,8 +54,8 @@ def _dm_message(body="hello", **overrides):
     data = {
         "isGroup": False,
         "body": body,
-        "senderId": "6281234567890@s.whatsapp.net",
-        "from": "6281234567890@s.whatsapp.net",
+        "senderId": "6281234567890@s.messaging.net",
+        "from": "6281234567890@s.messaging.net",
         "botIds": [],
         "mentionedIds": [],
     }
@@ -73,7 +73,7 @@ def test_group_messages_can_require_direct_trigger_via_config():
     assert adapter._should_process_message(
         _group_message(
             "hi there",
-            mentionedIds=["15551230000@s.whatsapp.net"],
+            mentionedIds=["15551230000@s.messaging.net"],
         )
     ) is True
     assert adapter._should_process_message(
@@ -155,11 +155,11 @@ def test_dm_policy_disabled_still_allows_groups():
 
 # --- Config bridging tests ---
 
-def test_config_bridges_whatsapp_dm_and_group_policy(monkeypatch, tmp_path):
+def test_config_bridges_messaging_dm_and_group_policy(monkeypatch, tmp_path):
     hermes_home = tmp_path / ".hermes"
     hermes_home.mkdir()
     (hermes_home / "config.yaml").write_text(
-        "whatsapp:\n"
+        "messaging:\n"
         "  dm_policy: disabled\n"
         "  group_policy: allowlist\n"
         "  group_allow_from:\n"
@@ -168,19 +168,19 @@ def test_config_bridges_whatsapp_dm_and_group_policy(monkeypatch, tmp_path):
     )
 
     monkeypatch.setenv("HERMES_HOME", str(hermes_home))
-    monkeypatch.delenv("WHATSAPP_DM_POLICY", raising=False)
-    monkeypatch.delenv("WHATSAPP_GROUP_POLICY", raising=False)
-    monkeypatch.delenv("WHATSAPP_GROUP_ALLOWED_USERS", raising=False)
+    monkeypatch.delenv("MESSAGING_DM_POLICY", raising=False)
+    monkeypatch.delenv("MESSAGING_GROUP_POLICY", raising=False)
+    monkeypatch.delenv("MESSAGING_GROUP_ALLOWED_USERS", raising=False)
 
     config = load_gateway_config()
 
     assert config is not None
-    assert config.platforms[Platform.WHATSAPP].extra["dm_policy"] == "disabled"
-    assert config.platforms[Platform.WHATSAPP].extra["group_policy"] == "allowlist"
-    assert config.platforms[Platform.WHATSAPP].extra["group_allow_from"] == ["120363001234567890@g.us"]
-    assert __import__("os").environ["WHATSAPP_DM_POLICY"] == "disabled"
-    assert __import__("os").environ["WHATSAPP_GROUP_POLICY"] == "allowlist"
-    assert __import__("os").environ["WHATSAPP_GROUP_ALLOWED_USERS"] == "120363001234567890@g.us"
+    assert config.platforms[Platform.MESSAGING].extra["dm_policy"] == "disabled"
+    assert config.platforms[Platform.MESSAGING].extra["group_policy"] == "allowlist"
+    assert config.platforms[Platform.MESSAGING].extra["group_allow_from"] == ["120363001234567890@g.us"]
+    assert __import__("os").environ["MESSAGING_DM_POLICY"] == "disabled"
+    assert __import__("os").environ["MESSAGING_GROUP_POLICY"] == "allowlist"
+    assert __import__("os").environ["MESSAGING_GROUP_ALLOWED_USERS"] == "120363001234567890@g.us"
 
 
 # --- Broadcast / status / newsletter pseudo-chats are always dropped ---
@@ -188,7 +188,7 @@ def test_config_bridges_whatsapp_dm_and_group_policy(monkeypatch, tmp_path):
 
 def test_status_broadcast_chats_are_always_dropped():
     """Felipe's gateway.log showed the agent replying to status@broadcast
-    (a contact's WhatsApp Story update). These pseudo-chats aren't real
+    (a contact's Messaging Story update). These pseudo-chats aren't real
     conversations and the adapter must drop them regardless of dm_policy.
     """
 
@@ -200,7 +200,7 @@ def test_status_broadcast_chats_are_always_dropped():
     status_msg = _dm_message(
         body="[video received]",
         chatId="status@broadcast",
-        senderId="34612345678@s.whatsapp.net",
+        senderId="34612345678@s.messaging.net",
     )
     assert adapter._should_process_message(status_msg) is False
 
@@ -219,13 +219,13 @@ def test_broadcast_filter_runs_before_allowlist():
     """
     adapter = _make_adapter(
         dm_policy="allowlist",
-        allow_from=["34612345678@s.whatsapp.net"],
+        allow_from=["34612345678@s.messaging.net"],
     )
 
     msg = _dm_message(
         body="[image received]",
         chatId="status@broadcast",
-        senderId="34612345678@s.whatsapp.net",
+        senderId="34612345678@s.messaging.net",
     )
     assert adapter._should_process_message(msg) is False
 

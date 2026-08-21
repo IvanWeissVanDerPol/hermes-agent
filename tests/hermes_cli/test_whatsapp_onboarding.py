@@ -29,7 +29,7 @@ class _FakeProc:
 
 
 
-def test_apply_whatsapp_onboarding_saves_pairing_policy(monkeypatch):
+def test_apply_messaging_onboarding_saves_pairing_policy(monkeypatch):
     from hermes_cli import web_server as ws
 
     saved = {}
@@ -41,11 +41,11 @@ def test_apply_whatsapp_onboarding_saves_pairing_policy(monkeypatch):
     monkeypatch.setattr(ws, "_write_platform_enabled", lambda platform, value: enabled.append((platform, value)))
     monkeypatch.setattr(
         ws,
-        "_restart_gateway_after_whatsapp_onboarding",
+        "_restart_gateway_after_messaging_onboarding",
         lambda profile=None: {"restart_started": True, "restart_pid": 12345},
     )
 
-    record = ws._WhatsAppOnboardingSession(
+    record = ws._MessagingOnboardingSession(
         proc=None,
         mode="bot",
         allowed_users="",
@@ -54,37 +54,37 @@ def test_apply_whatsapp_onboarding_saves_pairing_policy(monkeypatch):
         expires_at_ts=time.time() + 600,
         status="connected",
     )
-    ws._whatsapp_onboarding_sessions.clear()
-    ws._whatsapp_onboarding_sessions["pairing"] = record
+    ws._messaging_onboarding_sessions.clear()
+    ws._messaging_onboarding_sessions["pairing"] = record
 
     result = asyncio.run(
-        ws.apply_whatsapp_onboarding(
+        ws.apply_messaging_onboarding(
             "pairing",
-            ws.WhatsAppOnboardingApply(mode="bot", allowed_users=""),
+            ws.MessagingOnboardingApply(mode="bot", allowed_users=""),
         )
     )
 
     assert result["ok"] is True
-    assert saved["WHATSAPP_MODE"] == "bot"
-    assert saved["WHATSAPP_DM_POLICY"] == "pairing"
-    assert saved["WHATSAPP_ENABLED"] == "true"
-    assert "WHATSAPP_ALLOWED_USERS" not in removed
-    assert enabled == [("whatsapp", True)]
-    assert "pairing" not in ws._whatsapp_onboarding_sessions
+    assert saved["MESSAGING_MODE"] == "bot"
+    assert saved["MESSAGING_DM_POLICY"] == "pairing"
+    assert saved["MESSAGING_ENABLED"] == "true"
+    assert "MESSAGING_ALLOWED_USERS" not in removed
+    assert enabled == [("messaging", True)]
+    assert "pairing" not in ws._messaging_onboarding_sessions
 
 
-def test_start_whatsapp_onboarding_existing_creds_returns_linked_account(monkeypatch, tmp_path):
+def test_start_messaging_onboarding_existing_creds_returns_linked_account(monkeypatch, tmp_path):
     from hermes_cli import web_server as ws
 
     session_dir = tmp_path / "session"
     session_dir.mkdir()
     (session_dir / "creds.json").write_text(
-        '{"me":{"id":"15551234567:1@s.whatsapp.net","name":"Hermes Bot"}}',
+        '{"me":{"id":"15551234567:1@s.messaging.net","name":"Hermes Bot"}}',
         encoding="utf-8",
     )
 
     old_proc = _FakeProc(returncode=1)
-    old_record = ws._WhatsAppOnboardingSession(
+    old_record = ws._MessagingOnboardingSession(
         proc=old_proc,
         mode="bot",
         allowed_users="",
@@ -92,27 +92,27 @@ def test_start_whatsapp_onboarding_existing_creds_returns_linked_account(monkeyp
         expires_at="2099-01-01T00:00:00Z",
         expires_at_ts=time.time() + 600,
     )
-    ws._whatsapp_onboarding_sessions.clear()
-    ws._whatsapp_onboarding_sessions["old"] = old_record
-    monkeypatch.setattr(ws, "_whatsapp_session_path", lambda: session_dir)
+    ws._messaging_onboarding_sessions.clear()
+    ws._messaging_onboarding_sessions["old"] = old_record
+    monkeypatch.setattr(ws, "_messaging_session_path", lambda: session_dir)
     monkeypatch.setattr(ws.secrets, "token_urlsafe", lambda size: "existing-creds")
 
     result = asyncio.run(
-        ws.start_whatsapp_onboarding(
-            ws.WhatsAppOnboardingStart(mode="self-chat", allowed_users="")
+        ws.start_messaging_onboarding(
+            ws.MessagingOnboardingStart(mode="self-chat", allowed_users="")
         )
     )
 
     assert result["pairing_id"] == "existing-creds"
     assert result["status"] == "connected"
     assert result["qr_payload"] is None
-    assert result["account_id"] == "15551234567:1@s.whatsapp.net"
+    assert result["account_id"] == "15551234567:1@s.messaging.net"
     assert result["account_name"] == "Hermes Bot"
     assert result["account_phone"] == "15551234567"
     assert old_record.status == "cancelled"
     assert old_proc.terminated is True
-    assert ws._whatsapp_onboarding_sessions["existing-creds"].account_phone == "15551234567"
-    ws._whatsapp_onboarding_sessions.clear()
+    assert ws._messaging_onboarding_sessions["existing-creds"].account_phone == "15551234567"
+    ws._messaging_onboarding_sessions.clear()
 
 
 

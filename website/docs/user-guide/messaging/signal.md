@@ -44,7 +44,7 @@ signal-cli is **not** in apt or snap repositories. The Linux install above downl
 
 ## Step 1: Link Your Signal Account
 
-Signal-cli works as a **linked device** — like WhatsApp Web, but for Signal. Your phone stays the primary device.
+Signal-cli works as a **linked device** — like Messaging Web, but for Signal. Your phone stays the primary device.
 
 ```bash
 # Generate a linking URI (displays a QR code or link)

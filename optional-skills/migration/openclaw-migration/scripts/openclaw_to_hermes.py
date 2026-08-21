@@ -89,9 +89,9 @@ MIGRATION_OPTION_METADATA: Dict[str, Dict[str, str]] = {
         "label": "Slack settings",
         "description": "Import Slack bot/app tokens and allowlist into Hermes .env.",
     },
-    "whatsapp-settings": {
-        "label": "WhatsApp settings",
-        "description": "Import WhatsApp allowlist into Hermes .env.",
+    "messaging-settings": {
+        "label": "Messaging settings",
+        "description": "Import Messaging allowlist into Hermes .env.",
     },
     "signal-settings": {
         "label": "Signal settings",
@@ -198,7 +198,7 @@ MIGRATION_PRESETS: Dict[str, set[str]] = {
         "tts-assets",
         "discord-settings",
         "slack-settings",
-        "whatsapp-settings",
+        "messaging-settings",
         "signal-settings",
         "model-config",
         "tts-config",
@@ -1037,7 +1037,7 @@ class Migrator:
         self.run_if_selected("secret-settings", lambda: self.handle_secret_settings(config))
         self.run_if_selected("discord-settings", lambda: self.migrate_discord_settings(config))
         self.run_if_selected("slack-settings", lambda: self.migrate_slack_settings(config))
-        self.run_if_selected("whatsapp-settings", lambda: self.migrate_whatsapp_settings(config))
+        self.run_if_selected("messaging-settings", lambda: self.migrate_messaging_settings(config))
         self.run_if_selected("signal-settings", lambda: self.migrate_signal_settings(config))
         self.run_if_selected("provider-keys", lambda: self.handle_provider_keys(config))
         self.run_if_selected("model-config", lambda: self.migrate_model_config(config))
@@ -1605,20 +1605,20 @@ class Migrator:
         else:
             self.record("slack-settings", self.source_root / "openclaw.json", self.target_root / ".env", "skipped", "No Slack settings found")
 
-    def migrate_whatsapp_settings(self, config: Optional[Dict[str, Any]] = None) -> None:
+    def migrate_messaging_settings(self, config: Optional[Dict[str, Any]] = None) -> None:
         config = config or self.load_openclaw_config()
         additions: Dict[str, str] = {}
-        whatsapp = config.get("channels", {}).get("whatsapp", {})
-        if isinstance(whatsapp, dict):
-            allow_from = self._get_channel_field(whatsapp, "allowFrom") or []
+        messaging = config.get("channels", {}).get("messaging", {})
+        if isinstance(messaging, dict):
+            allow_from = self._get_channel_field(messaging, "allowFrom") or []
             if isinstance(allow_from, list):
                 users = [str(u).strip() for u in allow_from if str(u).strip()]
                 if users:
-                    additions["WHATSAPP_ALLOWED_USERS"] = ",".join(users)
+                    additions["MESSAGING_ALLOWED_USERS"] = ",".join(users)
         if additions:
-            self.merge_env_values(additions, "whatsapp-settings", self.source_root / "openclaw.json")
+            self.merge_env_values(additions, "messaging-settings", self.source_root / "openclaw.json")
         else:
-            self.record("whatsapp-settings", self.source_root / "openclaw.json", self.target_root / ".env", "skipped", "No WhatsApp settings found")
+            self.record("messaging-settings", self.source_root / "openclaw.json", self.target_root / ".env", "skipped", "No Messaging settings found")
 
     def migrate_signal_settings(self, config: Optional[Dict[str, Any]] = None) -> None:
         config = config or self.load_openclaw_config()
@@ -3080,17 +3080,17 @@ class Migrator:
                 "",
             ])
 
-        # Check if WhatsApp was detected
-        has_whatsapp = any(i.kind == "whatsapp-settings" and i.status == "migrated" for i in self.items)
-        if has_whatsapp:
+        # Check if Messaging was detected
+        has_messaging = any(i.kind == "messaging-settings" and i.status == "migrated" for i in self.items)
+        if has_messaging:
             notes.extend([
                 "",
-                "## WhatsApp Requires Re-Pairing",
+                "## Messaging Requires Re-Pairing",
                 "",
-                "WhatsApp uses QR-code pairing, not token-based auth. Your allowlist",
+                "Messaging uses QR-code pairing, not token-based auth. Your allowlist",
                 "was migrated, but you must re-pair the device by running:",
                 "",
-                "    hermes whatsapp",
+                "    hermes messaging",
                 "",
             ])
 

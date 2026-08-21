@@ -1,11 +1,11 @@
-"""Tests for WhatsApp reply_prefix config.yaml support.
+"""Tests for Messaging reply_prefix config.yaml support.
 
 Covers:
-- config.yaml whatsapp.reply_prefix bridging into PlatformConfig.extra
-- WhatsAppAdapter reading reply_prefix from config.extra
-- Bridge subprocess receiving WHATSAPP_REPLY_PREFIX env var
-- config.yaml whatsapp.send_read_receipts bridging into PlatformConfig.extra
-- WhatsAppAdapter parsing send_read_receipts as a boolean
+- config.yaml messaging.reply_prefix bridging into PlatformConfig.extra
+- MessagingAdapter reading reply_prefix from config.extra
+- Bridge subprocess receiving MESSAGING_REPLY_PREFIX env var
+- config.yaml messaging.send_read_receipts bridging into PlatformConfig.extra
+- MessagingAdapter parsing send_read_receipts as a boolean
 - Config version covers all ENV_VARS_BY_VERSION keys (regression guard)
 """
 
@@ -36,59 +36,59 @@ class _AsyncResponseContext:
 
 
 class TestConfigYamlBridging:
-    """Test that whatsapp.reply_prefix in config.yaml flows into PlatformConfig."""
+    """Test that messaging.reply_prefix in config.yaml flows into PlatformConfig."""
 
     def test_reply_prefix_bridged_from_yaml(self, tmp_path):
-        """whatsapp.reply_prefix in config.yaml sets PlatformConfig.extra."""
+        """messaging.reply_prefix in config.yaml sets PlatformConfig.extra."""
         config_yaml = tmp_path / "config.yaml"
-        config_yaml.write_text('whatsapp:\n  reply_prefix: "Custom Bot"\n')
+        config_yaml.write_text('messaging:\n  reply_prefix: "Custom Bot"\n')
 
         with patch("gateway.config.get_hermes_home", return_value=tmp_path):
             from gateway.config import load_gateway_config
-            # Need to also patch WHATSAPP_ENABLED so the platform exists
-            with patch.dict("os.environ", {"WHATSAPP_ENABLED": "true"}, clear=False):
+            # Need to also patch MESSAGING_ENABLED so the platform exists
+            with patch.dict("os.environ", {"MESSAGING_ENABLED": "true"}, clear=False):
                 config = load_gateway_config()
 
-        wa_config = config.platforms.get(Platform.WHATSAPP)
+        wa_config = config.platforms.get(Platform.MESSAGING)
         assert wa_config is not None
         assert wa_config.extra.get("reply_prefix") == "Custom Bot"
 
     def test_empty_reply_prefix_bridged(self, tmp_path):
         """Empty string reply_prefix disables the header."""
         config_yaml = tmp_path / "config.yaml"
-        config_yaml.write_text('whatsapp:\n  reply_prefix: ""\n')
+        config_yaml.write_text('messaging:\n  reply_prefix: ""\n')
 
         with patch("gateway.config.get_hermes_home", return_value=tmp_path):
             from gateway.config import load_gateway_config
-            with patch.dict("os.environ", {"WHATSAPP_ENABLED": "true"}, clear=False):
+            with patch.dict("os.environ", {"MESSAGING_ENABLED": "true"}, clear=False):
                 config = load_gateway_config()
 
-        wa_config = config.platforms.get(Platform.WHATSAPP)
+        wa_config = config.platforms.get(Platform.MESSAGING)
         assert wa_config is not None
         assert wa_config.extra.get("reply_prefix") == ""
 
 
 # ---------------------------------------------------------------------------
-# WhatsAppAdapter __init__
+# MessagingAdapter __init__
 # ---------------------------------------------------------------------------
 
 
 class TestAdapterInit:
-    """Test that WhatsAppAdapter reads reply_prefix from config.extra."""
+    """Test that MessagingAdapter reads reply_prefix from config.extra."""
 
     def test_reply_prefix_from_extra(self):
-        from plugins.platforms.whatsapp.adapter import WhatsAppAdapter
+        from plugins.platforms.messaging.adapter import MessagingAdapter
         config = PlatformConfig(enabled=True, extra={"reply_prefix": "Bot\\n"})
-        adapter = WhatsAppAdapter(config)
+        adapter = MessagingAdapter(config)
         assert adapter._reply_prefix == "Bot\\n"
 
 
 class TestReadReceiptPolicyOrdering:
     @pytest.mark.asyncio
     async def test_accepted_receipt_key_is_sent_to_bridge(self):
-        from plugins.platforms.whatsapp.adapter import WhatsAppAdapter
+        from plugins.platforms.messaging.adapter import MessagingAdapter
 
-        adapter = WhatsAppAdapter(
+        adapter = MessagingAdapter(
             PlatformConfig(enabled=True, extra={"send_read_receipts": True})
         )
         response = SimpleNamespace(status=200)
@@ -98,7 +98,7 @@ class TestReadReceiptPolicyOrdering:
         key = {
             "id": "incoming-1",
             "remoteJid": "120363001234567890@g.us",
-            "participant": "15550001111@s.whatsapp.net",
+            "participant": "15550001111@s.messaging.net",
             "fromMe": False,
         }
 

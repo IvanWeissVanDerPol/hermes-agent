@@ -1,8 +1,8 @@
 """
-Interactive setup wizard for the WhatsApp Cloud API adapter.
+Interactive setup wizard for the Messaging Cloud API adapter.
 
-Entry point: ``hermes whatsapp-cloud`` (dispatched from
-``cmd_whatsapp_cloud`` in ``hermes_cli/main.py``).
+Entry point: ``hermes messaging-cloud`` (dispatched from
+``cmd_messaging_cloud`` in ``hermes_cli/main.py``).
 
 Walks the user through the 6 credentials Meta requires + recipient
 allowlist, auto-generates the verify token, and prints exact follow-up
@@ -13,7 +13,7 @@ webhook dashboard, adding their phone to the recipient list).
 Heavy emphasis on field-shape validation to catch the most common
 configuration mistakes:
 
-- Putting the actual phone number in ``WHATSAPP_CLOUD_PHONE_NUMBER_ID``
+- Putting the actual phone number in ``MESSAGING_CLOUD_PHONE_NUMBER_ID``
   (the field expects Meta's 15-17 digit internal ID, not a phone number).
   This is the #1 trap — caught us during Phase 3 live testing.
 - Pasting tokens with trailing whitespace.
@@ -134,20 +134,20 @@ def _validate_access_token(value: str) -> tuple[bool, Optional[str]]:
         if s.startswith("sk-"):
             return False, (
                 "That's an OpenAI key (starts with 'sk-'), not a Meta "
-                "WhatsApp access token. Meta tokens start with 'EAA'."
+                "Messaging access token. Meta tokens start with 'EAA'."
             )
         if s.startswith("xoxb-") or s.startswith("xoxp-"):
             return False, (
-                "That's a Slack token, not a Meta WhatsApp access token. "
+                "That's a Slack token, not a Meta Messaging access token. "
                 "Meta tokens start with 'EAA'."
             )
         if s.startswith("ghp_") or s.startswith("gho_"):
             return False, (
-                "That's a GitHub token, not a Meta WhatsApp access "
+                "That's a GitHub token, not a Meta Messaging access "
                 "token. Meta tokens start with 'EAA'."
             )
         return False, (
-            "Meta WhatsApp access tokens start with 'EAA'. Check that "
+            "Meta Messaging access tokens start with 'EAA'. Check that "
             "you're copying from the right place (API Setup → 'Generate "
             "access token', or Business Settings → System Users → "
             "'Generate token' for a permanent one)."
@@ -229,8 +229,8 @@ def _prompt_validated(
 # ---------------------------------------------------------------------------
 
 
-def run_whatsapp_cloud_setup() -> int:
-    """Interactive wizard for the WhatsApp Cloud API adapter.
+def run_messaging_cloud_setup() -> int:
+    """Interactive wizard for the Messaging Cloud API adapter.
 
     Returns 0 on full success, 1 on user abort, 2 on partial completion
     (some fields written but the user bailed before finishing).
@@ -238,15 +238,15 @@ def run_whatsapp_cloud_setup() -> int:
     from hermes_cli.config import get_env_value, save_env_value
 
     print()
-    print("⚕ WhatsApp Business Cloud API Setup")
+    print("⚕ Messaging Business Cloud API Setup")
     print("=" * 50)
     print()
-    print("This wizard configures Hermes to talk to WhatsApp via Meta's")
+    print("This wizard configures Hermes to talk to Messaging via Meta's")
     print("official Cloud API. It's the production-grade path:")
     print()
     print("  • No QR codes, no Node.js bridge subprocess")
     print("  • Stable connection — no account-ban risk")
-    print("  • Business account required (not personal WhatsApp)")
+    print("  • Business account required (not personal Messaging)")
     print("  • Public webhook URL required (Cloudflare Tunnel, ngrok,")
     print("    or your own reverse proxy with TLS)")
     print()
@@ -254,8 +254,8 @@ def run_whatsapp_cloud_setup() -> int:
     print("FIRST, then come back and re-run this wizard:")
     print()
     print("  1. https://developers.facebook.com/apps → Create App")
-    print("     → 'Connect with customers through WhatsApp'")
-    print("  2. App Dashboard → WhatsApp → API Setup")
+    print("     → 'Connect with customers through Messaging'")
+    print("  2. App Dashboard → Messaging → API Setup")
     print("  3. Click 'Generate access token' (temp 24h token is fine to")
     print("     start; switch to a System User permanent token later)")
     print()
@@ -269,13 +269,13 @@ def run_whatsapp_cloud_setup() -> int:
     print("─" * 50)
     print("STEP 1 — Phone Number ID")
     print("─" * 50)
-    current_phone_id = get_env_value("WHATSAPP_CLOUD_PHONE_NUMBER_ID") or None
+    current_phone_id = get_env_value("MESSAGING_CLOUD_PHONE_NUMBER_ID") or None
     phone_id = _prompt_validated(
         "Phone Number ID",
         _validate_phone_number_id,
         current=current_phone_id,
         help_text=(
-            "Found in: App Dashboard → WhatsApp → API Setup, in the\n"
+            "Found in: App Dashboard → Messaging → API Setup, in the\n"
             "'Send and receive messages' section.\n"
             "Look BELOW the 'From' dropdown — there's a 'Phone number ID'\n"
             "line with the value (15-17 digits, e.g. '7794189252778687').\n"
@@ -291,14 +291,14 @@ def run_whatsapp_cloud_setup() -> int:
             print("\n✗ Phone Number ID is required. Aborting.")
             return 1
     else:
-        save_env_value("WHATSAPP_CLOUD_PHONE_NUMBER_ID", phone_id)
+        save_env_value("MESSAGING_CLOUD_PHONE_NUMBER_ID", phone_id)
         print(f"  ✓ Saved: {phone_id}")
     print()
 
     print("─" * 50)
     print("STEP 2 — Access Token")
     print("─" * 50)
-    current_token = get_env_value("WHATSAPP_CLOUD_ACCESS_TOKEN") or None
+    current_token = get_env_value("MESSAGING_CLOUD_ACCESS_TOKEN") or None
     current_display = (current_token[:15] + "...") if current_token else None
     token = _prompt_validated(
         "Access Token",
@@ -307,7 +307,7 @@ def run_whatsapp_cloud_setup() -> int:
         secret=True,
         help_text=(
             "Two options for getting one:\n\n"
-            "  (a) TEMP — App Dashboard → WhatsApp → API Setup →\n"
+            "  (a) TEMP — App Dashboard → Messaging → API Setup →\n"
             "      'Generate access token' button. Lasts 24 hours.\n"
             "      Fine for testing today; you'll have to regenerate\n"
             "      tomorrow.\n\n"
@@ -316,10 +316,10 @@ def run_whatsapp_cloud_setup() -> int:
             "      • business.facebook.com → Settings → System users →\n"
             "        Add → Admin role\n"
             "      • Assign Assets → your app (Manage app), your\n"
-            "        WhatsApp account (Manage WABAs)\n"
+            "        Messaging account (Manage WABAs)\n"
             "      • Generate token → expiration: Never → permissions:\n"
-            "        business_management, whatsapp_business_messaging,\n"
-            "        whatsapp_business_management\n\n"
+            "        business_management, messaging_business_messaging,\n"
+            "        messaging_business_management\n\n"
             "Tokens start with 'EAA'."
         ),
     )
@@ -332,14 +332,14 @@ def run_whatsapp_cloud_setup() -> int:
             print("\n✗ Access Token is required. Aborting.")
             return 1
     else:
-        save_env_value("WHATSAPP_CLOUD_ACCESS_TOKEN", token)
+        save_env_value("MESSAGING_CLOUD_ACCESS_TOKEN", token)
         print("  ✓ Saved (token hidden)")
     print()
 
     print("─" * 50)
     print("STEP 3 — App Secret (required for webhook signature verification)")
     print("─" * 50)
-    current_secret = get_env_value("WHATSAPP_CLOUD_APP_SECRET") or None
+    current_secret = get_env_value("MESSAGING_CLOUD_APP_SECRET") or None
     current_secret_display = (current_secret[:8] + "...") if current_secret else None
     app_secret = _prompt_validated(
         "App Secret",
@@ -361,16 +361,16 @@ def run_whatsapp_cloud_setup() -> int:
             print("  ✓ Keeping existing App Secret")
         else:
             print("\n⚠ Skipping App Secret — inbound webhooks will be refused")
-            print("   until you set WHATSAPP_CLOUD_APP_SECRET manually.")
+            print("   until you set MESSAGING_CLOUD_APP_SECRET manually.")
     else:
-        save_env_value("WHATSAPP_CLOUD_APP_SECRET", app_secret)
+        save_env_value("MESSAGING_CLOUD_APP_SECRET", app_secret)
         print("  ✓ Saved (secret hidden)")
     print()
 
     print("─" * 50)
     print("STEP 4 — App ID & WABA ID (optional, for analytics)")
     print("─" * 50)
-    current_app_id = get_env_value("WHATSAPP_CLOUD_APP_ID") or None
+    current_app_id = get_env_value("MESSAGING_CLOUD_APP_ID") or None
     app_id = _prompt_validated(
         "App ID (optional, press Enter to skip)",
         lambda v: (True, None) if not v else _validate_app_id(v),
@@ -382,25 +382,25 @@ def run_whatsapp_cloud_setup() -> int:
         ),
     )
     if app_id:
-        save_env_value("WHATSAPP_CLOUD_APP_ID", app_id)
+        save_env_value("MESSAGING_CLOUD_APP_ID", app_id)
         print(f"  ✓ Saved: {app_id}")
     elif current_app_id:
         print(f"  ✓ Keeping existing: {current_app_id}")
 
-    current_waba_id = get_env_value("WHATSAPP_CLOUD_WABA_ID") or None
+    current_waba_id = get_env_value("MESSAGING_CLOUD_WABA_ID") or None
     waba_id = _prompt_validated(
         "WABA ID (optional, press Enter to skip)",
         lambda v: (True, None) if not v else _validate_waba_id(v),
         current=current_waba_id,
         help_text=(
-            "WhatsApp Business Account ID. Found in: App Dashboard →\n"
-            "WhatsApp → API Setup, near the top — 'WhatsApp Business\n"
+            "Messaging Business Account ID. Found in: App Dashboard →\n"
+            "Messaging → API Setup, near the top — 'Messaging Business\n"
             "Account ID'. Numeric, ~15+ digits.\n"
             "Not required for messaging — useful for analytics."
         ),
     )
     if waba_id:
-        save_env_value("WHATSAPP_CLOUD_WABA_ID", waba_id)
+        save_env_value("MESSAGING_CLOUD_WABA_ID", waba_id)
         print(f"  ✓ Saved: {waba_id}")
     elif current_waba_id:
         print(f"  ✓ Keeping existing: {current_waba_id}")
@@ -409,7 +409,7 @@ def run_whatsapp_cloud_setup() -> int:
     print("─" * 50)
     print("STEP 5 — Verify Token (auto-generated)")
     print("─" * 50)
-    current_verify = get_env_value("WHATSAPP_CLOUD_VERIFY_TOKEN") or None
+    current_verify = get_env_value("MESSAGING_CLOUD_VERIFY_TOKEN") or None
     if current_verify:
         print(f"  An existing verify token is already set ({current_verify[:8]}...).")
         try:
@@ -418,14 +418,14 @@ def run_whatsapp_cloud_setup() -> int:
             regen = "n"
         if regen in {"y", "yes"}:
             verify_token = secrets.token_urlsafe(32)
-            save_env_value("WHATSAPP_CLOUD_VERIFY_TOKEN", verify_token)
+            save_env_value("MESSAGING_CLOUD_VERIFY_TOKEN", verify_token)
             print(f"  ✓ New verify token: {verify_token}")
         else:
             verify_token = current_verify
             print("  ✓ Keeping existing verify token")
     else:
         verify_token = secrets.token_urlsafe(32)
-        save_env_value("WHATSAPP_CLOUD_VERIFY_TOKEN", verify_token)
+        save_env_value("MESSAGING_CLOUD_VERIFY_TOKEN", verify_token)
         print(f"  ✓ Generated: {verify_token}")
     print()
     print("  → COPY THIS TOKEN NOW. You'll paste it into Meta's webhook")
@@ -441,7 +441,7 @@ def run_whatsapp_cloud_setup() -> int:
     print("  to allow anyone — only safe if you've also configured Meta's")
     print("  recipient whitelist for app-development mode.)")
     print()
-    current_allow = get_env_value("WHATSAPP_CLOUD_ALLOWED_USERS") or None
+    current_allow = get_env_value("MESSAGING_CLOUD_ALLOWED_USERS") or None
     allow_default = current_allow if current_allow else None
     try:
         allowed = input(
@@ -454,18 +454,18 @@ def run_whatsapp_cloud_setup() -> int:
         allowed = ",".join(
             re.sub(r"[\s\-+]", "", part) for part in allowed.split(",") if part.strip()
         )
-        save_env_value("WHATSAPP_CLOUD_ALLOWED_USERS", allowed)
+        save_env_value("MESSAGING_CLOUD_ALLOWED_USERS", allowed)
         print(f"  ✓ Saved: {allowed}")
     else:
         print("  ⚠ No allowlist — every inbound message will be denied.")
-        print("    Re-run this wizard or set WHATSAPP_CLOUD_ALLOWED_USERS manually.")
+        print("    Re-run this wizard or set MESSAGING_CLOUD_ALLOWED_USERS manually.")
     print()
 
     print("─" * 50)
     print("SETUP COMPLETE — Next steps")
     print("─" * 50)
     print()
-    print("  Hermes needs a public HTTPS URL to receive WhatsApp messages.")
+    print("  Hermes needs a public HTTPS URL to receive Messaging messages.")
     print("  The recommended path is Cloudflare Tunnel (free, no port")
     print("  forwarding, no DNS setup).")
     print()
@@ -487,7 +487,7 @@ def run_whatsapp_cloud_setup() -> int:
     print("    4. Verify your local config is reachable. From a third")
     print("       terminal, with the tunnel URL substituted:")
     print()
-    print("         curl 'https://YOUR-TUNNEL.trycloudflare.com/whatsapp/webhook?\\")
+    print("         curl 'https://YOUR-TUNNEL.trycloudflare.com/messaging/webhook?\\")
     print(f"               hub.mode=subscribe&hub.verify_token={verify_token}&\\")
     print("               hub.challenge=hello'")
     print()
@@ -496,23 +496,23 @@ def run_whatsapp_cloud_setup() -> int:
     print("       (should return JSON with verify_token_configured: true).")
     print()
     print("    5. Configure Meta to point at your tunnel:")
-    print("         App Dashboard → WhatsApp → Configuration → Edit webhook")
-    print("         Callback URL: <tunnel-url>/whatsapp/webhook")
+    print("         App Dashboard → Messaging → Configuration → Edit webhook")
+    print("         Callback URL: <tunnel-url>/messaging/webhook")
     print(f"         Verify Token: {verify_token}")
     print("         → Click 'Verify and save'")
     print("         → Then 'Manage' webhook fields → subscribe to 'messages'")
     print()
     print("    6. Add your phone to Meta's recipient list:")
-    print("         App Dashboard → WhatsApp → API Setup → 'To' →")
+    print("         App Dashboard → Messaging → API Setup → 'To' →")
     print("         'Manage phone number list'")
     print()
     print("    7. DM the bot's test number from your phone.")
     print()
     print("─" * 50)
-    print("Optional: polish your bot's WhatsApp profile")
+    print("Optional: polish your bot's Messaging profile")
     print("─" * 50)
     print()
-    print("  WhatsApp shows a display name and profile picture for your bot")
+    print("  Messaging shows a display name and profile picture for your bot")
     print("  in every chat header and contact list. These are set in Meta's")
     print("  Business Manager, not via this wizard — but here's where to do")
     print("  it once you're up and running:")
@@ -525,7 +525,7 @@ def run_whatsapp_cloud_setup() -> int:
     else:
         print("    • Display name + profile picture:")
         print("        https://business.facebook.com/wa/manage/phone-numbers/")
-        print("        (select your WhatsApp Business Account on that page)")
+        print("        (select your Messaging Business Account on that page)")
     print("        Display-name changes go through a ~24-48h Meta review.")
     print()
     print("    • About, description, website, hours, business category:")
@@ -536,6 +536,6 @@ def run_whatsapp_cloud_setup() -> int:
     print("        Business Manager → Security Center → Start Verification.")
     print()
     print("  Docs: https://hermes-agent.nousresearch.com/docs/user-guide/")
-    print("        messaging/whatsapp-cloud")
+    print("        messaging/messaging-cloud")
     print()
     return 0

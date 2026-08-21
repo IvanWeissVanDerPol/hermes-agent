@@ -37,7 +37,7 @@ from hermes_cli.subcommands.uninstall import build_uninstall_parser
 from hermes_cli.subcommands.update import build_update_parser
 from hermes_cli.subcommands.version import build_version_parser
 from hermes_cli.subcommands.webhook import build_webhook_parser
-from hermes_cli.subcommands.whatsapp import build_whatsapp_parser
+from hermes_cli.subcommands.messaging import build_messaging_parser
 
 
 def _h(name):
@@ -52,7 +52,7 @@ SINGLE_HANDLER_CASES = [
     ("model", build_model_parser, "cmd_model", ["model"]),
     ("setup", build_setup_parser, "cmd_setup", ["setup"]),
 
-    ("whatsapp", build_whatsapp_parser, "cmd_whatsapp", ["whatsapp"]),
+    ("messaging", build_messaging_parser, "cmd_messaging", ["messaging"]),
     ("slack", build_slack_parser, "cmd_slack", ["slack"]),
     ("login", build_login_parser, "cmd_login", ["login"]),
     ("logout", build_logout_parser, "cmd_logout", ["logout"]),

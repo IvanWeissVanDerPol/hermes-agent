@@ -99,7 +99,7 @@ Platform toolsets define the complete tool configuration for a deployment target
 | `hermes-telegram` | Same as `hermes-cli`. |
 | `hermes-discord` | Adds `discord` and `discord_admin` on top of `hermes-cli`. |
 | `hermes-slack` | Same as `hermes-cli`. |
-| `hermes-whatsapp` | Same as `hermes-cli`. |
+| `hermes-messaging` | Same as `hermes-cli`. |
 | `hermes-signal` | Same as `hermes-cli`. |
 | `hermes-matrix` | Same as `hermes-cli`. |
 | `hermes-mattermost` | Same as `hermes-cli`. |

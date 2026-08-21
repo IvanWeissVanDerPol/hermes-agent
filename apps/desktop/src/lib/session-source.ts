@@ -22,7 +22,7 @@ const SOURCE_LABELS: Record<string, string> = {
   tui: 'TUI',
   webhook: 'Webhook',
   weixin: 'WeChat',
-  whatsapp: 'WhatsApp',
+  messaging: 'Messaging',
   yuanbao: 'Yuanbao'
 }
 
@@ -36,7 +36,7 @@ const SOURCE_ALIASES: Record<string, string[]> = {
   telegram: ['tg'],
   tui: ['terminal'],
   weixin: ['wechat'],
-  whatsapp: ['wa']
+  messaging: ['wa']
 }
 
 // Sources that run on the local machine rather than an external messaging
@@ -56,7 +56,7 @@ export const MESSAGING_SESSION_SOURCE_IDS = [
   'mattermost',
   'matrix',
   'signal',
-  'whatsapp',
+  'messaging',
   'bluebubbles',
   'photon',
   'homeassistant',

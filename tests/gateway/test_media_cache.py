@@ -110,7 +110,7 @@ class TestBlueBubblesParity:
         assert got == expected
 
 
-class TestWhatsAppCloudParity:
+class TestMessagingCloudParity:
     """Historical _ext_for_mime: overrides → mimetypes → None."""
 
     CASES = {
@@ -125,7 +125,7 @@ class TestWhatsAppCloudParity:
 
     @pytest.mark.parametrize("mime,expected", sorted(CASES.items()))
     def test_pinned_overrides(self, mime, expected):
-        from gateway.platforms.whatsapp_cloud import _ext_for_mime
+        from gateway.platforms.messaging_cloud import _ext_for_mime
         assert _ext_for_mime(mime) == expected
 
 

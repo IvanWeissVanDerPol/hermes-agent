@@ -216,7 +216,7 @@ command_allowlist:
 # 平台专属允许列表
 TELEGRAM_ALLOWED_USERS=123456789,987654321
 DISCORD_ALLOWED_USERS=111222333444555666
-WHATSAPP_ALLOWED_USERS=15551234567
+MESSAGING_ALLOWED_USERS=15551234567
 SLACK_ALLOWED_USERS=U01ABC123
 
 # 跨平台允许列表（对所有平台均检查）
@@ -255,13 +255,13 @@ or configure platform allowlists (e.g., TELEGRAM_ALLOWED_USERS=your_id).
 ```yaml
 unauthorized_dm_behavior: pair
 
-whatsapp:
+messaging:
   unauthorized_dm_behavior: ignore
 ```
 
 - `pair` 为默认值。未授权的 DM 会收到配对码回复。
 - `ignore` 静默丢弃未授权的 DM。
-- 平台部分会覆盖全局默认值，因此可以在 Telegram 上保持配对，同时让 WhatsApp 保持静默。
+- 平台部分会覆盖全局默认值，因此可以在 Telegram 上保持配对，同时让 Messaging 保持静默。
 
 **安全特性**（基于 OWASP + NIST SP 800-63-4 指南）：
 

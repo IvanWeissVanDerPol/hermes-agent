@@ -728,7 +728,7 @@ class SignalAdapter(BasePlatformAdapter):
                 # Catch-all: application/*, text/*, and unknown MIME types are
                 # treated as documents so run.py's document-context injection
                 # surfaces the cached file path to the agent (same pattern as
-                # WhatsApp/Slack/BlueBubbles/Mattermost).
+                # Messaging/Slack/BlueBubbles/Mattermost).
                 msg_type = MessageType.DOCUMENT
 
         # Parse timestamp from envelope data (milliseconds since epoch)

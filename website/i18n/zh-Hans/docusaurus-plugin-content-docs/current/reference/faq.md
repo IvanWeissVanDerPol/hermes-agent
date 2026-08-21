@@ -112,7 +112,7 @@ Hermes Agent 本身**免费且开源**（MIT 许可证）。您只需为所选�
 
 ### 多人可以使用同一个实例吗？
 
-可以。[消息网关](../user-guide/messaging/index.md)允许多个用户通过 Telegram、Discord、Slack、WhatsApp 或 Home Assistant 与同一个 Hermes Agent 实例交互。访问权限通过白名单（特定用户 ID）和私信配对（第一个发消息的用户获得访问权）来控制。
+可以。[消息网关](../user-guide/messaging/index.md)允许多个用户通过 Telegram、Discord、Slack、Messaging 或 Home Assistant 与同一个 Hermes Agent 实例交互。访问权限通过白名单（特定用户 ID）和私信配对（第一个发消息的用户获得访问权）来控制。
 
 ### 记忆（memory）和技能（skills）有什么区别？
 
@@ -414,7 +414,7 @@ cat ~/.hermes/logs/gateway.log | tail -50
 **解决方案：**
 - 使用 `hermes gateway setup` 验证您的 bot token 是否有效
 - 检查网关日志：`cat ~/.hermes/logs/gateway.log | tail -50`
-- 对于基于 webhook 的平台（Slack、WhatsApp），确保您的服务器可公开访问
+- 对于基于 webhook 的平台（Slack、Messaging），确保您的服务器可公开访问
 
 #### 白名单混淆 — 谁可以与 bot 交互？
 
@@ -484,7 +484,7 @@ nohup hermes gateway run > ~/.hermes/logs/gateway.log 2>&1 &
 
 #### macOS：网关找不到 Node.js / ffmpeg / 其他工具
 
-**原因：** launchd 服务继承的是最小 PATH（`/usr/bin:/bin:/usr/sbin:/sbin`），不包含 Homebrew、nvm、cargo 或其他用户安装的工具目录。这通常会导致 WhatsApp bridge（`node not found`）或语音转录（`ffmpeg not found`）失败。
+**原因：** launchd 服务继承的是最小 PATH（`/usr/bin:/bin:/usr/sbin:/sbin`），不包含 Homebrew、nvm、cargo 或其他用户安装的工具目录。这通常会导致 Messaging bridge（`node not found`）或语音转录（`ffmpeg not found`）失败。
 
 **解决方案：** 网关在您运行 `hermes gateway install` 时会捕获您的 shell PATH。如果您在设置网关后安装了新工具，请重新运行 install 以捕获更新后的 PATH：
 
@@ -666,11 +666,11 @@ delegation:
 
 有关委托工作原理的更多信息，请参阅[子智能体委托](../user-guide/features/delegation.md)。
 
-### 在一个 WhatsApp 号码上运行多个智能体（按聊天绑定）
+### 在一个 Messaging 号码上运行多个智能体（按聊天绑定）
 
-**场景：** 在 OpenClaw 中，您可以将多个独立智能体绑定到特定的 WhatsApp 聊天 — 一个用于家庭购物清单群组，另一个用于您的私聊。Hermes 能做到吗？
+**场景：** 在 OpenClaw 中，您可以将多个独立智能体绑定到特定的 Messaging 聊天 — 一个用于家庭购物清单群组，另一个用于您的私聊。Hermes 能做到吗？
 
-**当前限制：** Hermes 的每个 profile 都需要自己的 WhatsApp 号码/会话。您无法将多个 profiles 绑定到同一个 WhatsApp 号码上的不同聊天 — WhatsApp bridge（Baileys）每个号码使用一个已认证的会话。
+**当前限制：** Hermes 的每个 profile 都需要自己的 Messaging 号码/会话。您无法将多个 profiles 绑定到同一个 Messaging 号码上的不同聊天 — Messaging bridge（Baileys）每个号码使用一个已认证的会话。
 
 **变通方案：**
 
@@ -678,11 +678,11 @@ delegation:
 
 2. **使用 cron 作业处理专项任务。** 对于购物清单跟踪器，设置一个监控特定聊天并管理清单的 cron 作业 — 无需单独的智能体。
 
-3. **使用独立号码。** 如果您需要真正独立的智能体，将每个 profile 与其自己的 WhatsApp 号码配对。Google Voice 等服务提供的虚拟号码可用于此目的。
+3. **使用独立号码。** 如果您需要真正独立的智能体，将每个 profile 与其自己的 Messaging 号码配对。Google Voice 等服务提供的虚拟号码可用于此目的。
 
 4. **改用 Telegram 或 Discord。** 这些平台更自然地支持按聊天绑定 — 每个 Telegram 群组或 Discord 频道获得自己的会话，您可以在同一账户上运行多个 bot token（每个 profile 一个）。
 
-详情请参阅 [Profiles](../user-guide/profiles.md) 和 [WhatsApp 设置](../user-guide/messaging/whatsapp.md)。
+详情请参阅 [Profiles](../user-guide/profiles.md) 和 [Messaging 设置](../user-guide/messaging/messaging.md)。
 
 ### 控制 Telegram 中显示的内容（隐藏日志和推理过程）
 

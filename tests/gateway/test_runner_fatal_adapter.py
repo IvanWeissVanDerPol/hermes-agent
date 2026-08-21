@@ -33,7 +33,7 @@ class _FatalAdapter(BasePlatformAdapter):
 
 class _RuntimeRetryableAdapter(BasePlatformAdapter):
     def __init__(self):
-        super().__init__(PlatformConfig(enabled=True, token="token"), Platform.WHATSAPP)
+        super().__init__(PlatformConfig(enabled=True, token="token"), Platform.MESSAGING)
 
     async def connect(self, *, is_reconnect: bool = False) -> bool:
         return True
@@ -86,19 +86,19 @@ async def test_runner_queues_retryable_runtime_fatal_for_reconnection(monkeypatc
     """
     config = GatewayConfig(
         platforms={
-            Platform.WHATSAPP: PlatformConfig(enabled=True, token="token")
+            Platform.MESSAGING: PlatformConfig(enabled=True, token="token")
         },
         sessions_dir=tmp_path / "sessions",
     )
     runner = GatewayRunner(config)
     adapter = _RuntimeRetryableAdapter()
     adapter._set_fatal_error(
-        "whatsapp_bridge_exited",
-        "WhatsApp bridge process exited unexpectedly (code 1).",
+        "messaging_bridge_exited",
+        "Messaging bridge process exited unexpectedly (code 1).",
         retryable=True,
     )
 
-    runner.adapters = {Platform.WHATSAPP: adapter}
+    runner.adapters = {Platform.MESSAGING: adapter}
     runner.delivery_router.adapters = runner.adapters
     runner.stop = AsyncMock()
 
@@ -107,8 +107,8 @@ async def test_runner_queues_retryable_runtime_fatal_for_reconnection(monkeypatc
     # Gateway stays alive — watcher will retry in background
     runner.stop.assert_not_awaited()
     assert runner._exit_with_failure is False
-    assert Platform.WHATSAPP in runner._failed_platforms
-    assert runner._failed_platforms[Platform.WHATSAPP]["attempts"] == 0
+    assert Platform.MESSAGING in runner._failed_platforms
+    assert runner._failed_platforms[Platform.MESSAGING]["attempts"] == 0
 
 
 @pytest.mark.asyncio
@@ -118,13 +118,13 @@ async def test_retryable_fatal_queues_reconnect_after_cancellation_swallowing_di
     """A wedged old adapter cannot block runner-owned reconnect recovery."""
     monkeypatch.setenv("HERMES_GATEWAY_ADAPTER_DISCONNECT_TIMEOUT", "0.01")
     config = GatewayConfig(
-        platforms={Platform.WHATSAPP: PlatformConfig(enabled=True, token="token")},
+        platforms={Platform.MESSAGING: PlatformConfig(enabled=True, token="token")},
         sessions_dir=tmp_path / "sessions",
     )
     runner = GatewayRunner(config)
     adapter = _RuntimeRetryableAdapter()
     adapter._set_fatal_error("transport_stale", "transport stale", retryable=True)
-    runner.adapters = {Platform.WHATSAPP: adapter}
+    runner.adapters = {Platform.MESSAGING: adapter}
     runner.delivery_router.adapters = runner.adapters
 
     started = asyncio.Event()
@@ -147,8 +147,8 @@ async def test_retryable_fatal_queues_reconnect_after_cancellation_swallowing_di
     try:
         assert operation in done
         assert runner.adapters == {}
-        assert Platform.WHATSAPP in runner._failed_platforms
-        assert runner._failed_platforms[Platform.WHATSAPP]["attempts"] == 0
+        assert Platform.MESSAGING in runner._failed_platforms
+        assert runner._failed_platforms[Platform.MESSAGING]["attempts"] == 0
     finally:
         release.set()
         await asyncio.wait({operation}, timeout=0.2)

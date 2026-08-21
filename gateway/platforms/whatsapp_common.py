@@ -1,13 +1,13 @@
 """
-Transport-agnostic WhatsApp behavior shared by the Baileys bridge adapter
-and the official WhatsApp Cloud API adapter.
+Transport-agnostic Messaging behavior shared by the Baileys bridge adapter
+and the official Messaging Cloud API adapter.
 
 The mixin provides:
 - Allow-list / DM / group gating
 - Mention detection (explicit @-mentions + configurable regex patterns)
 - Quoted-reply-to-bot detection
 - Broadcast / Channel / Newsletter filtering
-- WhatsApp-flavored markdown conversion
+- Messaging-flavored markdown conversion
 - Outgoing chunk length budgeting
 
 It is the *behavior layer*. Transport-specific concerns (subprocess management,
@@ -42,13 +42,13 @@ from agent.secret_scope import get_secret as _scoped_get_secret
 
 
 def _get_wsecret(name, default=None):
-    """Scope-aware WHATSAPP_* read with the default-profile startup fallback.
+    """Scope-aware MESSAGING_* read with the default-profile startup fallback.
 
     Secondary profiles run under ``_profile_runtime_scope`` -- the scope is
     authoritative and a scoped miss returns ``default`` (no cross-profile
     borrow). The DEFAULT profile's adapter constructs and sends *unscoped*
     under multiplexing, where a bare ``get_secret`` would raise
-    ``UnscopedSecretError`` and crash its WhatsApp path; there ``os.environ``
+    ``UnscopedSecretError`` and crash its Messaging path; there ``os.environ``
     is that profile's own value, so fall back to it. Same pattern as the
     Slack ``SLACK_APP_TOKEN`` read (#59739).
     """
@@ -61,18 +61,18 @@ def _get_wsecret(name, default=None):
 logger = logging.getLogger(__name__)
 
 
-class WhatsAppBehaviorMixin:
-    """Shared behavior for all WhatsApp adapters (Baileys + Cloud API).
+class MessagingBehaviorMixin:
+    """Shared behavior for all Messaging adapters (Baileys + Cloud API).
 
     See module docstring for the attribute contract the host adapter must
     satisfy. This mixin owns no state of its own — every value it touches
     is either a class attribute or set by the adapter's ``__init__``.
     """
 
-    # WhatsApp message limits — practical UX limit, not protocol max.
-    # WhatsApp allows ~65K but long messages are unreadable on mobile.
+    # Messaging message limits — practical UX limit, not protocol max.
+    # Messaging allows ~65K but long messages are unreadable on mobile.
     MAX_MESSAGE_LENGTH: int = 4096
-    supports_code_blocks = True  # WhatsApp renders fenced code blocks (monospace)
+    supports_code_blocks = True  # Messaging renders fenced code blocks (monospace)
 
     DEFAULT_REPLY_PREFIX: str = "⚕ *Hermes Agent*\n────────────\n"
 
@@ -81,10 +81,10 @@ class WhatsAppBehaviorMixin:
 
     @classmethod
     def _sanitize_outbound_text(cls, content: str) -> str:
-        """Remove invisible formatting chars that leak badly in WhatsApp.
+        """Remove invisible formatting chars that leak badly in Messaging.
 
         Some provider/gateway formatting paths can emit unicode like WORD
-        JOINER (U+2060) plus NARROW NO-BREAK SPACE (U+202F). WhatsApp may
+        JOINER (U+2060) plus NARROW NO-BREAK SPACE (U+202F). Messaging may
         render those as mojibake-looking prefixes (``⁠ text``) instead of
         invisible spacing. Keep normal text and emoji joiners intact, but
         strip known zero-width format chars and normalize odd unicode spaces.
@@ -96,7 +96,7 @@ class WhatsAppBehaviorMixin:
 
     @property
     def enforces_own_access_policy(self) -> bool:
-        """WhatsApp gates DM/group access at intake via dm_policy/group_policy."""
+        """Messaging gates DM/group access at intake via dm_policy/group_policy."""
         return True
 
     # ------------------------------------------------------------------ config
@@ -107,12 +107,12 @@ class WhatsAppBehaviorMixin:
         adapter) can override this to always return ``""`` or apply a
         different policy.
         """
-        whatsapp_mode = _get_wsecret("WHATSAPP_MODE", default="self-chat") or "self-chat"
-        if whatsapp_mode != "self-chat":
+        messaging_mode = _get_wsecret("MESSAGING_MODE", default="self-chat") or "self-chat"
+        if messaging_mode != "self-chat":
             return ""
         if self._reply_prefix is not None:
             return self._reply_prefix.replace("\\n", "\n")
-        env_prefix = _get_wsecret("WHATSAPP_REPLY_PREFIX")
+        env_prefix = _get_wsecret("MESSAGING_REPLY_PREFIX")
         if env_prefix is not None:
             return env_prefix.replace("\\n", "\n")
         return self.DEFAULT_REPLY_PREFIX
@@ -124,23 +124,23 @@ class WhatsAppBehaviorMixin:
         # code-fence repair even if a user configures a very long prefix.
         return max(1024, self.MAX_MESSAGE_LENGTH - prefix_len)
 
-    def _whatsapp_require_mention(self) -> bool:
+    def _messaging_require_mention(self) -> bool:
         configured = self.config.extra.get("require_mention")
         if configured is not None:
             if isinstance(configured, str):
                 return configured.lower() in {"true", "1", "yes", "on"}
             return bool(configured)
-        return (_get_wsecret("WHATSAPP_REQUIRE_MENTION", default="false") or "false").lower() in {
+        return (_get_wsecret("MESSAGING_REQUIRE_MENTION", default="false") or "false").lower() in {
             "true",
             "1",
             "yes",
             "on",
         }
 
-    def _whatsapp_free_response_chats(self) -> set[str]:
+    def _messaging_free_response_chats(self) -> set[str]:
         raw = self.config.extra.get("free_response_chats")
         if raw is None:
-            raw = _get_wsecret("WHATSAPP_FREE_RESPONSE_CHATS", default="") or ""
+            raw = _get_wsecret("MESSAGING_FREE_RESPONSE_CHATS", default="") or ""
         if isinstance(raw, list):
             return {str(part).strip() for part in raw if str(part).strip()}
         return {part.strip() for part in str(raw).split(",") if part.strip()}
@@ -178,7 +178,7 @@ class WhatsAppBehaviorMixin:
 
     # ------------------------------------------------------------------ JID helpers
     @staticmethod
-    def _normalize_whatsapp_id(value: Optional[str]) -> str:
+    def _normalize_messaging_id(value: Optional[str]) -> str:
         if not value:
             return ""
         normalized = str(value).strip()
@@ -188,7 +188,7 @@ class WhatsAppBehaviorMixin:
 
     @staticmethod
     def _is_broadcast_chat(chat_id: str) -> bool:
-        """True for WhatsApp pseudo-chats that aren't real conversations.
+        """True for Messaging pseudo-chats that aren't real conversations.
 
         Covers Status updates (Stories) and Channel/Newsletter broadcasts.
         These show up as inbound messages on Baileys but the agent should
@@ -210,18 +210,18 @@ class WhatsAppBehaviorMixin:
     def _open_dm_opted_in(self) -> bool:
         if os.getenv("GATEWAY_ALLOW_ALL_USERS", "").lower() in {"true", "1", "yes"}:
             return True
-        return (_get_wsecret("WHATSAPP_ALLOW_ALL_USERS", default="") or "").lower() in {"true", "1", "yes"}
+        return (_get_wsecret("MESSAGING_ALLOW_ALL_USERS", default="") or "").lower() in {"true", "1", "yes"}
 
     @staticmethod
-    def _matches_whatsapp_allowlist(candidate: str, allow_from) -> bool:
-        """Match a WhatsApp identifier against an allowlist across phone/LID forms.
+    def _matches_messaging_allowlist(candidate: str, allow_from) -> bool:
+        """Match a Messaging identifier against an allowlist across phone/LID forms.
 
-        WhatsApp delivers inbound senders in LID form (``<id>@lid``) while
+        Messaging delivers inbound senders in LID form (``<id>@lid``) while
         operators usually configure allowlists with phone numbers, and vice
         versa. A raw set-membership check therefore never matches a known
         contact. Resolve both the candidate and each allowlist entry through
         the bridge's ``lid-mapping-*.json`` files (the shared
-        ``gateway.whatsapp_identity`` helper that the gateway authz and
+        ``gateway.messaging_identity`` helper that the gateway authz and
         session-key paths already use) so either configured form resolves to
         the inbound form.
         """
@@ -232,22 +232,22 @@ class WhatsAppBehaviorMixin:
         if candidate in allow_from:
             return True
 
-        from gateway.whatsapp_identity import (
-            expand_whatsapp_aliases,
-            normalize_whatsapp_identifier,
+        from gateway.messaging_identity import (
+            expand_messaging_aliases,
+            normalize_messaging_identifier,
         )
 
-        candidate_aliases = expand_whatsapp_aliases(candidate)
+        candidate_aliases = expand_messaging_aliases(candidate)
         if not candidate_aliases:
             return False
         for entry in allow_from:
             if entry == "*":
                 return True
-            if normalize_whatsapp_identifier(entry) in candidate_aliases:
+            if normalize_messaging_identifier(entry) in candidate_aliases:
                 return True
             # Entry may itself be an unmapped form; expand it too so a phone
             # allowlist entry resolves when the inbound sender arrived as a LID.
-            if expand_whatsapp_aliases(entry) & candidate_aliases:
+            if expand_messaging_aliases(entry) & candidate_aliases:
                 return True
         return False
 
@@ -256,7 +256,7 @@ class WhatsAppBehaviorMixin:
         if self._dm_policy == "disabled":
             return False
         if self._dm_policy == "allowlist":
-            return self._matches_whatsapp_allowlist(sender_id, self._live_dm_allow_from())
+            return self._matches_messaging_allowlist(sender_id, self._live_dm_allow_from())
         if self._dm_policy == "open":
             return self._open_dm_opted_in()
         return False
@@ -269,7 +269,7 @@ class WhatsAppBehaviorMixin:
         if self._dm_policy == "disabled":
             return False
         if self._dm_policy == "allowlist":
-            return self._matches_whatsapp_allowlist(principal, self._live_dm_allow_from())
+            return self._matches_messaging_allowlist(principal, self._live_dm_allow_from())
         if self._dm_policy == "pairing":
             return True
         if self._dm_policy == "open":
@@ -281,7 +281,7 @@ class WhatsAppBehaviorMixin:
         if self._group_policy == "disabled":
             return False
         if self._group_policy == "allowlist":
-            return self._matches_whatsapp_allowlist(chat_id, self._group_allow_from)
+            return self._matches_messaging_allowlist(chat_id, self._group_allow_from)
         if self._group_policy == "pairing":
             return False
         if self._group_policy == "open":
@@ -291,7 +291,7 @@ class WhatsAppBehaviorMixin:
     def _compile_mention_patterns(self):
         patterns = self.config.extra.get("mention_patterns")
         if patterns is None:
-            raw = (_get_wsecret("WHATSAPP_MENTION_PATTERNS", default="") or "").strip()
+            raw = (_get_wsecret("MESSAGING_MENTION_PATTERNS", default="") or "").strip()
             if raw:
                 try:
                     patterns = json.loads(raw)
@@ -309,7 +309,7 @@ class WhatsAppBehaviorMixin:
             patterns = [patterns]
         if not isinstance(patterns, list):
             logger.warning(
-                "[%s] whatsapp mention_patterns must be a list or string; got %s",
+                "[%s] messaging mention_patterns must be a list or string; got %s",
                 self.name,
                 type(patterns).__name__,
             )
@@ -323,27 +323,27 @@ class WhatsAppBehaviorMixin:
                 compiled.append(re.compile(pattern, re.IGNORECASE))
             except re.error as exc:
                 logger.warning(
-                    "[%s] Invalid WhatsApp mention pattern %r: %s",
+                    "[%s] Invalid Messaging mention pattern %r: %s",
                     self.name,
                     pattern,
                     exc,
                 )
         if compiled:
             logger.info(
-                "[%s] Loaded %d WhatsApp mention pattern(s)", self.name, len(compiled)
+                "[%s] Loaded %d Messaging mention pattern(s)", self.name, len(compiled)
             )
         return compiled
 
     def _bot_ids_from_message(self, data: Dict[str, Any]) -> set[str]:
         bot_ids = set()
         for candidate in data.get("botIds") or []:
-            normalized = self._normalize_whatsapp_id(candidate)
+            normalized = self._normalize_messaging_id(candidate)
             if normalized:
                 bot_ids.add(normalized)
         return bot_ids
 
     def _message_is_reply_to_bot(self, data: Dict[str, Any]) -> bool:
-        quoted_participant = self._normalize_whatsapp_id(data.get("quotedParticipant"))
+        quoted_participant = self._normalize_messaging_id(data.get("quotedParticipant"))
         if not quoted_participant:
             return False
         return quoted_participant in self._bot_ids_from_message(data)
@@ -355,7 +355,7 @@ class WhatsAppBehaviorMixin:
         mentioned_ids = {
             nid
             for candidate in (data.get("mentionedIds") or [])
-            if (nid := self._normalize_whatsapp_id(candidate))
+            if (nid := self._normalize_messaging_id(candidate))
         }
         if mentioned_ids & bot_ids:
             return True
@@ -389,7 +389,7 @@ class WhatsAppBehaviorMixin:
 
     def _should_process_message(self, data: Dict[str, Any]) -> bool:
         chat_id_raw = str(data.get("chatId") or "")
-        # WhatsApp uses pseudo-chats for Status updates (Stories) and
+        # Messaging uses pseudo-chats for Status updates (Stories) and
         # Channel/Newsletter broadcasts. These are not real conversations
         # and the agent should never reply to them — even in self-chat mode
         # where the bridge may surface them as "fromMe" events.
@@ -408,9 +408,9 @@ class WhatsAppBehaviorMixin:
             return True
         # Group messages: check mention / free-response settings
         chat_id = str(data.get("chatId") or "")
-        if chat_id in self._whatsapp_free_response_chats():
+        if chat_id in self._messaging_free_response_chats():
             return True
-        if not self._whatsapp_require_mention():
+        if not self._messaging_require_mention():
             return True
         body = str(data.get("body") or "").strip()
         if body.startswith("/"):
@@ -423,9 +423,9 @@ class WhatsAppBehaviorMixin:
 
     # ------------------------------------------------------------------ formatting
     def format_message(self, content: str) -> str:
-        """Convert standard markdown to WhatsApp-compatible formatting.
+        """Convert standard markdown to Messaging-compatible formatting.
 
-        WhatsApp supports: *bold*, _italic_, ~strikethrough~, ```code```,
+        Messaging supports: *bold*, _italic_, ~strikethrough~, ```code```,
         and monospaced `inline`. Standard markdown uses different syntax
         for bold/italic/strikethrough, so we convert here.
 
@@ -457,8 +457,8 @@ class WhatsAppBehaviorMixin:
 
         result = re.sub(r"`[^`\n]+`", _save_code, result)
 
-        # --- 3. Convert markdown formatting to WhatsApp syntax ---
-        # Italic: standard Markdown *text* → WhatsApp _text_.  Do this before
+        # --- 3. Convert markdown formatting to Messaging syntax ---
+        # Italic: standard Markdown *text* → Messaging _text_.  Do this before
         # bold conversion so **bold** does not become italic by accident.  The
         # lookarounds avoid list bullets and bold delimiters.
         result = re.sub(
@@ -471,12 +471,12 @@ class WhatsAppBehaviorMixin:
         result = re.sub(r"__(.+?)__", r"*\1*", result)
         # Strikethrough: ~~text~~ → ~text~
         result = re.sub(r"~~(.+?)~~", r"~\1~", result)
-        # _text_ is already WhatsApp italic — leave as-is
+        # _text_ is already Messaging italic — leave as-is
 
         # --- 4. Convert markdown headers to bold text ---
         # # Header → *Header*. Strip any *...* wrapping already produced
         # by step 3 (e.g. "# **Title**" → "*Title*", not "**Title**",
-        # which WhatsApp renders with literal asterisks).
+        # which Messaging renders with literal asterisks).
         def _header_to_bold(m: re.Match) -> str:
             inner = m.group(1).strip()
             while len(inner) > 1 and inner.startswith("*") and inner.endswith("*"):
@@ -503,8 +503,8 @@ class WhatsAppBehaviorMixin:
 # Shared bridge directory resolution for CLI and adapter
 # ---------------------------------------------------------------------------
 
-def resolve_whatsapp_bridge_dir() -> Path:
-    """Resolve the WhatsApp bridge directory, mirroring to HERMES_HOME if needed.
+def resolve_messaging_bridge_dir() -> Path:
+    """Resolve the Messaging bridge directory, mirroring to HERMES_HOME if needed.
 
     When the install tree is read-only (e.g., Docker /opt/hermes), this function
     mirrors the bridge source to a writable HERMES_HOME location and returns that
@@ -517,11 +517,11 @@ def resolve_whatsapp_bridge_dir() -> Path:
 
     # Default location in install tree (may be read-only)
     from hermes_constants import get_hermes_home
-    install_bridge = _Path(__file__).resolve().parents[2] / "scripts" / "whatsapp-bridge"
+    install_bridge = _Path(__file__).resolve().parents[2] / "scripts" / "messaging-bridge"
 
     # Try HERMES_HOME location first
     hermes_home = get_hermes_home()
-    hermes_home_bridge = hermes_home / "scripts" / "whatsapp-bridge"
+    hermes_home_bridge = hermes_home / "scripts" / "messaging-bridge"
 
     # Check if install dir is writable
     try:

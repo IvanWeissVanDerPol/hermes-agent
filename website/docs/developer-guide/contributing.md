@@ -36,7 +36,7 @@ We value contributions in this order:
 | **Git**              | With the `git-lfs` extension installed                                                        |
 | **Python 3.11–3.13** | uv will install it if missing                                                                 |
 | **uv**               | Fast Python package manager ([install](https://docs.astral.sh/uv/))                           |
-| **Node.js 26+**      | Optional — needed for browser tools and WhatsApp bridge (matches root `package.json` engines) |
+| **Node.js 26+**      | Optional — needed for browser tools and Messaging bridge (matches root `package.json` engines) |
 
 ### Install with the standard installer
 
@@ -269,13 +269,13 @@ We use [Conventional Commits](https://www.conventionalcommits.org/):
 | `refactor` | Code restructuring            |
 | `chore`    | Build, CI, dependency updates |
 
-Scopes: `cli`, `gateway`, `tools`, `skills`, `agent`, `install`, `whatsapp`, `security`
+Scopes: `cli`, `gateway`, `tools`, `skills`, `agent`, `install`, `messaging`, `security`
 
 Examples:
 
 ```
 fix(cli): prevent crash in save_config_value when model is a string
-feat(gateway): add WhatsApp multi-user session isolation
+feat(gateway): add Messaging multi-user session isolation
 fix(security): prevent shell injection in sudo password piping
 ```
 

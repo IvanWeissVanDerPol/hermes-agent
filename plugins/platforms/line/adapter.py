@@ -95,7 +95,7 @@ def _get_scoped_secret(name, default=None):
     ``UnscopedSecretError`` and crash this path; there ``os.environ`` is that
     profile's own value, so fall back to it. Same pattern as the Slack
     ``SLACK_APP_TOKEN`` read (#59739) and
-    ``gateway/platforms/whatsapp_common.py::_get_wsecret``.
+    ``gateway/platforms/messaging_common.py::_get_wsecret``.
     """
     try:
         val = _scoped_get_secret(name, default)
@@ -187,7 +187,7 @@ LINE_AV_MAX_BYTES = 200 * 1024 * 1024  # 200 MB for voice/video
 # Map LINE webhook message types to the normalized MessageType the gateway
 # routes on. LINE has no separate "voice" type — audio messages are recorded
 # voice clips, so they map to VOICE (which the gateway sends through STT),
-# mirroring how Telegram/WhatsApp classify voice notes. Anything unknown
+# mirroring how Telegram/Messaging classify voice notes. Anything unknown
 # falls back to TEXT.
 _LINE_MESSAGE_TYPES = {
     "text": MessageType.TEXT,

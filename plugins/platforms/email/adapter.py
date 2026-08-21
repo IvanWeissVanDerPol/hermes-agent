@@ -61,7 +61,7 @@ def _get_esecret(name: str, default: str = "") -> str:
     under multiplexing, where a bare ``get_secret`` would raise
     ``UnscopedSecretError`` and crash its email path; there ``os.environ``
     is that profile's own value, so fall back to it. Same pattern as the
-    Slack ``SLACK_APP_TOKEN`` read (#59739) and the WhatsApp
+    Slack ``SLACK_APP_TOKEN`` read (#59739) and the Messaging
     ``_get_wsecret`` fix (5438e9c629).
     """
     try:

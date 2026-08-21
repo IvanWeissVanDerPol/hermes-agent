@@ -1,5 +1,5 @@
 /**
- * Regression tests for the WhatsApp bridge send queue (#33360).
+ * Regression tests for the Messaging bridge send queue (#33360).
  *
  * The bridge must serialise all sock.sendMessage() calls through a
  * promise-based queue so that concurrent HTTP /send requests never
@@ -7,7 +7,7 @@
  * the confirmed root cause of cross-chat contamination.
  *
  * These tests exercise the queue itself — they do NOT require a live
- * WhatsApp socket.
+ * Messaging socket.
  */
 
 import { strict as assert } from 'node:assert';

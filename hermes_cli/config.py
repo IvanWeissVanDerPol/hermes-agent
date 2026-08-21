@@ -299,7 +299,7 @@ _EXTRA_ENV_KEYS = frozenset({
     # support floor retired its only consumer (the v3→4 migration): it is no
     # longer listed here and doctor flags it as ignored.
     "HERMES_TOOL_PROGRESS_MODE",
-    "WHATSAPP_MODE", "WHATSAPP_ENABLED",
+    "MESSAGING_MODE", "MESSAGING_ENABLED",
     "MATTERMOST_HOME_CHANNEL", "MATTERMOST_HOME_CHANNEL_NAME", "MATTERMOST_REPLY_MODE",
     "MATRIX_PASSWORD", "MATRIX_ENCRYPTION", "MATRIX_DEVICE_ID", "MATRIX_HOME_ROOM",
     "MATRIX_REQUIRE_MENTION", "MATRIX_FREE_RESPONSE_ROOMS", "MATRIX_AUTO_THREAD", "MATRIX_DM_AUTO_THREAD",
@@ -951,7 +951,7 @@ from hermes_cli.config_defaults import DEFAULT_CONFIG, OPTIONAL_ENV_VARS  # noqa
 ENV_VARS_BY_VERSION: Dict[int, List[str]] = {
     3: ["FIRECRAWL_API_KEY", "BROWSERBASE_API_KEY", "BROWSERBASE_PROJECT_ID", "FAL_KEY"],
     4: ["VOICE_TOOLS_OPENAI_KEY", "ELEVENLABS_API_KEY"],
-    5: ["WHATSAPP_ENABLED", "WHATSAPP_MODE", "WHATSAPP_ALLOWED_USERS",
+    5: ["MESSAGING_ENABLED", "MESSAGING_MODE", "MESSAGING_ALLOWED_USERS",
         "SLACK_BOT_TOKEN", "SLACK_APP_TOKEN", "SLACK_ALLOWED_USERS"],
     10: ["TAVILY_API_KEY"],
     11: ["TERMINAL_MODAL_MODE"],
@@ -4672,7 +4672,7 @@ _OPEN_DICT_TOP_LEVEL_KEYS = frozenset({
 # etc.). For these we validate the FIRST segment but accept anything below.
 _SCHEMA_DEFINED_DICT_KEYS = frozenset({
     # Platform configs — PlatformConfig dataclass + dynamic extras
-    "discord", "telegram", "slack", "whatsapp", "signal", "mattermost",
+    "discord", "telegram", "slack", "messaging", "signal", "mattermost",
     "matrix", "feishu", "wecom", "weixin", "bluebubbles", "qqbot", "yuanbao",
     "email", "sms", "dingtalk",
     # MCP server template / dynamic auth dicts

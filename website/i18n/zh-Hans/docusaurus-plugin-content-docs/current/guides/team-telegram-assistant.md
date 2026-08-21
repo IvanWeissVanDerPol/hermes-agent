@@ -434,7 +434,7 @@ hermes gateway stop && hermes gateway start
 - **[定时任务](/user-guide/features/cron)**——高级 cron 调度，含投递选项和 cron 表达式
 - **[上下文文件](/user-guide/features/context-files)**——用于项目知识的 AGENTS.md、SOUL.md 和 .cursorrules
 - **[个性设置](/user-guide/features/personality)**——内置个性预设和自定义角色定义
-- **添加更多平台**——同一 gateway 可同时运行 [Discord](/user-guide/messaging/discord)、[Slack](/user-guide/messaging/slack) 和 [WhatsApp](/user-guide/messaging/whatsapp)
+- **添加更多平台**——同一 gateway 可同时运行 [Discord](/user-guide/messaging/discord)、[Slack](/user-guide/messaging/slack) 和 [Messaging](/user-guide/messaging/messaging)
 
 ---
 

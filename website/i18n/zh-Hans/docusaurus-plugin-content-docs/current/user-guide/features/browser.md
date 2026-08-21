@@ -457,7 +457,7 @@ Press Enter to submit the form
 
 截图并使用视觉 AI 进行分析。当文本快照无法捕获重要视觉信息时使用 — 尤其适用于 CAPTCHA、复杂布局或视觉验证挑战。
 
-截图会持久保存，文件路径与 AI 分析结果一并返回。在消息平台（Telegram、Discord、Slack、WhatsApp）上，您可以要求 Agent 分享截图 — 它将通过 `MEDIA:` 机制作为原生图片附件发送。
+截图会持久保存，文件路径与 AI 分析结果一并返回。在消息平台（Telegram、Discord、Slack、Messaging）上，您可以要求 Agent 分享截图 — 它将通过 `MEDIA:` 机制作为原生图片附件发送。
 
 ```
 What does the chart on this page show?

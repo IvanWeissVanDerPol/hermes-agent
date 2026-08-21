@@ -80,13 +80,13 @@ class TelegramOnboardingApply(BaseModel):
     profile: Optional[str] = None
 
 
-class WhatsAppOnboardingStart(BaseModel):
+class MessagingOnboardingStart(BaseModel):
     mode: Optional[str] = "bot"
     allowed_users: Optional[str] = ""
     profile: Optional[str] = None
 
 
-class WhatsAppOnboardingApply(BaseModel):
+class MessagingOnboardingApply(BaseModel):
     mode: Optional[str] = None
     allowed_users: Optional[str] = None
     profile: Optional[str] = None

@@ -639,7 +639,7 @@ class TestNpmBareSpawnsResolved:
         [
             "hermes_cli/tools_config.py",
             "hermes_cli/doctor.py",
-            "plugins/platforms/whatsapp/adapter.py",
+            "plugins/platforms/messaging/adapter.py",
             "tools/browser_tool.py",
         ],
     )

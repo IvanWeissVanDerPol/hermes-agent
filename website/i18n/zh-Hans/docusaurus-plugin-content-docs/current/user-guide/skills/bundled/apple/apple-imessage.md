@@ -48,7 +48,7 @@ description: "通过 macOS 上的 imsg CLI 发送和接收 iMessages/SMS"
 
 ## 何时不使用
 
-- Telegram/Discord/Slack/WhatsApp 消息 → 使用相应的 gateway 频道
+- Telegram/Discord/Slack/Messaging 消息 → 使用相应的 gateway 频道
 - 群聊管理（添加/移除成员）→ 不支持
 - 批量/群发消息 → 始终先与用户确认
 

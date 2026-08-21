@@ -1751,7 +1751,7 @@ class TestSlackAudioExtResolution:
     Regression for: Slack in-app voice messages are MP4/AAC containers
     (``audio/mp4``, filename ``audio_message*.mp4``) that the old code cached
     as ``.ogg`` (the catch-all fallback), so OpenAI STT — which sniffs the
-    container from the filename extension — rejected them. WhatsApp ``.ogg``
+    container from the filename extension — rejected them. Messaging ``.ogg``
     and uploaded ``.m4a`` worked because their extension happened to match.
     """
 
@@ -1763,7 +1763,7 @@ class TestSlackAudioExtResolution:
         assert ext in {".mp4", ".m4a"}
         assert ext in _slack_mod._SLACK_STT_SUPPORTED_EXTS
 
-    def test_whatsapp_ogg_preserved(self):
+    def test_messaging_ogg_preserved(self):
         f = {"name": "voice.ogg", "mimetype": "audio/ogg"}
         assert _slack_mod._resolve_slack_audio_ext(f, f["mimetype"]) == ".ogg"
 

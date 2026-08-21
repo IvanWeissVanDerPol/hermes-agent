@@ -1,13 +1,13 @@
-"""Regression tests for ``cmd_whatsapp`` env-var write ordering.
+"""Regression tests for ``cmd_messaging`` env-var write ordering.
 
-Before the fix, ``hermes whatsapp`` wrote ``WHATSAPP_ENABLED=true`` at
+Before the fix, ``hermes messaging`` wrote ``MESSAGING_ENABLED=true`` at
 step 2 — before npm install (step 4) and before QR pairing (step 6).
-If the user Ctrl+C'd at any later step, ``.env`` claimed WhatsApp was
+If the user Ctrl+C'd at any later step, ``.env`` claimed Messaging was
 ready when the bridge still had no ``creds.json``.  Every subsequent
 ``hermes gateway`` then paid a 30s bridge-bootstrap timeout and queued
-WhatsApp for indefinite retries — looking like "the gateway is broken."
+Messaging for indefinite retries — looking like "the gateway is broken."
 
-The fix: only set ``WHATSAPP_ENABLED=true`` once pairing actually
+The fix: only set ``MESSAGING_ENABLED=true`` once pairing actually
 succeeds (creds.json exists).  Aborted setup leaves no enabled state.
 """
 
@@ -31,7 +31,7 @@ def isolated_home(tmp_path, monkeypatch):
     monkeypatch.setenv("HERMES_HOME", str(hermes))
     # Ensure get_env_value cache doesn't carry stale state.
     for key in list(os.environ):
-        if key.startswith("WHATSAPP_"):
+        if key.startswith("MESSAGING_"):
             monkeypatch.delenv(key, raising=False)
     return hermes
 
@@ -49,12 +49,12 @@ def _env_value(hermes_home: Path, key: str) -> str | None:
     return None
 
 
-def test_aborted_setup_does_not_enable_whatsapp(isolated_home, monkeypatch):
+def test_aborted_setup_does_not_enable_messaging(isolated_home, monkeypatch):
     """User picks mode 1, then Ctrl+C's at the allowed-users prompt.
 
-    WHATSAPP_ENABLED must NOT be present in .env after abort.
+    MESSAGING_ENABLED must NOT be present in .env after abort.
     """
-    from hermes_cli.main import cmd_whatsapp
+    from hermes_cli.main import cmd_messaging
 
     # First input() = mode choice, second input() = allowed-users prompt
     # We raise KeyboardInterrupt on the second call to simulate abort.
@@ -74,30 +74,30 @@ def test_aborted_setup_does_not_enable_whatsapp(isolated_home, monkeypatch):
     buf = io.StringIO()
     with redirect_stdout(buf):
         try:
-            cmd_whatsapp(MagicMock())
+            cmd_messaging(MagicMock())
         except KeyboardInterrupt:
             pass
 
-    assert _env_value(isolated_home, "WHATSAPP_ENABLED") is None, (
-        "Setup aborted before pairing — WHATSAPP_ENABLED must not be set. "
+    assert _env_value(isolated_home, "MESSAGING_ENABLED") is None, (
+        "Setup aborted before pairing — MESSAGING_ENABLED must not be set. "
         f"Got .env: {(isolated_home / '.env').read_text() if (isolated_home / '.env').exists() else '(missing)'}"
     )
 
 
-def test_existing_pairing_skip_branch_enables_whatsapp(isolated_home, monkeypatch):
-    """User runs ``hermes whatsapp`` with an existing paired session and
+def test_existing_pairing_skip_branch_enables_messaging(isolated_home, monkeypatch):
+    """User runs ``hermes messaging`` with an existing paired session and
     chooses "no, keep my session" at the re-pair prompt.  The env var
-    should be (re-)written to true so the gateway picks WhatsApp back up,
+    should be (re-)written to true so the gateway picks Messaging back up,
     even if the var was lost since the original pairing.
     """
-    from hermes_cli.main import cmd_whatsapp
+    from hermes_cli.main import cmd_messaging
 
-    # Pre-create a paired session WITHOUT WHATSAPP_ENABLED in .env.
-    session = isolated_home / "whatsapp" / "session"
+    # Pre-create a paired session WITHOUT MESSAGING_ENABLED in .env.
+    session = isolated_home / "messaging" / "session"
     session.mkdir(parents=True)
     (session / "creds.json").write_text("{}")
-    monkeypatch.setenv("WHATSAPP_MODE", "bot")
-    monkeypatch.setenv("WHATSAPP_ALLOWED_USERS", "15551234567")
+    monkeypatch.setenv("MESSAGING_MODE", "bot")
+    monkeypatch.setenv("MESSAGING_ALLOWED_USERS", "15551234567")
 
     # mode already set → skip mode prompt; users already set → skip update
     # prompt with "no"; pairing exists → "no, keep session" → return.
@@ -134,7 +134,7 @@ def test_existing_pairing_skip_branch_enables_whatsapp(isolated_home, monkeypatc
 
     buf = io.StringIO()
     with redirect_stdout(buf):
-        cmd_whatsapp(MagicMock())
+        cmd_messaging(MagicMock())
 
     # The skip-rebar branch should have set the env var on its way out.
-    assert _env_value(isolated_home, "WHATSAPP_ENABLED") == "true"
+    assert _env_value(isolated_home, "MESSAGING_ENABLED") == "true"

@@ -62,7 +62,7 @@ hermes cron list   # 将 next_run 时间与本地时间对比
 | `telegram` | `~/.hermes/.env` 中的 `TELEGRAM_BOT_TOKEN` |
 | `discord` | `~/.hermes/.env` 中的 `DISCORD_BOT_TOKEN` |
 | `slack` | `~/.hermes/.env` 中的 `SLACK_BOT_TOKEN` |
-| `whatsapp` | 已配置 WhatsApp gateway |
+| `messaging` | 已配置 Messaging gateway |
 | `signal` | 已配置 Signal gateway |
 | `matrix` | 已配置 Matrix homeserver |
 | `email` | `config.yaml` 中已配置 SMTP |

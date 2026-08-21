@@ -13,7 +13,7 @@ export const MIME_MAP = {
   xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
 };
 
-export function normalizeWhatsAppId(value) {
+export function normalizeMessagingId(value) {
   if (!value) return '';
   return String(value).replace(':', '@');
 }
@@ -121,8 +121,8 @@ export function pollUpdateForAggregation({
   }
 
   // Baileys poll decryption keys include both creator and voter JIDs.  On
-  // WhatsApp LID chats, the poll creator can be the linked-device LID even
-  // when sock.user.id is the classic @s.whatsapp.net JID.  Try the exact
+  // Messaging LID chats, the poll creator can be the linked-device LID even
+  // when sock.user.id is the classic @s.messaging.net JID.  Try the exact
   // candidates the live bridge knows before falling back to the generic helper.
   const creatorCandidates = uniqueStrings([
     ...pollCreatorJids,
@@ -164,7 +164,7 @@ export function buildTextSendPayload(text, { replyTo, messageStore } = {}) {
   if (quoted?.key && quoted?.message) {
     // Baileys expects quoted messages as sendMessage options, not inside the
     // message content payload. Keeping this split avoids silently sending a
-    // literal/ignored `quoted` field instead of a native WhatsApp reply.
+    // literal/ignored `quoted` field instead of a native Messaging reply.
     options.quoted = quoted;
   }
   return { content, options };
@@ -309,10 +309,10 @@ export async function extractBridgeEvent({
 }) {
   const messageContent = getMessageContent(msg);
   const contextInfo = getContextInfo(messageContent);
-  const mentionedIds = Array.from(new Set((contextInfo?.mentionedJid || []).map(normalizeWhatsAppId).filter(Boolean)));
+  const mentionedIds = Array.from(new Set((contextInfo?.mentionedJid || []).map(normalizeMessagingId).filter(Boolean)));
   const quotedMessageId = contextInfo?.stanzaId || null;
-  const quotedParticipant = normalizeWhatsAppId(contextInfo?.participant || '') || null;
-  const quotedRemoteJid = normalizeWhatsAppId(contextInfo?.remoteJid || '') || null;
+  const quotedParticipant = normalizeMessagingId(contextInfo?.participant || '') || null;
+  const quotedRemoteJid = normalizeMessagingId(contextInfo?.remoteJid || '') || null;
   const hasQuotedMessage = !!contextInfo?.quotedMessage;
   const quotedText = textFromQuotedMessage(contextInfo?.quotedMessage);
 
@@ -431,8 +431,8 @@ export async function extractBridgeEvent({
     nativeMetadata.reaction = {
       text: messageContent.reactionMessage.text || '',
       messageId: messageContent.reactionMessage.key?.id || '',
-      remoteJid: normalizeWhatsAppId(messageContent.reactionMessage.key?.remoteJid || ''),
-      participant: normalizeWhatsAppId(messageContent.reactionMessage.key?.participant || ''),
+      remoteJid: normalizeMessagingId(messageContent.reactionMessage.key?.remoteJid || ''),
+      participant: normalizeMessagingId(messageContent.reactionMessage.key?.participant || ''),
     };
   } else if (messageContent.pollCreationMessage || messageContent.pollCreationMessageV2 || messageContent.pollCreationMessageV3) {
     const item = messageContent.pollCreationMessage || messageContent.pollCreationMessageV2 || messageContent.pollCreationMessageV3;
@@ -511,7 +511,7 @@ export function mediaPayloadForFile({ buffer, filePath, mediaType, caption, file
   const type = mediaType || inferMediaType(ext);
   if (type === 'image' && ext === 'gif') {
     // Pure helper fallback: do not lie and label raw GIF bytes as mp4.
-    // The live bridge tries ffmpeg conversion to WhatsApp gifPlayback video
+    // The live bridge tries ffmpeg conversion to Messaging gifPlayback video
     // before it falls back to this regular image payload.
     return { image: buffer, caption: caption || undefined, mimetype: MIME_MAP[ext] || 'image/gif' };
   }

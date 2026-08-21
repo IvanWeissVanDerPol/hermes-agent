@@ -139,7 +139,7 @@
     "date": "2026",
     "category": "dev-workflow",
     "headline": "73% of every API call is fixed overhead (I measured it)",
-    "quote": "I built a monitoring dashboard to profile token consumption on a Hermes v0.6.0 deployment running Telegram + WhatsApp + Cron gateways. After analyzing 6 request dumps, I found that 73% of every API call is fixed overhead.",
+    "quote": "I built a monitoring dashboard to profile token consumption on a Hermes v0.6.0 deployment running Telegram + Messaging + Cron gateways. After analyzing 6 request dumps, I found that 73% of every API call is fixed overhead.",
     "size": "sm"
   },
   {
@@ -1041,7 +1041,7 @@
     "date": "2026-03",
     "category": "personal-assistant",
     "headline": "'Every morning at 9am, check HN for AI news and DM me on Telegram'",
-    "quote": "Conversation continues across platforms (Telegram, Discord, Slack, WhatsApp, Signal, terminal). Real memory: two curated files MEMORY.md + USER.md, plus SQLite full-text search over all past sessions. Scheduled tasks via natural language — no crontab editing.",
+    "quote": "Conversation continues across platforms (Telegram, Discord, Slack, Messaging, Signal, terminal). Real memory: two curated files MEMORY.md + USER.md, plus SQLite full-text search over all past sessions. Scheduled tasks via natural language — no crontab editing.",
     "size": "md"
   },
   {
@@ -1459,18 +1459,18 @@
     "date": "",
     "category": "business-ops",
     "headline": "Hermes as my Chief of Staff with sub-agents per project",
-    "quote": "My 'main agent' is my 'Chief of Staff' who has his own memory cross-project/workflow. Every 'project' (1 project = 1 Slack channel) has its own agent sub-profile with its own memory. The whole system runs on a VPS, with backup routing if the main model fails, and gets backed up every night to Github. Daily reporting is sent to WhatsApp.",
+    "quote": "My 'main agent' is my 'Chief of Staff' who has his own memory cross-project/workflow. Every 'project' (1 project = 1 Slack channel) has its own agent sub-profile with its own memory. The whole system runs on a VPS, with backup routing if the main model fails, and gets backed up every night to Github. Daily reporting is sent to Messaging.",
     "size": "lg"
   },
   {
-    "id": "exm-family-whatsapp",
+    "id": "exm-family-messaging",
     "source": "x",
     "author": "@EXM7777",
     "url": "https://x.com/EXM7777/status/2049869015221510424",
     "date": "2026-04-30",
     "category": "personal-assistant",
-    "headline": "One Hermes for the whole family on WhatsApp",
-    "quote": "3 weeks ago I decided to setup an Hermes agent for my family (3 members), they all use it for different use cases, one $200 ChatGPT sub is more than enough. It unlocked a whole new world for them, just because it lives inside whatsapp and has magic proactive behaviors.",
+    "headline": "One Hermes for the whole family on Messaging",
+    "quote": "3 weeks ago I decided to setup an Hermes agent for my family (3 members), they all use it for different use cases, one $200 ChatGPT sub is more than enough. It unlocked a whole new world for them, just because it lives inside messaging and has magic proactive behaviors.",
     "size": "md"
   },
   {
@@ -1613,7 +1613,7 @@
     "date": "2026-03",
     "category": "cost-optimization",
     "headline": "Hetzner VPS at $10/mo, Claude Opus via OpenRouter",
-    "quote": "Personal AI that lives on a server with persistent memory. Remembers preferences, projects, and past problem-solving. Accessible via Terminal, Telegram, Discord, Slack, or WhatsApp. Set up on a $10/month Hetzner VPS with Claude Opus via OpenRouter.",
+    "quote": "Personal AI that lives on a server with persistent memory. Remembers preferences, projects, and past problem-solving. Accessible via Terminal, Telegram, Discord, Slack, or Messaging. Set up on a $10/month Hetzner VPS with Claude Opus via OpenRouter.",
     "size": "sm"
   },
   {
@@ -1679,7 +1679,7 @@
     "date": "2026",
     "category": "privacy",
     "headline": "Independent technical security eval: 5 defensive patterns",
-    "quote": "The genuine differentiator is the multi-platform messaging gateway — runs across Telegram, Discord, Slack, WhatsApp, Signal, WeChat, iMessage, and CLI simultaneously. Five defensive security patterns including OSV malware checking for MCP packages and credential stripping from output.",
+    "quote": "The genuine differentiator is the multi-platform messaging gateway — runs across Telegram, Discord, Slack, Messaging, Signal, WeChat, iMessage, and CLI simultaneously. Five defensive security patterns including OSV malware checking for MCP packages and credential stripping from output.",
     "size": "sm"
   },
   {
@@ -1789,7 +1789,7 @@
     "date": "2026",
     "category": "meta",
     "headline": "'The best self-improving agent we've used'",
-    "quote": "Hermes is the best self-improving agent we've used — it gets smarter the longer you run it. The WhatsApp and Telegram integrations make it feel genuinely personal.",
+    "quote": "Hermes is the best self-improving agent we've used — it gets smarter the longer you run it. The Messaging and Telegram integrations make it feel genuinely personal.",
     "size": "sm"
   },
   {

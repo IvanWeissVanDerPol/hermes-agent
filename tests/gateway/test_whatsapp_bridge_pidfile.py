@@ -1,9 +1,9 @@
-"""Regression tests: the WhatsApp stale-bridge cleanup must never kill a stranger.
+"""Regression tests: the Messaging stale-bridge cleanup must never kill a stranger.
 
 The bridge records its PID in ``bridge.pid``. On the next start the gateway
 SIGTERMs that PID to reap an orphaned bridge. The original code checked only
 that the PID was *alive* — but once the bridge exits and is reaped the kernel
-can recycle its number onto an unrelated process. Because the WhatsApp bridge
+can recycle its number onto an unrelated process. Because the Messaging bridge
 crash-loops, this cleanup ran constantly, and a recycled PID that had landed on
 the user's browser main process got SIGTERMed, closing the browser at irregular
 intervals (no crash, no coredump — a clean kill of a stranger).
@@ -22,7 +22,7 @@ import pytest
 import os
 import socket
 
-from plugins.platforms.whatsapp.adapter import (
+from plugins.platforms.messaging.adapter import (
     _bridge_pid_is_ours,
     _kill_port_process,
     _kill_stale_bridge_by_pidfile,
@@ -96,7 +96,7 @@ class TestKillPortProcess:
 
     Root cause of the live Firefox kills: ``lsof -ti :PORT`` (and ``fuser
     PORT/tcp``) also returned *client* sockets whose connection merely involved
-    the port number. The WhatsApp bridge uses port 3000 by default — a common
+    the port number. The Messaging bridge uses port 3000 by default — a common
     local dev-server port — so a browser tab on ``localhost:3000`` was matched
     and SIGTERMed every time the (crash-looping) bridge restarted.
     """

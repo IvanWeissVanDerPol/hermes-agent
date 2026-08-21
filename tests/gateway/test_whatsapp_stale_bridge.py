@@ -1,4 +1,4 @@
-"""Tests for the WhatsApp stale-bridge staleness handshake.
+"""Tests for the Messaging stale-bridge staleness handshake.
 
 Regression tests for the stale-bridge trap: ``connect()`` reused any
 already-running bridge with ``status: connected`` unconditionally, and
@@ -40,11 +40,11 @@ class _AsyncCM:
 
 def _make_adapter(bridge_script: str = "/tmp/test-bridge.js",
                   session_path: Path = Path("/tmp/test-wa-session")):
-    """Create a WhatsAppAdapter with test attributes (bypass __init__)."""
-    from plugins.platforms.whatsapp.adapter import WhatsAppAdapter
+    """Create a MessagingAdapter with test attributes (bypass __init__)."""
+    from plugins.platforms.messaging.adapter import MessagingAdapter
 
-    adapter = WhatsAppAdapter.__new__(WhatsAppAdapter)
-    adapter.platform = Platform.WHATSAPP
+    adapter = MessagingAdapter.__new__(MessagingAdapter)
+    adapter.platform = Platform.MESSAGING
     adapter.config = MagicMock()
     adapter._bridge_port = 19876
     adapter._bridge_script = bridge_script
@@ -82,7 +82,7 @@ def _mock_health(json_data):
 
 def _setup_bridge_dir(tmp_path: Path) -> Path:
     """Create a real bridge dir with bridge.js + package.json + creds."""
-    bridge_dir = tmp_path / "whatsapp-bridge"
+    bridge_dir = tmp_path / "messaging-bridge"
     bridge_dir.mkdir()
     (bridge_dir / "bridge.js").write_text("// current bridge code\n")
     (bridge_dir / "package.json").write_text('{"name": "bridge"}\n')
@@ -94,7 +94,7 @@ def _setup_bridge_dir(tmp_path: Path) -> Path:
 
 def _fresh_node_modules(bridge_dir: Path) -> None:
     """Create node_modules with a stamp matching the current package.json."""
-    from plugins.platforms.whatsapp.adapter import _file_content_hash
+    from plugins.platforms.messaging.adapter import _file_content_hash
 
     nm = bridge_dir / "node_modules"
     nm.mkdir()
@@ -105,7 +105,7 @@ def _fresh_node_modules(bridge_dir: Path) -> None:
 
 class TestFileContentHash:
     def test_hashes_file(self, tmp_path):
-        from plugins.platforms.whatsapp.adapter import _file_content_hash
+        from plugins.platforms.messaging.adapter import _file_content_hash
 
         f = tmp_path / "x.js"
         f.write_text("abc")
@@ -119,7 +119,7 @@ class TestStaleBridgeHandshake:
 
     @pytest.mark.asyncio
     async def test_restarts_bridge_when_read_receipt_config_changed(self, tmp_path):
-        from plugins.platforms.whatsapp.adapter import _file_content_hash
+        from plugins.platforms.messaging.adapter import _file_content_hash
 
         bridge_dir = _setup_bridge_dir(tmp_path)
         _fresh_node_modules(bridge_dir)
@@ -140,11 +140,11 @@ class TestStaleBridgeHandshake:
         mock_proc.poll.return_value = 1
         mock_proc.returncode = 1
 
-        with patch("plugins.platforms.whatsapp.adapter.check_whatsapp_requirements", return_value=True), \
+        with patch("plugins.platforms.messaging.adapter.check_messaging_requirements", return_value=True), \
              patch("aiohttp.ClientSession", mock_client), \
-             patch("plugins.platforms.whatsapp.adapter.asyncio.sleep", new_callable=AsyncMock), \
-             patch("plugins.platforms.whatsapp.adapter._kill_stale_bridge_by_pidfile"), \
-             patch("plugins.platforms.whatsapp.adapter._kill_port_process"), \
+             patch("plugins.platforms.messaging.adapter.asyncio.sleep", new_callable=AsyncMock), \
+             patch("plugins.platforms.messaging.adapter._kill_stale_bridge_by_pidfile"), \
+             patch("plugins.platforms.messaging.adapter._kill_port_process"), \
              patch("subprocess.Popen", return_value=mock_proc) as mock_popen, \
              patch.object(adapter, "_acquire_platform_lock", return_value=True, create=True):
             await adapter.connect()
@@ -165,11 +165,11 @@ class TestDepRefreshStamp:
         mock_proc.poll.return_value = 1
         mock_proc.returncode = 1
 
-        with patch("plugins.platforms.whatsapp.adapter.check_whatsapp_requirements", return_value=True), \
+        with patch("plugins.platforms.messaging.adapter.check_messaging_requirements", return_value=True), \
              patch("aiohttp.ClientSession", _mock_health({"status": "disconnected"})), \
-             patch("plugins.platforms.whatsapp.adapter.asyncio.sleep", new_callable=AsyncMock), \
-             patch("plugins.platforms.whatsapp.adapter._kill_stale_bridge_by_pidfile"), \
-             patch("plugins.platforms.whatsapp.adapter._kill_port_process"), \
+             patch("plugins.platforms.messaging.adapter.asyncio.sleep", new_callable=AsyncMock), \
+             patch("plugins.platforms.messaging.adapter._kill_stale_bridge_by_pidfile"), \
+             patch("plugins.platforms.messaging.adapter._kill_port_process"), \
              patch("subprocess.run") as mock_run, \
              patch("subprocess.Popen", return_value=mock_proc), \
              patch.object(adapter, "_acquire_platform_lock", return_value=True, create=True):
@@ -192,11 +192,11 @@ class TestCacheDirEnvPassthrough:
         mock_proc.poll.return_value = 1
         mock_proc.returncode = 1
 
-        with patch("plugins.platforms.whatsapp.adapter.check_whatsapp_requirements", return_value=True), \
+        with patch("plugins.platforms.messaging.adapter.check_messaging_requirements", return_value=True), \
              patch("aiohttp.ClientSession", _mock_health({"status": "disconnected"})), \
-             patch("plugins.platforms.whatsapp.adapter.asyncio.sleep", new_callable=AsyncMock), \
-             patch("plugins.platforms.whatsapp.adapter._kill_stale_bridge_by_pidfile"), \
-             patch("plugins.platforms.whatsapp.adapter._kill_port_process"), \
+             patch("plugins.platforms.messaging.adapter.asyncio.sleep", new_callable=AsyncMock), \
+             patch("plugins.platforms.messaging.adapter._kill_stale_bridge_by_pidfile"), \
+             patch("plugins.platforms.messaging.adapter._kill_port_process"), \
              patch("subprocess.Popen", return_value=mock_proc) as mock_popen, \
              patch.object(adapter, "_acquire_platform_lock", return_value=True, create=True):
             await adapter.connect()
@@ -210,4 +210,4 @@ class TestCacheDirEnvPassthrough:
         assert env["HERMES_IMAGE_CACHE_DIR"] == str(get_image_cache_dir())
         assert env["HERMES_AUDIO_CACHE_DIR"] == str(get_audio_cache_dir())
         assert env["HERMES_DOCUMENT_CACHE_DIR"] == str(get_document_cache_dir())
-        assert env["WHATSAPP_SEND_READ_RECEIPTS"] == "true"
+        assert env["MESSAGING_SEND_READ_RECEIPTS"] == "true"

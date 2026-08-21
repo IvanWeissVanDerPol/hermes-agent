@@ -1,7 +1,7 @@
 import path from 'path';
 import { existsSync, readFileSync } from 'fs';
 
-export function normalizeWhatsAppIdentifier(value) {
+export function normalizeMessagingIdentifier(value) {
   return String(value || '')
     .trim()
     .replace(/:.*@/, '@')
@@ -13,7 +13,7 @@ export function parseAllowedUsers(rawValue) {
   return new Set(
     String(rawValue || '')
       .split(',')
-      .map((value) => normalizeWhatsAppIdentifier(value))
+      .map((value) => normalizeMessagingIdentifier(value))
       .filter(Boolean)
   );
 }
@@ -26,15 +26,15 @@ function readMappingFile(sessionDir, identifier, suffix = '') {
 
   try {
     const parsed = JSON.parse(readFileSync(filePath, 'utf8'));
-    const normalized = normalizeWhatsAppIdentifier(parsed);
+    const normalized = normalizeMessagingIdentifier(parsed);
     return normalized || null;
   } catch {
     return null;
   }
 }
 
-export function expandWhatsAppIdentifiers(identifier, sessionDir) {
-  const normalized = normalizeWhatsAppIdentifier(identifier);
+export function expandMessagingIdentifiers(identifier, sessionDir) {
+  const normalized = normalizeMessagingIdentifier(identifier);
   if (!normalized) {
     return new Set();
   }
@@ -65,7 +65,7 @@ export function expandWhatsAppIdentifiers(identifier, sessionDir) {
 
 export function matchesAllowedUser(senderId, allowedUsers, sessionDir) {
   // Empty allowlist = NO ONE allowed (secure default, #8389).  Operators
-  // who want an open bot must set ``WHATSAPP_ALLOWED_USERS=*`` explicitly.
+  // who want an open bot must set ``MESSAGING_ALLOWED_USERS=*`` explicitly.
   // Previous behaviour (empty → return true) let any stranger DM the
   // bridge and trigger a Python-side pairing-code reply.
   if (!allowedUsers || allowedUsers.size === 0) {
@@ -77,7 +77,7 @@ export function matchesAllowedUser(senderId, allowedUsers, sessionDir) {
     return true;
   }
 
-  const aliases = expandWhatsAppIdentifiers(senderId, sessionDir);
+  const aliases = expandMessagingIdentifiers(senderId, sessionDir);
   for (const alias of aliases) {
     if (allowedUsers.has(alias)) {
       return true;

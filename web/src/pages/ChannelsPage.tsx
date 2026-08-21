@@ -31,7 +31,7 @@ import type {
   MessagingPlatformEnvVar,
   MessagingPlatformUpdate,
   TelegramOnboardingStartResponse,
-  WhatsAppOnboardingStartResponse,
+  MessagingOnboardingStartResponse,
 } from "@/lib/api";
 import { useModalBehavior } from "@/hooks/useModalBehavior";
 import { usePageHeader } from "@/contexts/usePageHeader";
@@ -120,12 +120,12 @@ function isTerminalTelegramOnboardingError(error: unknown): boolean {
   return /\b410\b/.test(message) && /\b(expired|claimed|gone)\b/i.test(message);
 }
 
-function isTerminalWhatsAppOnboardingError(error: unknown): boolean {
+function isTerminalMessagingOnboardingError(error: unknown): boolean {
   const message = error instanceof Error ? error.message : String(error);
   return /\b410\b/.test(message) && /\b(expired|gone)\b/i.test(message);
 }
 
-function normalizeWhatsAppMode(mode: unknown): "bot" | "self-chat" | null {
+function normalizeMessagingMode(mode: unknown): "bot" | "self-chat" | null {
   return mode === "bot" || mode === "self-chat" ? mode : null;
 }
 
@@ -619,8 +619,8 @@ export default function ChannelsPage() {
                     showToast={showToast}
                   />
                 )}
-                {platform.id === "whatsapp" && (
-                  <WhatsAppOnboardingPanel
+                {platform.id === "messaging" && (
+                  <MessagingOnboardingPanel
                     onChanged={load}
                     onRestartNeeded={() => setRestartNeeded(true)}
                     platform={platform}
@@ -637,7 +637,7 @@ export default function ChannelsPage() {
   );
 }
 
-function WhatsAppOnboardingPanel({
+function MessagingOnboardingPanel({
   onChanged,
   onRestartNeeded,
   platform,
@@ -651,10 +651,10 @@ function WhatsAppOnboardingPanel({
   showToast: (message: string, type: "success" | "error") => void;
 }) {
   const configuredMode = useMemo(
-    () => normalizeWhatsAppMode(platform.whatsapp_setup?.mode),
-    [platform.whatsapp_setup?.mode],
+    () => normalizeMessagingMode(platform.messaging_setup?.mode),
+    [platform.messaging_setup?.mode],
   );
-  const [setup, setSetup] = useState<WhatsAppOnboardingStartResponse | null>(
+  const [setup, setSetup] = useState<MessagingOnboardingStartResponse | null>(
     null,
   );
   const [qrDataUrl, setQrDataUrl] = useState("");
@@ -691,7 +691,7 @@ function WhatsAppOnboardingPanel({
 
     const poll = async () => {
       try {
-        const status = await api.getWhatsAppOnboardingStatus(setup.pairing_id);
+        const status = await api.getMessagingOnboardingStatus(setup.pairing_id);
         if (cancelled) return;
         setSetup(status);
         if (status.qr_payload && status.qr_payload !== setup.qr_payload) {
@@ -704,7 +704,7 @@ function WhatsAppOnboardingPanel({
           return;
         }
         if (status.status === "error") {
-          setError(status.error || "WhatsApp setup failed.");
+          setError(status.error || "Messaging setup failed.");
           setSetup(null);
           setQrDataUrl("");
           setPhase("idle");
@@ -717,14 +717,14 @@ function WhatsAppOnboardingPanel({
         const expiresAt = Date.parse(setup.expires_at);
         const expired =
           Number.isFinite(expiresAt) && Date.now() >= expiresAt;
-        if (isTerminalWhatsAppOnboardingError(pollError) || expired) {
+        if (isTerminalMessagingOnboardingError(pollError) || expired) {
           setSetup(null);
           setQrDataUrl("");
           setPhase("idle");
-          setError("WhatsApp QR setup expired. Start a new QR setup to try again.");
+          setError("Messaging QR setup expired. Start a new QR setup to try again.");
           return;
         }
-        setError(`Still waiting for WhatsApp. Retrying after: ${pollError}`);
+        setError(`Still waiting for Messaging. Retrying after: ${pollError}`);
         timeout = setTimeout(poll, 2000);
       }
     };
@@ -754,7 +754,7 @@ function WhatsAppOnboardingPanel({
     setError("");
     setQrDataUrl("");
     try {
-      const res = await api.startWhatsAppOnboarding({
+      const res = await api.startMessagingOnboarding({
         mode,
         allowed_users: allowedUsers,
       });
@@ -763,7 +763,7 @@ function WhatsAppOnboardingPanel({
         await updateQr(res.qr_payload);
       }
       if (res.status === "error") {
-        setError(res.error || "WhatsApp setup failed.");
+        setError(res.error || "Messaging setup failed.");
         setSetup(null);
         setPhase("idle");
       } else {
@@ -778,7 +778,7 @@ function WhatsAppOnboardingPanel({
   const cancel = async () => {
     if (setup) {
       try {
-        await api.cancelWhatsAppOnboarding(setup.pairing_id);
+        await api.cancelMessagingOnboarding(setup.pairing_id);
       } catch {
         /* local cleanup still wins */
       }
@@ -811,20 +811,20 @@ function WhatsAppOnboardingPanel({
     setPhase("applying");
     setError("");
     try {
-      const result = await api.applyWhatsAppOnboarding(setup.pairing_id, {
+      const result = await api.applyMessagingOnboarding(setup.pairing_id, {
         mode,
         allowed_users: allowedUsers,
       });
       resetSetup();
       if (result.restart_started) {
-        showToast("WhatsApp saved; gateway restarting…", "success");
+        showToast("Messaging saved; gateway restarting…", "success");
         setRestartNeeded(false);
         setTimeout(() => void onChanged(), 4000);
         void watchRestartOutcome();
       } else {
         onRestartNeeded();
         const detail = result.restart_error ? `: ${result.restart_error}` : "";
-        showToast(`WhatsApp saved; gateway restart failed${detail}`, "error");
+        showToast(`Messaging saved; gateway restart failed${detail}`, "error");
       }
       await onChanged();
     } catch (applyError) {
@@ -847,34 +847,34 @@ function WhatsAppOnboardingPanel({
         : "waiting";
   const setupHelp =
     phase === "connected" || phase === "applying"
-      ? "WhatsApp is linked but Hermes is not listening yet. Save and restart the gateway to finish setup."
+      ? "Messaging is linked but Hermes is not listening yet. Save and restart the gateway to finish setup."
       : setup?.status === "installing"
-        ? "Preparing the WhatsApp bridge. The QR code will appear here when it is ready."
+        ? "Preparing the Messaging bridge. The QR code will appear here when it is ready."
         : setup?.status === "starting"
-          ? "Starting the WhatsApp pairing bridge. The QR code will appear here when it is ready."
-          : "Open WhatsApp on your phone, then go to Linked Devices and scan from there. This QR is not a browser URL.";
+          ? "Starting the Messaging pairing bridge. The QR code will appear here when it is ready."
+          : "Open Messaging on your phone, then go to Linked Devices and scan from there. This QR is not a browser URL.";
   const linkedAccountLabel = setup?.account_phone
     ? `+${setup.account_phone}`
     : setup?.account_name || setup?.account_id || "";
   const linkedAccountDetail =
     setup?.account_phone || setup?.account_id
-      ? "This is the WhatsApp account Hermes is now logged into."
-      : "Hermes is logged into the WhatsApp account that scanned the QR code.";
+      ? "This is the Messaging account Hermes is now logged into."
+      : "Hermes is logged into the Messaging account that scanned the QR code.";
   const linkedAccountChatUrl = setup?.account_phone
-    ? `https://wa.me/${setup.account_phone}`
+    ? `tel:+${setup.account_phone}`
     : "";
   const messageInstruction =
     mode === "self-chat"
       ? "After the restart, open Message Yourself on the linked account and send Hermes a message."
-      : "After the restart, start a chat from another WhatsApp account with the linked account and send Hermes a message.";
-  const hasSavedAllowedUsers = Boolean(platform.whatsapp_setup?.allowed_users_set);
+      : "After the restart, start a chat from another Messaging account with the linked account and send Hermes a message.";
+  const hasSavedAllowedUsers = Boolean(platform.messaging_setup?.allowed_users_set);
   const pairingInstruction =
     mode === "self-chat" && !allowedUsers.trim()
       ? hasSavedAllowedUsers
-        ? "Hermes will keep the saved WhatsApp allowlist."
+        ? "Hermes will keep the saved Messaging allowlist."
         : "Self-chat mode will allow the linked account automatically when you save."
       : !allowedUsers.trim() && hasSavedAllowedUsers
-        ? "Hermes will keep the saved WhatsApp allowlist."
+        ? "Hermes will keep the saved Messaging allowlist."
         : "If no allowed numbers were entered, Hermes replies with a pairing code. Approve it from the dashboard Pairing page.";
 
   return (
@@ -892,7 +892,7 @@ function WhatsAppOnboardingPanel({
           </Button>
           {platform.configured && (
             <span className="text-xs text-muted-foreground">
-              Existing WhatsApp settings are configured.
+              Existing Messaging settings are configured.
             </span>
           )}
         </div>
@@ -922,9 +922,9 @@ function WhatsAppOnboardingPanel({
             </div>
           </div>
           <div className="grid min-w-0 flex-1 gap-1.5">
-            <Label htmlFor="whatsapp-allowed-users">Allowed WhatsApp numbers</Label>
+            <Label htmlFor="messaging-allowed-users">Allowed Messaging numbers</Label>
             <Input
-              id="whatsapp-allowed-users"
+              id="messaging-allowed-users"
               value={allowedUsers}
               onChange={(event) => setAllowedUsers(event.target.value)}
               disabled={phase === "waiting" || phase === "applying"}
@@ -968,7 +968,7 @@ function WhatsAppOnboardingPanel({
                     <div className="font-medium">
                       {linkedAccountLabel
                         ? `Linked as ${linkedAccountLabel}`
-                        : "WhatsApp device linked"}
+                        : "Messaging device linked"}
                     </div>
                     <div className="mt-1 text-muted-foreground">{linkedAccountDetail}</div>
                     <ol className="mt-3 list-decimal space-y-1 pl-5 text-muted-foreground">
@@ -1010,27 +1010,27 @@ function WhatsAppOnboardingPanel({
               {qrDataUrl ? (
                 <img
                   src={qrDataUrl}
-                  alt="WhatsApp setup QR code"
+                  alt="Messaging setup QR code"
                   className="h-60 w-60 bg-white p-2"
                 />
               ) : phase === "connected" || phase === "applying" ? (
                 <div className="flex h-60 w-60 flex-col items-center justify-center gap-2 border border-border bg-background/50 p-4 text-center">
                   <Badge tone="success">Linked</Badge>
                   <div className="text-sm text-muted-foreground">
-                    {linkedAccountLabel || "Existing WhatsApp session found"}
+                    {linkedAccountLabel || "Existing Messaging session found"}
                   </div>
                 </div>
               ) : (
                 <div className="flex h-60 w-60 flex-col items-center justify-center gap-3 border border-border bg-background/50 p-4 text-center">
                   <Spinner className="text-2xl" />
                   <div className="text-xs text-muted-foreground">
-                    Waiting for WhatsApp to provide a QR code…
+                    Waiting for Messaging to provide a QR code…
                   </div>
                 </div>
               )}
               {phase === "waiting" && (
                 <span className="text-center text-xs text-muted-foreground">
-                  Scan with WhatsApp Linked Devices, not the camera app.
+                  Scan with Messaging Linked Devices, not the camera app.
                 </span>
               )}
               <Button size="sm" ghost onClick={() => void cancel()}>

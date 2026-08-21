@@ -1651,9 +1651,9 @@ export const zh: Translations = {
       },
       SIGNAL_ACCOUNT: { label: '电话号码', help: '在 signal-cli 桥接中注册的号码。' },
       SIGNAL_ALLOWED_USERS: { label: '允许的 Signal 用户', help: '推荐。逗号分隔的 Signal 标识符。' },
-      WHATSAPP_ENABLED: { label: '启用 WhatsApp 桥接', help: '由下方开关自动设置。除非确知需要，否则请勿改动。' },
-      WHATSAPP_MODE: { label: '桥接模式' },
-      WHATSAPP_ALLOWED_USERS: { label: '允许的 WhatsApp 用户', help: '推荐。逗号分隔的电话号码或 WhatsApp ID。' }
+      MESSAGING_ENABLED: { label: '启用 Messaging 桥接', help: '由下方开关自动设置。除非确知需要，否则请勿改动。' },
+      MESSAGING_MODE: { label: '桥接模式' },
+      MESSAGING_ALLOWED_USERS: { label: '允许的 Messaging 用户', help: '推荐。逗号分隔的电话号码或 Messaging ID。' }
     },
     platformIntro: {
       telegram:
@@ -1664,7 +1664,7 @@ export const zh: Translations = {
       mattermost: '在你的 Mattermost 服务器上，创建机器人账户或个人访问令牌，然后在此粘贴服务器 URL 和令牌。',
       matrix: '用机器人账户登录你的 homeserver，然后复制访问令牌、用户 ID 和 homeserver URL。',
       signal: '在可访问的位置运行 signal-cli REST 桥接，然后把 Hermes 指向该 URL 和已注册的电话号码。',
-      whatsapp: '启动 Hermes 自带的 WhatsApp 桥接，首次运行时扫描二维码，然后启用该平台。',
+      messaging: '启动 Hermes 自带的 Messaging 桥接，首次运行时扫描二维码，然后启用该平台。',
       bluebubbles:
         '在装有 iMessage 的 Mac 上运行 BlueBubbles Server，暴露其 API，然后用服务器密码把 Hermes 指向该 URL。',
       homeassistant: '在 Home Assistant 中打开你的个人资料并创建长期访问令牌。把它连同你的 HA URL 一起粘贴到这里。',

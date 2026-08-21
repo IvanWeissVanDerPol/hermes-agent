@@ -129,7 +129,7 @@ LEGACY_AUTHOR_MAP = {
     "allenliang2022@users.noreply.github.com": "allenliang2022",  # PR #56932 test coverage folded into #56909 salvage (408 → retryable timeout)
     "m888.braun@hotmail.com": "ManniBr",  # PR #57417 partial salvage (gateway: fail-closed adapter resolution for unregistered secondary profiles)
     "poowis2011@hotmail.com": "Umi4Life",  # PR #47377 salvage (agent: emit one-shot fallback switch notice on successful fallback so gateway users see model/provider change; #35419)
-    "austin@openvm067.space": "austinlaw076",  # PR #57563 partial salvage (auth: lazy per-profile Anthropic OAuth file; gateway: whatsapp_cloud/line added to port-binding platform set)
+    "austin@openvm067.space": "austinlaw076",  # PR #57563 partial salvage (auth: lazy per-profile Anthropic OAuth file; gateway: messaging_cloud/line added to port-binding platform set)
     "sunsky.lau@gmail.com": "liuhao1024",  # PR #56993 salvage (gateway: process-level HERMES_HOME for pid/lock/status identity files; #56986)
     "roseycomanagement@roseyco.co.uk": "Roseyco-management",  # PR #63581 salvage (telegram: require getUpdates progress before polling is healthy; #63243, #63766)
     "nima20002000@users.noreply.github.com": "nima20002000",  # PR #36022/#36025 salvage (code-exec truncation metadata; achievements hover loop)
@@ -138,7 +138,7 @@ LEGACY_AUTHOR_MAP = {
     "jashlee+microsoft@microsoft.com": "s905060",  # PR #57943 salvage (photon: auto-reinstall stale sidecar node_modules when lockfile is newer than npm's install marker; #59169)
     "lohinth25@proton.me": "l0h1nth",  # PR #32210 salvage (mattermost: accept leading-space slash commands from mobile clients; #25184)
     "roseycomanagement@roseyco.co.uk": "arnispiekus",  # PR #63581 salvage (telegram: require getUpdates progress before polling is healthy; #63243)
-    "perkintahmaz50@gmail.com": "devatnull",  # PR #58704 salvage (whatsapp: native Baileys polls, clarify-as-poll, location pins, structured quoted replies, PTT/audio split, bridge_helpers extraction)
+    "perkintahmaz50@gmail.com": "devatnull",  # PR #58704 salvage (messaging: native Baileys polls, clarify-as-poll, location pins, structured quoted replies, PTT/audio split, bridge_helpers extraction)
     "tim@iteachyouai.com": "tjp2021",  # PR #4097 salvage (copilot: per-turn x-initiator header so user prompts bill as premium requests; #3040)
     "39274208+falkoro@users.noreply.github.com": "falkoro",  # PRs #58519/#58520 salvage (config: env-ref-aware load_config cache invalidation; auxiliary: honor auxiliary.<task>.base_url/api_key with explicit provider arg)
     "3723267+kevinrajaram@users.noreply.github.com": "kevinrajaram",  # PR #3850 salvage (gateway: add POSIX system dirs to PATH so launchctl/systemctl resolve under UV's minimal-PATH bundled Python; #3849)
@@ -149,7 +149,7 @@ LEGACY_AUTHOR_MAP = {
     "al3060388206@gmail.com": "ooiuuii",  # PR #58466/#58377 salvage (redact: fireworks fw-/fpk_ prefixes; telegram: redact bot tokens out of transport error strings). Also PR #58433 salvage (codex: accept recorded final_text when app-server omits turn/completed) and PR #58472 salvage (gateway: cap proxy SSE line buffer at 16MiB).
     "Jigoooo@users.noreply.github.com": "Jigoooo",  # PR #58474 salvage (auxiliary: fall back to token resolver when anthropic pool has no usable entry)
     "root@vmi3351581.contaboserver.net": "ostravajih",  # PR #58374 salvage (poolside: coerce integer finish_reason and tool_call id to strings)
-    "hello@sahil-shubham.in": "sahil-shubham",  # PR #58448 salvage (whatsapp_cloud: honor documented WHATSAPP_CLOUD_ALLOWED_USERS / ALLOW_ALL_USERS in the DM intake gate)
+    "hello@sahil-shubham.in": "sahil-shubham",  # PR #58448 salvage (messaging_cloud: honor documented MESSAGING_CLOUD_ALLOWED_USERS / ALLOW_ALL_USERS in the DM intake gate)
     "ahmet.tunc@gmail.com": "Ahmett101",  # PR #58445 salvage (profiles: allowlist default-export roots + preserve symlinks)
     "ignaciopastorsan@gmail.com": "IpastorSan",  # PR #63690 salvage (codex: rescue reasoning-only turns that die after 3 continuation attempts)
     "Ahmett101@users.noreply.github.com": "Ahmett101",  # PR #59455 salvage (background-review: guard summarize against list-shaped tool responses; #59437)
@@ -164,7 +164,7 @@ LEGACY_AUTHOR_MAP = {
     "louis@letsfive.io": "Mibayy",  # PR #3176 salvage (api-server: per-client model routing via model_routes)
     "jneeee@outlook.com": "jneeee",  # PR #3526 salvage (extra HTTP headers for LLM API calls via config.yaml)
     "ai-lab@foxmail.com": "CrazyBoyM",  # PR #55828 salvage (image_gen openai-codex: wire image-to-image / reference-image editing via Codex Responses input_image parts; magic-byte + read-guard + 25MB-cap + clamp-to-16 hardening)
-    "r0gersm1th@users.noreply.github.com": "r0gersm1th",  # PR #3219 salvage (whatsapp bridge: resolve LID sender IDs to phone numbers in the message payload so phone-based allowlists match; commit authored by collaborator r0gersm1th, PR by @ajmeese7)
+    "r0gersm1th@users.noreply.github.com": "r0gersm1th",  # PR #3219 salvage (messaging bridge: resolve LID sender IDs to phone numbers in the message payload so phone-based allowlists match; commit authored by collaborator r0gersm1th, PR by @ajmeese7)
     "louis@letsfive.io": "Mibayy",  # PR #3296 salvage (status: provider label honors config.yaml model.base_url, not just OPENAI_BASE_URL env)
     "me@keslerm.com": "keslerm",  # PR #3459 salvage (gateway: 'log' tool_progress mode — silent in chat, tool calls appended to ~/.hermes/logs/tool_calls.log via rotating handler; duplicate of #3458 by @dlkakbs who submitted 4 min earlier — both credited)
     "david.d.zhang@gmail.com": "Git-on-my-level",  # PR #3659 salvage (gateway: persist per-session /model overrides across gateway restarts)
@@ -1351,7 +1351,7 @@ LEGACY_AUTHOR_MAP = {
     "iamagenius00@users.noreply.github.com": "iamagenius00",
     "9219265+cresslank@users.noreply.github.com": "cresslank",
     "trevmanthony@gmail.com": "trevthefoolish",
-    "at828@proton.me": "ATran28",  # PR #77270 whatsapp bridge reconnect wedge fix
+    "at828@proton.me": "ATran28",  # PR #77270 messaging bridge reconnect wedge fix
     "ziliangpeng@users.noreply.github.com": "ziliangpeng",
     "ziliangdotme@gmail.com": "ziliangpeng",
     "centripetal-star@users.noreply.github.com": "centripetal-star",
@@ -1792,7 +1792,7 @@ LEGACY_AUTHOR_MAP = {
     "284216128+ephron-ren@users.noreply.github.com": "ephron-ren",  # PR #25358 salvage (MiMo reasoning echo-back)
     "96843562+freqyfreqy@users.noreply.github.com": "freqyfreqy",  # PR #25423 salvage (docs LSP worktree -> repo)
     "54306477+fu576@users.noreply.github.com": "fu576",  # PR #25369 salvage (api_mode not inherited cross-provider)
-    "258095375+kfa-ai@users.noreply.github.com": "kfa-ai",  # PR #25398 salvage (whatsapp quoted reply metadata)
+    "258095375+kfa-ai@users.noreply.github.com": "kfa-ai",  # PR #25398 salvage (messaging quoted reply metadata)
     "99181308+magic524@users.noreply.github.com": "magic524",  # PR #25361 salvage (QQBot reconnect loop)
     "9150277+PaTTeeL@users.noreply.github.com": "PaTTeeL",  # PR #25359 salvage (custom_providers in compression length)
     "1700913+pearjelly@users.noreply.github.com": "pearjelly",  # PR #25388 salvage (feishu ws connect override sync)

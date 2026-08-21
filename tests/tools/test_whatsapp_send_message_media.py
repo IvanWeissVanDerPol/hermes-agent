@@ -1,4 +1,4 @@
-"""WhatsApp media delivery for send_message (#19105).
+"""Messaging media delivery for send_message (#19105).
 
 Covers two layers:
 
@@ -16,7 +16,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from plugins.platforms.whatsapp.adapter import _bridge_media_type, _standalone_send
+from plugins.platforms.messaging.adapter import _bridge_media_type, _standalone_send
 
 
 # ---------------------------------------------------------------------------
@@ -127,7 +127,7 @@ def test_text_plus_mixed_media_routes_native_types():
         assert calls[0][1]["message"] == "hello"
         media_types = [c[1]["mediaType"] for c in calls if c[0].endswith("/send-media")]
         assert media_types == ["image", "video", "audio"]
-        # chat id normalized to a WhatsApp JID
+        # chat id normalized to a Messaging JID
         assert "@" in calls[0][1]["chatId"]
     finally:
         for p in (img, vid, voice):

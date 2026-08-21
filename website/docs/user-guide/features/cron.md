@@ -286,7 +286,7 @@ When scheduling jobs, you specify where the output goes:
 | `"discord"` | Discord home channel | Uses `DISCORD_HOME_CHANNEL` |
 | `"discord:#engineering"` | Specific Discord channel | By channel name |
 | `"slack"` | Slack home channel | |
-| `"whatsapp"` | WhatsApp home | |
+| `"messaging"` | Messaging home | |
 | `"signal"` | Signal | |
 | `"matrix"` | Matrix home room | |
 | `"mattermost"` | Mattermost home channel | |
@@ -369,7 +369,7 @@ Behaviour is **thread-preferred**, scoped to the job's origin chat:
   thread's session, so a reply in-thread continues with full context. A
   recurring job (e.g. a daily brief) opens a fresh thread per run, keeping each
   delivery's follow-up discussion isolated.
-- **DM-only platforms** (WhatsApp, Signal, SMS): no threads exist, so the brief
+- **DM-only platforms** (Messaging, Signal, SMS): no threads exist, so the brief
   is mirrored into the origin DM session instead — the DM itself is the
   continuation surface.
 

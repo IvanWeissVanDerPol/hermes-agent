@@ -22,9 +22,9 @@ from typing import Optional
 
 from gateway.config import Platform
 from gateway.session import SessionSource
-from gateway.whatsapp_identity import (
-    expand_whatsapp_aliases as _expand_whatsapp_auth_aliases,
-    normalize_whatsapp_identifier as _normalize_whatsapp_identifier,
+from gateway.messaging_identity import (
+    expand_messaging_aliases as _expand_messaging_auth_aliases,
+    normalize_messaging_identifier as _normalize_messaging_identifier,
 )
 
 
@@ -224,7 +224,7 @@ class GatewayAuthorizationMixin:
         """Whether the adapter for *platform* gates access at intake itself.
 
         Mirrors ``BasePlatformAdapter.enforces_own_access_policy``. Adapters
-        such as WeCom, Weixin, Yuanbao, QQBot, and WhatsApp evaluate their
+        such as WeCom, Weixin, Yuanbao, QQBot, and Messaging evaluate their
         documented ``dm_policy`` / ``group_policy`` / ``allow_from`` config before a
         message is dispatched to the gateway. The flag alone is NOT "already
         authorized": these adapters default to ``open``, which forwards every
@@ -507,8 +507,8 @@ class GatewayAuthorizationMixin:
         platform_env_map = {
             Platform.TELEGRAM: "TELEGRAM_ALLOWED_USERS",
             Platform.DISCORD: "DISCORD_ALLOWED_USERS",
-            Platform.WHATSAPP: "WHATSAPP_ALLOWED_USERS",
-            Platform.WHATSAPP_CLOUD: "WHATSAPP_CLOUD_ALLOWED_USERS",
+            Platform.MESSAGING: "MESSAGING_ALLOWED_USERS",
+            Platform.MESSAGING_CLOUD: "MESSAGING_CLOUD_ALLOWED_USERS",
             Platform.SLACK: "SLACK_ALLOWED_USERS",
             Platform.SIGNAL: "SIGNAL_ALLOWED_USERS",
             Platform.EMAIL: "EMAIL_ALLOWED_USERS",
@@ -534,8 +534,8 @@ class GatewayAuthorizationMixin:
         platform_allow_all_map = {
             Platform.TELEGRAM: "TELEGRAM_ALLOW_ALL_USERS",
             Platform.DISCORD: "DISCORD_ALLOW_ALL_USERS",
-            Platform.WHATSAPP: "WHATSAPP_ALLOW_ALL_USERS",
-            Platform.WHATSAPP_CLOUD: "WHATSAPP_CLOUD_ALLOW_ALL_USERS",
+            Platform.MESSAGING: "MESSAGING_ALLOW_ALL_USERS",
+            Platform.MESSAGING_CLOUD: "MESSAGING_CLOUD_ALLOW_ALL_USERS",
             Platform.SLACK: "SLACK_ALLOW_ALL_USERS",
             Platform.SIGNAL: "SIGNAL_ALLOW_ALL_USERS",
             Platform.EMAIL: "EMAIL_ALLOW_ALL_USERS",
@@ -653,7 +653,7 @@ class GatewayAuthorizationMixin:
                 if effective_policy == "allowlist":
                     # Trust allowlist intake only when the live adapter still
                     # allowlists this sender. Pairing revoke can clear
-                    # WHATSAPP_ALLOWED_USERS while a construction-time
+                    # MESSAGING_ALLOWED_USERS while a construction-time
                     # ``_allow_from`` snapshot would otherwise keep authorizing
                     # until restart; re-check when the adapter exposes a DM
                     # allowlist helper. Adapters without that helper keep the
@@ -751,17 +751,17 @@ class GatewayAuthorizationMixin:
         if "@" in user_id:
             check_ids.add(user_id.split("@")[0])
 
-        # WhatsApp (Baileys + Cloud): resolve phone↔LID / JID aliases so
+        # Messaging (Baileys + Cloud): resolve phone↔LID / JID aliases so
         # device-suffix and bare-phone allowlist entries match the same principal.
-        if source.platform in {Platform.WHATSAPP, Platform.WHATSAPP_CLOUD}:
+        if source.platform in {Platform.MESSAGING, Platform.MESSAGING_CLOUD}:
             normalized_allowed_ids = set()
             for allowed_id in allowed_ids:
-                normalized_allowed_ids.update(_expand_whatsapp_auth_aliases(allowed_id))
+                normalized_allowed_ids.update(_expand_messaging_auth_aliases(allowed_id))
             if normalized_allowed_ids:
                 allowed_ids = normalized_allowed_ids
 
-            check_ids.update(_expand_whatsapp_auth_aliases(user_id))
-            normalized_user_id = _normalize_whatsapp_identifier(user_id)
+            check_ids.update(_expand_messaging_auth_aliases(user_id))
+            normalized_user_id = _normalize_messaging_identifier(user_id)
             if normalized_user_id:
                 check_ids.add(normalized_user_id)
 
@@ -853,8 +853,8 @@ class GatewayAuthorizationMixin:
             platform_env_map = {
                 Platform.TELEGRAM: "TELEGRAM_ALLOWED_USERS",
                 Platform.DISCORD:  "DISCORD_ALLOWED_USERS",
-                Platform.WHATSAPP: "WHATSAPP_ALLOWED_USERS",
-                Platform.WHATSAPP_CLOUD: "WHATSAPP_CLOUD_ALLOWED_USERS",
+                Platform.MESSAGING: "MESSAGING_ALLOWED_USERS",
+                Platform.MESSAGING_CLOUD: "MESSAGING_CLOUD_ALLOWED_USERS",
                 Platform.SLACK:    "SLACK_ALLOWED_USERS",
                 Platform.SIGNAL:   "SIGNAL_ALLOWED_USERS",
                 Platform.EMAIL:    "EMAIL_ALLOWED_USERS",

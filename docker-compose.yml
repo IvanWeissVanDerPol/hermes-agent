@@ -63,6 +63,7 @@ services:
   dashboard:
     image: hermes-agent
     container_name: hermes-dashboard
+    pid: "service:gateway"
     restart: unless-stopped
     network_mode: host
     depends_on:
@@ -72,5 +73,23 @@ services:
     environment:
       - HERMES_UID=${HERMES_UID:-10000}
       - HERMES_GID=${HERMES_GID:-10000}
+      - HERMES_DASHBOARD_SESSION_TOKEN=We5OQwzTVaDti5UZChdxl9jKJwM0-LxAacWSZT6R1QI
     # Localhost-only. For remote access, tunnel via `ssh -L 9119:localhost:9119`.
     command: ["dashboard", "--host", "127.0.0.1", "--no-open"]
+  mem0:
+    image: mem0ai/mem0-server
+    container_name: mem0
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./mem0.env
+    environment:
+      - QDRANT_URL=http://38.9.96.179:6333
+      - QDRANT_COLLECTION=mem0
+      - EMBEDDER=fastembed
+      - EMBEDDING_MODEL=all-MiniLM-L6-v2
+      - LLM_PROVIDER=anthropic
+      - LLM_MODEL=claude-sonnet-4-6
+    volumes:
+      - ./mem0-history:/app/history

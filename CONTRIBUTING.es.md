@@ -76,7 +76,7 @@ Esto no es una barra de calidad — es una decisión de acoplamiento y mantenimi
 | **Git** | Con la extensión `git-lfs` instalada |
 | **Python 3.11–3.13** | uv lo instalará si falta |
 | **uv** | Gestor de paquetes Python rápido ([instalar](https://docs.astral.sh/uv/)) |
-| **Node.js 20+** | Opcional — necesario para herramientas de navegador y puente WhatsApp (coincide con los engines de `package.json` raíz) |
+| **Node.js 20+** | Opcional — necesario para herramientas de navegador y puente Messaging (coincide con los engines de `package.json` raíz) |
 
 ### Clonar e instalar
 
@@ -184,12 +184,12 @@ hermes-agent/
 │   ├── config.py                 # Resolución de configuración de plataformas
 │   ├── session.py                # Almacén de sesiones, prompts de contexto, políticas de reset
 │   └── platforms/                # Adaptadores de plataformas
-│       ├── telegram.py, discord_adapter.py, slack.py, whatsapp.py
+│       ├── telegram.py, discord_adapter.py, slack.py, messaging.py
 │
 ├── scripts/                  # Scripts del instalador y puente
 │   ├── install.sh                # Instalador Linux/macOS
 │   ├── install.ps1               # Instalador Windows PowerShell
-│   └── whatsapp-bridge/          # Puente WhatsApp Node.js (Baileys)
+│   └── messaging-bridge/          # Puente Messaging Node.js (Baileys)
 │
 ├── skills/                   # Habilidades incluidas (copiadas a ~/.hermes/skills/ en la instalación)
 ├── optional-skills/          # Habilidades opcionales oficiales (descubribles vía hub, no activadas por defecto)
@@ -212,7 +212,7 @@ hermes-agent/
 | `~/.hermes/state.db` | Base de datos de sesiones SQLite |
 | `~/.hermes/sessions/` | Índice de enrutamiento del gateway (`sessions.json`), migas de pan de solicitudes, transcripciones `*.jsonl` del gateway y (opcionalmente) snapshots JSON por sesión cuando `sessions.write_json_snapshots: true` está configurado. Los snapshots por sesión están desactivados por defecto; state.db es canónica. |
 | `~/.hermes/cron/` | Datos de trabajos programados |
-| `~/.hermes/whatsapp/session/` | Credenciales del puente WhatsApp |
+| `~/.hermes/messaging/session/` | Credenciales del puente Messaging |
 
 ---
 
@@ -567,12 +567,12 @@ Usamos [Conventional Commits](https://www.conventionalcommits.org/):
 | `refactor` | Reestructuración de código (sin cambio de comportamiento) |
 | `chore` | Build, CI, actualizaciones de dependencias |
 
-Alcances: `cli`, `gateway`, `tools`, `skills`, `agent`, `install`, `whatsapp`, `security`, etc.
+Alcances: `cli`, `gateway`, `tools`, `skills`, `agent`, `install`, `messaging`, `security`, etc.
 
 Ejemplos:
 ```
 fix(cli): prevenir bloqueo en save_config_value cuando el modelo es una cadena
-feat(gateway): añadir aislamiento de sesión multi-usuario de WhatsApp
+feat(gateway): añadir aislamiento de sesión multi-usuario de Messaging
 fix(security): prevenir inyección de shell en el piping de contraseña sudo
 test(tools): añadir tests unitarios para file_operations
 ```

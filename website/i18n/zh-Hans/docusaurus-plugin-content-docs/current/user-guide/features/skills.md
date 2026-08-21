@@ -111,7 +111,7 @@ platforms: [macos, linux]     # macOS and Linux
 
 当 skill 响应（或任何 agent 响应）包含指向媒体文件的裸绝对路径时——例如 `/home/user/screenshots/diagram.png`——gateway 会自动检测到它，将其从可见文本中剥离，并以原生方式将文件传递给用户的聊天界面（Telegram 图片、Discord 附件等），而不是在消息中留下原始路径。
 
-对于音频，`[[audio_as_voice]]` 指令会将音频文件提升为在支持该功能的平台（Telegram、WhatsApp）上的原生语音消息气泡。
+对于音频，`[[audio_as_voice]]` 指令会将音频文件提升为在支持该功能的平台（Telegram、Messaging）上的原生语音消息气泡。
 
 ### 强制文档式传递：`[[as_document]]`
 
