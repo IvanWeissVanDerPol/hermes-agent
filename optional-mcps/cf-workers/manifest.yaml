@@ -1,0 +1,69 @@
+# Nous-approved MCP catalog entry.
+# Presence in this directory = approval. Merged via PR review.
+#
+# Schema version 1.
+manifest_version: 1
+
+name: cf-workers
+description: Manage Cloudflare Workers, KV, D1, R2, DNS, and the rest of the Cloudflare API from Hermes (Code Mode remote server, OAuth).
+source: https://github.com/cloudflare/mcp
+
+# Cloudflare ships a remote MCP server at https://mcp.cloudflare.com/mcp using
+# the recommended Code Mode pattern: the ~2,500-endpoint OpenAPI spec lives on
+# the server, and the agent calls three tools (`docs`, `search`, `execute`)
+# against it. That collapses the surface from ~244k tokens (raw MCP) to
+# ~1,100 tokens — see the upstream token comparison table.
+#
+# Hermes's MCP client + mcp_oauth_manager handle discovery, PKCE, token
+# exchange, and refresh — nothing to install locally.
+transport:
+  type: http
+  url: https://mcp.cloudflare.com/mcp
+
+auth:
+  type: oauth
+  # No `provider:` — this is native MCP OAuth (case 1), not a third-party
+  # provider like Google. The MCP client triggers the browser flow on the
+  # first probe / first connect. The user picks account + scope on the
+  # Cloudflare authorization page (which scopes map to API token scopes).
+
+# Tool selection at install time:
+# The Code Mode server exposes exactly three tools. All three are enabled by
+# default — they form one workflow (search the spec → call the endpoint),
+# and pruning any of them breaks the others. Users who want the raw per-
+# endpoint surface can disable Code Mode at the URL level with
+# `?codemode=false`, but that pulls ~244k tokens into context and isn't
+# what the catalog entry targets.
+tools:
+  default_enabled:
+    - docs
+    - search
+    - execute
+
+post_install: |
+  On first connection, Hermes will open a browser to authenticate with
+  Cloudflare. After auth, restart your Hermes session so the cf-workers
+  tools are loaded.
+
+  Re-run the tool checklist any time with:
+    hermes mcp configure cf-workers
+
+  Alternative — API token instead of OAuth (CI / headless / pinned scopes):
+  Create a Cloudflare API token at
+  https://dash.cloudflare.com/profile/api-tokens (with the scopes you
+  need; account tokens should include Account Resources : Read so the
+  server can auto-detect your account ID).
+
+  Then add the server with bearer-header auth — Hermes will prompt for
+  the token and save it to the active profile's .env:
+
+    hermes mcp add cf-workers-token \
+      --url 'https://mcp.cloudflare.com/mcp?codemode=false' \
+      --auth header
+
+  Tokens with Client IP Address Filtering are not currently supported by
+  the upstream server.
+
+  Note: ?codemode=false registers one tool per Cloudflare API endpoint
+  (~2,500) and pulls ~244k tokens into context. Only use it when you need
+  composition with another Code Mode system.
