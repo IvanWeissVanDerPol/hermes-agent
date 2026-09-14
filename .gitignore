@@ -1,0 +1,54 @@
+# === Canonical operator .gitignore (Hermes 2026-09-14) ===
+# Installed as the standard .env hardening for all repos across this operator.
+# See /opt/data/.gitignore_global for the canonical version (hermes user level).
+
+# Secrets — block ALL of these by default
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+secrets.json
+secrets.yaml
+secrets.yml
+credentials.json
+service-account*.json
+*.keystore
+*.jks
+*.htpasswd
+.netrc
+.gcloud/
+.aws/
+.azure/
+.gh-token
+
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+.venv/
+venv/
+
+# Node
+node_modules/
+
+# Build artifacts
+dist/
+build/
+.next/
+
+# Databases
+*.sqlite3
+*.db
+
+# Local-only
+.DS_Store
+Thumbs.db
+*.swp
+.vscode/
+.idea/
+
+# === End canonical section ===
