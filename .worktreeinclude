@@ -1,0 +1,17 @@
+# Files to copy into every new worktree (hermes worktree sync).
+# Without these, sessions can't run (missing .env) or take forever (.venv/).
+.env
+.envrc
+.worktreeinclude
+.gitignore
+.python-version
+.heartbeat
+.thesis_heartbeat
+.kanban-state.json
+.claude/
+.cursor/
+.github/
+.venv/
+node_modules/
+__pycache__/
+.venv313/
