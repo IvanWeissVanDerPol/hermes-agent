@@ -28,10 +28,16 @@
 #
 services:
   gateway:
-    build: .
-    image: hermes-agent
+    image: nousresearch/hermes-agent:v0.22.7
     container_name: hermes
     restart: unless-stopped
+    # 2026-11-02: 5g -> 4g. The gateway RSS leak grows to 1.1G+/day and starved the
+    # 8G host (swap 100%%, dashboard OOM loop 2026-10-27). 4g + the orphan reaper
+    # forces reclaim of leaked sessions instead of eating the host.
+    mem_limit: 3584m
+    cpus: 1.25
+    cpu_shares: 1024
+    memswap_limit: 6g
     network_mode: host
     volumes:
       - ~/.hermes:/opt/data
@@ -61,7 +67,7 @@ services:
     command: ["gateway", "run"]
 
   dashboard:
-    image: hermes-agent
+    image: nousresearch/hermes-agent:v0.22.7
     container_name: hermes-dashboard
     restart: unless-stopped
     network_mode: host
@@ -72,5 +78,15 @@ services:
     environment:
       - HERMES_UID=${HERMES_UID:-10000}
       - HERMES_GID=${HERMES_GID:-10000}
+      - HERMES_DASHBOARD_SESSION_TOKEN=${HERMES_DASHBOARD_SESSION_TOKEN:-}
     # Localhost-only. For remote access, tunnel via `ssh -L 9119:localhost:9119`.
     command: ["dashboard", "--host", "127.0.0.1", "--no-open"]
+    # 2026-10-23: cap dashboard memory so a leak can never starve the host.
+    # The host (8 GB) was being OOM-killed, killing this container in a loop
+    # (exit 137) before the old 2.5 GB watchdog threshold could fire.
+    # 2026-11-01: 1536m was too small once the agent loaded 29 MCP servers
+    # (steady state ~1.8 GB): the cgroup OOM-killed the dashboard (exit 137)
+    # every ~80s and Docker restarted it, so the upstream never stayed up.
+    mem_limit: ${HERMES_DASHBOARD_MEM_LIMIT:-5120m}
+    cpu_shares: 2048
+    memswap_limit: ${HERMES_DASHBOARD_MEMSWAP_LIMIT:-5120m}
